@@ -1,4 +1,4 @@
-# placeholder
+# name_this_shit
 Combination of the good parts of DAP and package_compare. Clearly the name is, 
 well, a placeholder.
 

@@ -2,12 +2,17 @@
 Combination of the good parts of DAP and package_compare. Clearly the name is, 
 well, a placeholder.
 
-**klab.process** is the only python package currently migrated. Will also include:
- * NCBI data and code
- * ref package validation
- * other stuff from DAP
+## Migrated packages
+ * **klab.process**
+    - NCBI data and code
+    - ref package validation
+    - other stuff from DAP
+ * **cookbook** - one-off code that was useful for something and might be again
+    - mbari
+    - seastar
 
-Others will (probably) be:
+
+## Other packages (probably)
  * **klab.translation**
     - importers and exporters to communicate with third party software
  * **klab.workflow**
@@ -19,6 +24,3 @@ Others will (probably) be:
     - bar
     - scatter
     - heatmap
- * **cookbook** (hatchet_job?)
-    - one off code that might be useful for something
-

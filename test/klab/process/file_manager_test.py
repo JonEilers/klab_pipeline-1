@@ -1,6 +1,6 @@
 import unittest
 
-import klab.processing.file_manager as file_manager
+import klab.process.file_manager as file_manager
 
 
 class TestFileManager(unittest.TestCase):

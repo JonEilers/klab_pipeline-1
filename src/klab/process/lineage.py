@@ -3,8 +3,8 @@ import argparse
 import os
 import pandas as pd
 
-from klab.processing.file_manager import read_df_from_file, write_df_to_file, CLASSIFICATION_COLUMN
-from klab.processing.derived_info import add_placement_type_column
+from klab.process.file_manager import read_df_from_file, write_df_to_file, CLASSIFICATION_COLUMN
+from klab.process.derived_info import add_placement_type_column
 
 
 ROOT_ID = 1

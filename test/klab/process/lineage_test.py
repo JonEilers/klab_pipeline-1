@@ -1,8 +1,8 @@
 import unittest
 import pandas as pd
 
-from klab.processing.file_manager import CLASSIFICATION_COLUMN
-import klab.processing.lineage as lineage
+from klab.process.file_manager import CLASSIFICATION_COLUMN
+import klab.process.lineage as lineage
 
 
 nodes_dict = {

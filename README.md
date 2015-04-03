@@ -10,6 +10,8 @@ well, a placeholder.
  * **cookbook** - one-off code that was useful for something and might be again
     - mbari
     - seastar
+ * **klab.analysis**  - the good stuff, what happens after processing
+    - diversity
 
 
 ## Other packages (probably)
@@ -17,8 +19,6 @@ well, a placeholder.
     - importers and exporters to communicate with third party software
  * **klab.workflow**
     - currently sort of working with Drake, need to improve with either make or scikit-bio
- * **klab.analysis** 
-    - diversity
  * **klab.plot** (graph?)
     - graphing routines to have some standards
     - bar

@@ -146,6 +146,6 @@ if __name__ == '__main__':
 
     create_placements(dir=args.directory, out_file=args.out_file)
 
-    # -d '/package_compare/test/data' -o '/package_compare/test/data/test_placements.tsv'
+    # -d '/placeholder/test/data' -o '/placeholder/test/data/test_placements.tsv'
     # -d '/data/2012_MBARI_COGs' -o '/shared_data/2012_placements.tsv'
     # -d '/data/2014_MBARI_COGs' -o '/shared_data/2014_placements.tsv'

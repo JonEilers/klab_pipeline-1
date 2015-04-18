@@ -2,6 +2,7 @@
 import argparse
 import os
 import pandas as pd
+import subprocess
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file, CLASSIFICATION_COLUMN
 from klab.process.derived_info import add_placement_type_column
@@ -101,6 +102,9 @@ def add_name_column(df, id_column, name_column, name_dict, deleted_list):
 
 
 def create_taxonomy_data_structures(dir):
+    return_code = subprocess.call(dir + "/get_ncbi_data.sh", shell=True)
+    if return_code != 0:
+        raise Exception('Problem getting NCBI data.')
     node_dict = _build_dict_from_file(os.path.join(dir, 'nodes.tsv'))
     name_dict = _build_dict_from_file(os.path.join(dir, 'names.tsv'))
     name_dict[MISSING_ID] = NO_MATCH  # better to add here than make a special case in code
@@ -141,6 +145,6 @@ if __name__ == '__main__':
     p = read_df_from_file(args.placement_file)
     create_lineage(ncbi_dir=args.ncbi_directory, placements=p, out_file=args.out_file)
 
-    # -n '/package_compare/src/ncbi_data' -p '/package_compare/test/data/test_placements.tsv' -o '/package_compare/test/data/test_placements_with_lineage.tsv'
+    # -n '/placeholder/src/data' -p '/placeholder/test/data/test_placements.tsv' -o '/placeholder/test/data/test_placements_with_lineage.tsv'
     # -n '/package_compare/src/ncbi_data' -p '/shared_data/2014_placements.tsv' -o '/shared_data/2014_placements_with_lineage.tsv'
     # -n '/package_compare/src/ncbi_data' -p '/shared_data/2012_placements.tsv' -o '/shared_data/2012_placements_with_lineage.tsv'

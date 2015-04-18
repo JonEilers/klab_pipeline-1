@@ -4,21 +4,20 @@ well, a placeholder.
 
 ## Migrated packages
  * **klab.process**
-    - NCBI data and code
     - ref package validation
     - other stuff from DAP
+ * **klab.analysis** - the good stuff, what happens after processing
+    - diversity
+ * **data**
+    - NCBI data and code
  * **cookbook** - one-off code that was useful for something and might be again
     - mbari
     - seastar
- * **klab.analysis**  - the good stuff, what happens after processing
-    - diversity
 
 
 ## Other packages (probably)
  * **klab.translation**
     - importers and exporters to communicate with third party software
- * **klab.workflow**
-    - currently sort of working with Drake, need to improve with either make or scikit-bio
  * **klab.plot** (graph?)
     - graphing routines to have some standards
     - bar

@@ -55,3 +55,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# specific files in project
+src/data/*.tsv
+src/data/ncbi_readme.txt

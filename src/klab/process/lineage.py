@@ -135,6 +135,12 @@ def create_lineage(ncbi_dir, placements, out_file=None):
     return df
 
 
+def path_contains(node_dict, tax_id, match_set):
+    lineage = _get_lineage(node_dict, tax_id)
+    intersection = list(set(lineage) & match_set)
+    return len(intersection) > 0
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-ncbi_directory', help='directory with NCBI data files', required=True)

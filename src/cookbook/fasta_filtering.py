@@ -27,7 +27,9 @@ if __name__ == '__main__':
     ncbi_dir = '../data'
     nodes, names, merged, deleted = create_taxonomy_data_structures(ncbi_dir)
 
-    filter_fasta_file(nodes, '/shared_projects/euk_fasta/18S.ref.fasta',
-                      '/shared_projects/euk_fasta/haptophyes.fasta', {2830})
-    filter_fasta_file(nodes, '/shared_projects/euk_fasta/18S.ref.fasta',
-                      '/shared_projects/euk_fasta/diatoms.fasta', {2836})
+    dir = '/shared_projects/euk_fasta/'
+    filter_fasta_file(nodes, dir + '18S.ref.fasta', dir + 'haptophyes.fasta', {2830})
+    filter_fasta_file(nodes, dir + '18S.ref.fasta', dir + 'diatoms.fasta', {2836})
+    filter_fasta_file(nodes, dir + '18S.ref.fasta', dir + 'greens.fasta', {3041})
+    filter_fasta_file(nodes, dir + '18S.ref.fasta', dir + 'dinos.fasta', {2864})
+    filter_fasta_file(nodes, dir + '18S.ref.fasta', dir + 'cryptophytes.fasta', {3027})

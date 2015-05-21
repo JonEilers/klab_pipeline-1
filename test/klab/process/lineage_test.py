@@ -115,8 +115,8 @@ class TestLineage(unittest.TestCase):
         self.assertEqual(7, df[CLASSIFICATION_COLUMN][1])
         self.assertEqual(50, df[CLASSIFICATION_COLUMN][2])
 
-    def test_path_contains(self):
-        self.assertFalse(lineage.path_contains(nodes_dict, 19, {5}))
-        self.assertTrue(lineage.path_contains(nodes_dict, 19, {2}))
-        self.assertTrue(lineage.path_contains(nodes_dict, 19, {2, 5}))
-        self.assertTrue(lineage.path_contains(nodes_dict, 9, {2, 5}))
+    def test_lineage_contains(self):
+        self.assertFalse(lineage.lineage_contains(nodes_dict, 19, {5}))
+        self.assertTrue(lineage.lineage_contains(nodes_dict, 19, {2}))
+        self.assertTrue(lineage.lineage_contains(nodes_dict, 19, {2, 5}))
+        self.assertTrue(lineage.lineage_contains(nodes_dict, 9, {2, 5}))

@@ -13,6 +13,7 @@ well, a placeholder.
  * **cookbook** - one-off code that was useful for something and might be again
     - mbari
     - seastar
+    - junk_drawer - Ryan's quick dump of DAP code, to be organized later
 
 
 ## Other packages (probably)

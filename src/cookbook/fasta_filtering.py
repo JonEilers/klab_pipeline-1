@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from Bio import SeqIO
+import string
 
 from klab.process.lineage import create_taxonomy_data_structures, lineage_contains
 
@@ -13,8 +14,8 @@ def filter_fasta_file(node_dict, name_dict, input_file, output_file, filter_set)
         tax_id = int(record.id.split('|')[0])
         if lineage_contains(node_dict, tax_id, filter_set):
             # replace id and description for easier visualization
-            record.id = str(tax_id)
-            record.description = '| ' + name_dict.get(tax_id)
+            record.id = str(tax_id) + '|' + string.replace(name_dict.get(tax_id), ' ', '_')
+            record.description = ''
             matching_sequences.append(record)
     input_handle.close()
 

@@ -43,7 +43,7 @@ def create_n_way_diversity_files(node_dict, placements, compare_column, path):
 
 if __name__ == '__main__':
     # load up the ncbi data
-    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('/package_compare/src/ncbi_data')
+    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('/placeholder/src/data')
 
     placements = read_df_from_file('/shared_projects/seastar/BM_refpkg_ssu_whole_enchilada.tsv')
     placements.rename(columns={'lowest_classification_name': CLASSIFICATION_NAME_COLUMN}, inplace=True)

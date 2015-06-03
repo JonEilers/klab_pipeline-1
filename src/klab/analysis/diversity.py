@@ -65,12 +65,12 @@ def build_similarity_frame(node_dict, abundance):
 
 
 if __name__ == '__main__':
-    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('/package_compare/src/ncbi_data')
+    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('/placeholder/src/data')
     placements = create_placements('/shared_projects/seastar/data/bm_ssu_analysis')
     add_name_column(placements, CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN, name_dict, deleted_list)
 
     abundance = group_and_count(placements, [CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN])
-    write_df_to_file(abundance, '/package_compare/test/diversity/abundance.tsv')
+    write_df_to_file(abundance, '/placeholder/test/diversity/abundance.tsv')
 
     similarity = build_similarity_frame(node_dict, abundance)
-    write_df_to_file(similarity, '/package_compare/test/diversity/similarity_matrix.tsv')
+    write_df_to_file(similarity, '/placeholder/test/diversity/similarity_matrix.tsv')

@@ -19,8 +19,3 @@ def add_mbari_size_column(df):
 def add_mbari_location_column(df):
     df['location'] = df.fragment_id.apply(lambda x: x.split('_')[1])
     return df
-
-
-def add_seastar_srr_column(df):
-    df['ncbi_srr'] = df.fragment_id.apply(lambda x: x.split('.')[0])
-    return df

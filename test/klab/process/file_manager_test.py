@@ -5,13 +5,13 @@ import klab.process.file_manager as file_manager
 
 class TestFileManager(unittest.TestCase):
     def test_read_df_from_file(self):
-        df = file_manager.read_df_from_file('/package_compare/test/data/test_data.tsv')
+        df = file_manager.read_df_from_file('/placeholder/test/data/test_data.tsv')
         self.assertEquals(7, len(df.index))
         self.assertEquals(9, len(df.columns))
 
 
     def test_build_data_frame_from_jplace_files(self):
-        df = file_manager._build_data_frame_from_jplace_files('/package_compare/test/data')
+        df = file_manager._build_data_frame_from_jplace_files('/placeholder/test/data')
 
         self.assertEquals(134, len(df.index))
         self.assertEquals(10, len(df.columns))
@@ -28,10 +28,10 @@ class TestFileManager(unittest.TestCase):
         self.assertAlmostEqual(0.002871, df.post_prob[0], 6)
 
     def test_classification_data_type_issue(self):
-        df = file_manager._build_data_frame_from_jplace_files('/package_compare/test/data')
+        df = file_manager._build_data_frame_from_jplace_files('/placeholder/test/data')
         self.assertEqual('object', str(df[file_manager.CLASSIFICATION_COLUMN].dtypes))
 
-        df2 = file_manager.create_placements('/package_compare/test/data')
+        df2 = file_manager.create_placements('/placeholder/test/data')
         self.assertEqual('int64', str(df2[file_manager.CLASSIFICATION_COLUMN].dtypes))
 
     # TODO ech 2015-03-09 - implement this

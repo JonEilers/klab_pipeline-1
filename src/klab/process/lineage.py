@@ -152,5 +152,5 @@ if __name__ == '__main__':
     create_lineage(ncbi_dir=args.ncbi_directory, placements=p, out_file=args.out_file)
 
     # -n '/placeholder/src/data' -p '/placeholder/test/data/test_placements.tsv' -o '/placeholder/test/data/test_placements_with_lineage.tsv'
-    # -n '/package_compare/src/ncbi_data' -p '/shared_data/2014_placements.tsv' -o '/shared_data/2014_placements_with_lineage.tsv'
-    # -n '/package_compare/src/ncbi_data' -p '/shared_data/2012_placements.tsv' -o '/shared_data/2012_placements_with_lineage.tsv'
+    # -n '/placeholder/src/data' -p '/shared_data/2014_placements.tsv' -o '/shared_data/2014_placements_with_lineage.tsv'
+    # -n '/placeholder/src/data' -p '/shared_data/2012_placements.tsv' -o '/shared_data/2012_placements_with_lineage.tsv'

@@ -12,7 +12,7 @@ def create_lineage_files(base):
     lineage_file = base + 'placements_with_lineage.tsv'
 
     p = create_placements(dir=jplace_dir)
-    l = create_lineage(ncbi_dir='/package_compare/src/ncbi_data', placements=p)
+    l = create_lineage(ncbi_dir='/placeholder/src/data', placements=p)
     add_mbari_size_column(l)
     add_mbari_location_column(l)
     write_df_to_file(l, lineage_file)
@@ -27,6 +27,7 @@ def create_and_write_count_files(lineage, grouping, path):
     write_df_to_file(confident_counts, path + 'count_confident.tsv')
 
 
+# ech 2015-03-07 - take the repetition out of rebuilding the mbari data for Robin
 def do_the_do(base):
     l = create_lineage_files(base)
 
@@ -37,10 +38,6 @@ def do_the_do(base):
                                      'location', 'placement_type'], base + 'classification_')
 
 
-# ech 2015-03-07 - take the repetition out of rebuilding the mbari data
 if __name__ == '__main__':
-    # do_the_do('/data/2014_MBARI_ssu_')
-    # do_the_do('/data/2014_MBARI_cluster_')
-    # do_the_do('/data/2014_MBARI_tigr_')
-    do_the_do('/data/2014_MBARI_cog_')
-
+    create_lineage_files('/data/2014_MBARI_cog_')
+    create_lineage_files('/data/2012_MBARI_cog_')

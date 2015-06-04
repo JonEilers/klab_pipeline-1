@@ -11,6 +11,7 @@ FUZZY = 'fuzzy'
 # This name can create some issues because 'count' is also a pandas function. Use df['count'] instead of df.count
 COUNT_COLUMN = 'count'
 
+
 # remove trailing/leading spaces, lowercase, replace internal spaces with '_'
 def standardize_column_headers(df):
     return df.rename(columns=lambda x: x.strip().lower().replace(' ', '_'), inplace=True)

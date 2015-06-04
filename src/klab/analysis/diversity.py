@@ -52,9 +52,9 @@ def _build_similarity_matrix(node_dict, abundance):
     for i in range(d):
         sm[i][i] = 1
         for j in range(i):
-            similarity = _calculate_similarity(ld, taxa_id_list[i], taxa_id_list[j])
-            sm[i][j] = similarity
-            sm[j][i] = similarity
+            sim = _calculate_similarity(ld, taxa_id_list[i], taxa_id_list[j])
+            sm[i][j] = sim
+            sm[j][i] = sim
     return sm, taxa_id_list,
 
 

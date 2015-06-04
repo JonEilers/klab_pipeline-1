@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import argparse
 import os
 import pandas as pd
@@ -6,7 +7,6 @@ import subprocess
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file, CLASSIFICATION_COLUMN
 from klab.process.derived_info import add_placement_type_column
-
 
 ROOT_ID = 1
 CELLULAR_ORGANISMS_ID = 131567

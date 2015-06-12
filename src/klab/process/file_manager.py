@@ -34,15 +34,15 @@ def _get_contents(file_name):
     return json_data
 
 
-def read_df_from_file(file_name):
+def read_df_from_file(file_name, low_memory=True):
     if not os.path.exists(file_name):
         raise Exception('File %s not found.' % file_name)
 
     ext = os.path.splitext(file_name)[1].lower()
     if ext == '.tsv':
-        return pd.read_table(file_name)
+        return pd.read_table(file_name, low_memory=low_memory)
     elif ext == '.csv':
-        return pd.read_csv(file_name)
+        return pd.read_csv(file_name, low_memory=low_memory)
     elif ext in ('.h5', '.hdf5'):
         # need PyTables et al for hdf5 storage
         return pd.read_hdf(file_name, 'table')

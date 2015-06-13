@@ -9,7 +9,7 @@ from klab.process.lineage import create_lineage
 
 # Robin specific requests
 
-def create_and_write_count_files(lineage, grouping, path):
+def create_count_files(lineage, grouping, path):
     c = group_and_count(lineage, grouping)
     fuzzy_counts = c[c.placement_type == FUZZY]
     confident_counts = c[c.placement_type == CONFIDENT]
@@ -20,13 +20,14 @@ def create_and_write_count_files(lineage, grouping, path):
 def create_mbari_files_for_robin(base):
     l = create_mbari_lineage_files(base)
 
-    create_and_write_count_files(l, ['cluster', 'domain_name', 'size', 'location', 'placement_type'], base + 'domain_')
-    create_and_write_count_files(l, ['cluster', 'domain_name', 'division_name', 'size', 'location', 'placement_type'],
-                                 base + 'division_')
-    create_and_write_count_files(l, ['cluster', 'domain_name', 'division_name', 'lowest_classification_name', 'size',
-                                     'location', 'placement_type'], base + 'classification_')
+    create_count_files(l, ['cluster', 'domain_name', 'size', 'location', 'placement_type'], base + 'domain_')
+    create_count_files(l, ['cluster', 'domain_name', 'division_name', 'size', 'location', 'placement_type'],
+                       base + 'division_')
+    create_count_files(l, ['cluster', 'domain_name', 'division_name', 'lowest_classification_name', 'size', 'location',
+                           'placement_type'], base + 'classification_')
 
 
+# 2015-06-12 ech - yup, it's grotty
 def get_top_level_folders(base):
     t = []
     for (dirpath, dirnames, filenames) in walk(base):
@@ -39,17 +40,23 @@ def get_top_level_folders(base):
 # If we do this more than occasionally we should rewrite lineage.py to accommodate 'one tsv per jplace'.
 def create_wdfw_placement_files_for_robin(base):
     for f in get_top_level_folders(base):
-        print base + f
+        path = base + f
+        print path + '_placements_with_lineage.tsv'
         p = create_placements(dir=base)
         l = create_lineage(ncbi_dir='/placeholder/src/data', placements=p)
-        write_df_to_file(l, base + '_placements_with_lineage.tsv')
+        write_df_to_file(l, path + '_placements_with_lineage.tsv')
+        # l = read_df_from_file(path + '_placements_with_lineage.tsv')
+        create_count_files(l, ['domain_name', 'placement_type'], path + '_domain_')
+        create_count_files(l, ['domain_name', 'division_name', 'placement_type'], path + '_division_')
+        create_count_files(l, ['domain_name', 'division_name', 'lowest_classification_name', 'placement_type'],
+                           path + '_classification_')
 
 
 if __name__ == '__main__':
     base = '/data/wdfw/'
-    # create_wdfw_placement_files_for_robin(base)
-    l = read_df_from_file('/data/wdfw/wdfw_placements_with_lineage.tsv')
-    # create_and_write_count_files(l, ['domain_name', 'placement_type'], base + '_domain_')
-    # create_and_write_count_files(l, ['domain_name', 'division_name', 'placement_type'], base + '_division_')
-    # create_and_write_count_files(l, ['domain_name', 'division_name', 'lowest_classification_name', 'placement_type'],
+    create_wdfw_placement_files_for_robin(base)
+    # l = read_df_from_file('/data/wdfw/wdfw_placements_with_lineage.tsv')
+    # create_count_files(l, ['domain_name', 'placement_type'], base + '_domain_')
+    # create_count_files(l, ['domain_name', 'division_name', 'placement_type'], base + '_division_')
+    # create_count_files(l, ['domain_name', 'division_name', 'lowest_classification_name', 'placement_type'],
     #                              base + '_classification_')

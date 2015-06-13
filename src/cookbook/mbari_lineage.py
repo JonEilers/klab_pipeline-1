@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from klab.process.derived_info import group_and_count, FUZZY, CONFIDENT
 from klab.process.file_manager import create_placements, write_df_to_file
 from klab.process.lineage import create_lineage
 
@@ -26,7 +25,7 @@ def _add_mbari_location_column(df):
     return df
 
 
-def create_lineage_files(base):
+def create_mbari_lineage_files(base):
     jplace_dir = base + 'analysis'
     lineage_file = base + 'placements_with_lineage.tsv'
 
@@ -38,25 +37,6 @@ def create_lineage_files(base):
     return l
 
 
-def create_and_write_count_files(lineage, grouping, path):
-    c = group_and_count(lineage, grouping)
-    fuzzy_counts = c[c.placement_type == FUZZY]
-    confident_counts = c[c.placement_type == CONFIDENT]
-    write_df_to_file(fuzzy_counts, path + 'count_fuzzy.tsv')
-    write_df_to_file(confident_counts, path + 'count_confident.tsv')
-
-
-# ech 2015-03-07 - take the repetition out of rebuilding the mbari data for Robin
-def do_the_do(base):
-    l = create_lineage_files(base)
-
-    create_and_write_count_files(l, ['cluster', 'domain_name', 'size', 'location', 'placement_type'], base + 'domain_')
-    create_and_write_count_files(l, ['cluster', 'domain_name', 'division_name', 'size', 'location', 'placement_type'],
-                                 base + 'division_')
-    create_and_write_count_files(l, ['cluster', 'domain_name', 'division_name', 'lowest_classification_name', 'size',
-                                     'location', 'placement_type'], base + 'classification_')
-
-
 if __name__ == '__main__':
-    create_lineage_files('/data/2014_MBARI_cog_')
-    create_lineage_files('/data/2012_MBARI_cog_')
+    create_mbari_lineage_files('/data/2014_MBARI_cog_')
+    create_mbari_lineage_files('/data/2012_MBARI_cog_')

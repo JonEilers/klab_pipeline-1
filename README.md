@@ -1,4 +1,4 @@
-# name_this_shit
+# klab_pipeline
 Combination of the good parts of DAP and package_compare. Clearly the name is, 
 well, a placeholder.
 

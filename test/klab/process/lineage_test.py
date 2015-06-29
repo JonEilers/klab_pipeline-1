@@ -103,10 +103,10 @@ class TestLineage(unittest.TestCase):
         self.assertEqual(56, lf.classification[2])
 
     def test_get_name_from_taxa_id(self):
-        self.assertEqual('bacteria', lineage._get_name_from_taxa_id(2, name_dict, del_list))
-        self.assertEqual(lineage.NO_NAME, lineage._get_name_from_taxa_id(89, name_dict, del_list))
-        self.assertEqual(lineage.DELETED_NAME, lineage._get_name_from_taxa_id(43, name_dict, del_list))
-        self.assertEqual(lineage.NO_MATCH, lineage._get_name_from_taxa_id(lineage.MISSING_ID, name_dict, del_list))
+        self.assertEqual('bacteria', lineage.get_name_from_taxa_id(2, name_dict, del_list))
+        self.assertEqual(lineage.NO_NAME, lineage.get_name_from_taxa_id(89, name_dict, del_list))
+        self.assertEqual(lineage.DELETED_NAME, lineage.get_name_from_taxa_id(43, name_dict, del_list))
+        self.assertEqual(lineage.NO_MATCH, lineage.get_name_from_taxa_id(lineage.MISSING_ID, name_dict, del_list))
 
     def test_update_classification_ids(self):
         df = pd.DataFrame(data=[5, 13, 30], columns=[CLASSIFICATION_COLUMN])

@@ -89,7 +89,7 @@ def _build_lineage_frame(node_dict, placements):
     return df
 
 
-def _get_name_from_taxa_id(tid, name_dict, deleted_list):
+def get_name_from_taxa_id(tid, name_dict, deleted_list):
     val = name_dict.get(tid, NO_NAME)
     if val == NO_NAME and tid in deleted_list:
         val = DELETED_NAME
@@ -97,7 +97,7 @@ def _get_name_from_taxa_id(tid, name_dict, deleted_list):
 
 
 def add_name_column(df, id_column, name_column, name_dict, deleted_list):
-    df[name_column] = df[id_column].apply(_get_name_from_taxa_id, args=(name_dict, deleted_list))
+    df[name_column] = df[id_column].apply(get_name_from_taxa_id, args=(name_dict, deleted_list))
     return df
 
 

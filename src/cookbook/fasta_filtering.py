@@ -22,7 +22,7 @@ def _turn_ncbi_name_into_file_name(ncbi_name):
     return s
 
 
-def filter_fasta_file(node_dict, name_dict, input_file, output_file, include, exclude):
+def _filter_fasta_file(node_dict, name_dict, input_file, output_file, include, exclude):
     # for big files want to not store in memory but use sequence generators to deal with single records at a time
     matching_sequences = []
     input_handle = open(input_file, 'rU')
@@ -61,7 +61,7 @@ def _split_fasta_file(ncbi_dir, input_file, output_dir, include_set, exclude_set
         # don't need exhaustively long names, so trim it at 15
         group_name = _turn_ncbi_name_into_file_name(get_name_from_taxa_id(group_id, names, deleted))[:15]
         out = cluster + '_' + group_name + '_' + str(group_id) + '.fasta'
-        filter_fasta_file(nodes, names, input_file, os.path.join(new_dir, out), {group_id}, exclude_set)
+        _filter_fasta_file(nodes, names, input_file, os.path.join(new_dir, out), {group_id}, exclude_set)
 
 
 if __name__ == '__main__':

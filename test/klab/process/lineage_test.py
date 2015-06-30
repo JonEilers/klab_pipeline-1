@@ -62,11 +62,11 @@ class TestLineage(unittest.TestCase):
         self.assertEqual(lineage.MISSING_ID_LIST, lineage._get_specific_taxonomy_levels(None))
 
     def test_get_lineage(self):
-        self.assertEqual([666], lineage._get_lineage(nodes_dict, 666))  # not in dictionary
-        self.assertEqual([1], lineage._get_lineage(nodes_dict, 1))  # root
-        self.assertEqual([131567], lineage._get_lineage(nodes_dict, 131567))  # cellular organisms
-        self.assertEqual([2], lineage._get_lineage(nodes_dict, 2))  # if not 131567 or 1, strip them off
-        self.assertEqual([2, 6, 7, 9, 56], lineage._get_lineage(nodes_dict, 56))
+        self.assertEqual([666], lineage.get_lineage(nodes_dict, 666))  # not in dictionary
+        self.assertEqual([1], lineage.get_lineage(nodes_dict, 1))  # root
+        self.assertEqual([131567], lineage.get_lineage(nodes_dict, 131567))  # cellular organisms
+        self.assertEqual([2], lineage.get_lineage(nodes_dict, 2))  # if not 131567 or 1, strip them off
+        self.assertEqual([2, 6, 7, 9, 56], lineage.get_lineage(nodes_dict, 56))
 
     def test_build_lineage_matrix_full(self):
         placements = pd.DataFrame([2, 6, 2, 6, 6, 56], columns=[CLASSIFICATION_COLUMN])
@@ -114,9 +114,3 @@ class TestLineage(unittest.TestCase):
         self.assertEqual(5, df[CLASSIFICATION_COLUMN][0])
         self.assertEqual(7, df[CLASSIFICATION_COLUMN][1])
         self.assertEqual(50, df[CLASSIFICATION_COLUMN][2])
-
-    def test_lineage_contains(self):
-        self.assertFalse(lineage.lineage_contains(nodes_dict, 19, {5}))
-        self.assertTrue(lineage.lineage_contains(nodes_dict, 19, {2}))
-        self.assertTrue(lineage.lineage_contains(nodes_dict, 19, {2, 5}))
-        self.assertTrue(lineage.lineage_contains(nodes_dict, 9, {2, 5}))

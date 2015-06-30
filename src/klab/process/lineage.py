@@ -59,7 +59,7 @@ def _get_specific_taxonomy_levels(taxonomy_list):
     return domain_division_class_ids + most_specific_id
 
 
-def _get_lineage(node_dict, leaf):
+def get_lineage(node_dict, leaf):
     parent_id = node_dict.get(leaf)
     lineage = [leaf]
     while parent_id and parent_id != CELLULAR_ORGANISMS_ID and parent_id != ROOT_ID:
@@ -72,7 +72,7 @@ def build_lineage_matrix(node_dict, placements, full_taxa=False):
     leaf_list = placements[CLASSIFICATION_COLUMN].unique()  # only build lineage for this set of placements
     lineage_matrix = []
     for leaf in leaf_list:
-        lineage = _get_lineage(node_dict, leaf)
+        lineage = get_lineage(node_dict, leaf)
         depth = len(lineage)
         if full_taxa:
             lineage_matrix.append(lineage)
@@ -133,12 +133,6 @@ def create_lineage(ncbi_dir, placements, out_file=None):
     if out_file:
         write_df_to_file(df, out_file)
     return df
-
-
-def lineage_contains(node_dict, tax_id, match_set):
-    lineage = _get_lineage(node_dict, tax_id)
-    intersection = list(set(lineage) & match_set)
-    return len(intersection) > 0
 
 
 if __name__ == '__main__':

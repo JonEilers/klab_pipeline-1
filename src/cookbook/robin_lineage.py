@@ -3,6 +3,8 @@
 #########################
 # Robin specific requests
 #########################
+import os
+import sys
 
 from klab.process.derived_info import group_and_count, FUZZY, CONFIDENT
 from klab.process.file_manager import write_df_to_file, create_placements
@@ -27,16 +29,22 @@ def create_mbari_files_for_robin(base):
                            'placement_type'], base + 'classification_')
 
 
-def create_wdfw_placement_files_for_robin(base):
-    p = create_placements(dir=base)
-    path = base + 'wdfw'
-    l = create_lineage(ncbi_dir='/placeholder/src/data', placements=p,
-                       out_file=path + '_placements_with_lineage.tsv')
-    create_count_files(l, ['domain_name', 'placement_type'], path + '_domain_')
-    create_count_files(l, ['domain_name', 'division_name', 'placement_type'], path + '_division_')
+def create_placement_files_for_robin(ncbi_dir, input_dir, output_dir):
+    p = create_placements(dir=input_dir)
+    l = create_lineage(ncbi_dir=ncbi_dir, placements=p,
+                       out_file=os.path.join(output_dir, 'placements_with_lineage.tsv'))
+    create_count_files(l, ['domain_name', 'placement_type'], os.path.join(output_dir, 'domain_'))
+    create_count_files(l, ['domain_name', 'division_name', 'placement_type'], os.path.join(output_dir, 'division_'))
     create_count_files(l, ['domain_name', 'division_name', 'lowest_classification_name', 'placement_type'],
-                       path + '_classification_')
+                       os.path.join(output_dir, 'classification_'))
 
 
 if __name__ == '__main__':
-    create_wdfw_placement_files_for_robin('/data/wdfw/')
+    # first argument is full path to directory where ncbi data files live
+    # second argument is full path to directory containing jplace files (finds them recursively)
+    # third argument is output directory
+    ncbi_dir = sys.argv[1]
+    input_dir = sys.argv[2]
+    output_dir = sys.argv[3]
+
+    create_placement_files_for_robin(ncbi_dir, input_dir, output_dir)

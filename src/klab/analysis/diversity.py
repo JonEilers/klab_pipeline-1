@@ -2,13 +2,13 @@
 
 from __future__ import division
 
-import numpy as np
 import pandas as pd
+
+import numpy as np
 
 from klab.process.derived_info import group_and_count
 from klab.process.file_manager import write_df_to_file, create_placements, CLASSIFICATION_COLUMN
 from klab.process.lineage import build_lineage_matrix, create_taxonomy_data_structures, add_name_column
-
 
 CLASSIFICATION_NAME_COLUMN = 'classification_name'
 
@@ -65,12 +65,12 @@ def build_similarity_frame(node_dict, abundance):
 
 
 if __name__ == '__main__':
-    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('/placeholder/src/data')
+    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('/klab_pipeline/src/data')
     placements = create_placements('/shared_projects/seastar/data/bm_ssu_analysis')
     add_name_column(placements, CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN, name_dict, deleted_list)
 
     abundance = group_and_count(placements, [CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN])
-    write_df_to_file(abundance, '/placeholder/test/diversity/abundance.tsv')
+    write_df_to_file(abundance, '/klab_pipeline/test/diversity/abundance.tsv')
 
     similarity = build_similarity_frame(node_dict, abundance)
-    write_df_to_file(similarity, '/placeholder/test/diversity/similarity_matrix.tsv')
+    write_df_to_file(similarity, '/klab_pipeline/test/diversity/similarity_matrix.tsv')

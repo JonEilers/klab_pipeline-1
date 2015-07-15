@@ -50,12 +50,12 @@ def read_df_from_file(file_name, low_memory=True):
         raise Exception('unknown file format')
 
 
-def write_df_to_file(df, file_name):
+def write_df_to_file(df, file_name, write_index=False):
     ext = os.path.splitext(file_name)[1].lower()
     if ext == '.tsv':
-        df.to_csv(file_name, index=False, sep='\t')
+        df.to_csv(file_name, index=write_index, sep='\t')
     elif ext == '.csv':
-        df.to_csv(file_name, index=False)
+        df.to_csv(file_name, index=write_index)
     elif ext in ('.h5', '.hdf5'):
         # need PyTables et al for hdf5 storage
         df.to_hdf(file_name, 'table')

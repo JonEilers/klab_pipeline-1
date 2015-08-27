@@ -16,15 +16,15 @@ def _get_and_clean_data(level):
     d = read_df_from_file('/data/MBARI_merged.tsv', low_memory=False)
 
     # rename for nicer ordering of graphs
-    d[level + '_name_14'][d[level + '_name_12'] == d[level + '_name_14']] = 'AAsame'
-    d[level + '_name_12'][d[level + '_name_12'] == 'None'] = 'zNone'
-    d[level + '_name_14'][d[level + '_name_14'] == 'None'] = 'zNone'
+    d['domain_name_14'][d[level + '_name_12'] == d[level + '_name_14']] = 'AAsame'
+    d['domain_name_12'][d['domain_name_12'] == 'None'] = 'zNone'
+    d['domain_name_14'][d['domain_name_14'] == 'None'] = 'zNone'
     return d
 
 
-def _massage_data(df, level):
+def _massage_data(df):
     # group, reshape and replace missing values
-    b = pd.DataFrame(df.groupby([level + '_name_12', level + '_name_14']).size())
+    b = pd.DataFrame(df.groupby(['domain_name_12', 'domain_name_14']).size())
     c = b.unstack()
     c.fillna(0, inplace=True)  # replace NaN
 
@@ -87,7 +87,7 @@ def _get_n_colors_in_hex(n=5):
 def _generate_spectrum_set_of_graphs(level):
     df = _get_and_clean_data(level)
 
-    d2 = _massage_data(df, level)
+    d2 = _massage_data(df)
 
     num_rows = len(d2.index)
     colors = _get_n_colors_in_hex(num_rows)
@@ -111,87 +111,87 @@ def _generate_domain_colored_set_of_graphs(level):
     colors = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
 
     t = 'all'
-    d2 = _massage_data(df, level)
-    data_file = '/shared_projects/MBARI/' + t + '_placements.csv'
+    d2 = _massage_data(df)
+    data_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements.csv'
     write_df_to_file(d2, data_file)
     title = t.title() + ' 2012 Placements to 2014'
-    plot_file = '/shared_projects/MBARI/' + t + '_placements_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, colors)
-    plot_file = '/shared_projects/MBARI/' + t + '_placements_scaled_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, colors, True)
 
     t = 'fuzzy'
     a = df[df['placement_type_12'] == t]
-    d2 = _massage_data(a, level)
-    data_file = '/shared_projects/MBARI/' + t + '_placements.csv'
+    d2 = _massage_data(a)
+    data_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements.csv'
     write_df_to_file(d2, data_file)
     title = t.title() + ' 2012 Placements to 2014'
-    plot_file = '/shared_projects/MBARI/' + t + '_placements_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, colors)
-    plot_file = '/shared_projects/MBARI/' + t + '_placements_scaled_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, colors, True)
 
     t = 'confident'
     a = df[df['placement_type_12'] == t]
-    d2 = _massage_data(a, level)
-    data_file = '/shared_projects/MBARI/' + t + '_placements.csv'
+    d2 = _massage_data(a)
+    data_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements.csv'
     write_df_to_file(d2, data_file)
     title = t.title() + ' 2012 Placements to 2014'
-    plot_file = '/shared_projects/MBARI/' + t + '_placements_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, colors)
-    plot_file = '/shared_projects/MBARI/' + t + '_placements_scaled_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, colors, True)
 
     t1 = 'confident'
     t2 = 'confident'
     a = df[df['placement_type_12'] == t1]
     a = a[a['placement_type_14'] == t2]
-    d2 = _massage_data(a, level)
-    data_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements.csv'
+    d2 = _massage_data(a)
+    data_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements.csv'
     write_df_to_file(d2, data_file)
     title = t1.title() + ' 2012 Placements to ' + t2.title() + ' 2014'
-    plot_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, colors)
-    plot_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, colors, True)
 
     t1 = 'confident'
     t2 = 'fuzzy'
     a = df[df['placement_type_12'] == t1]
     a = a[a['placement_type_14'] == t2]
-    d2 = _massage_data(a, level)
-    data_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements.csv'
+    d2 = _massage_data(a)
+    data_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements.csv'
     write_df_to_file(d2, data_file)
     title = t1.title() + ' 2012 Placements to ' + t2.title() + ' 2014'
-    plot_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, colors)
-    plot_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, colors, True)
 
     t1 = 'none'
     t2 = 'confident'
     a = df[df['placement_type_12'] == t1.title()]
     a = a[a['placement_type_14'] == t2]
-    d2 = _massage_data(a, level)
-    data_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements.csv'
+    d2 = _massage_data(a)
+    data_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements.csv'
     write_df_to_file(d2, data_file)
     title = 'No 2012 Placements to ' + t2.title() + ' 2014'
-    plot_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
-    plot_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, colors[1:], True)
 
     t1 = 'none'
     t2 = 'fuzzy'
     a = df[df['placement_type_12'] == t1.title()]
     a = a[a['placement_type_14'] == t2]
-    d2 = _massage_data(a, level)
-    data_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements.csv'
+    d2 = _massage_data(a)
+    data_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements.csv'
     write_df_to_file(d2, data_file)
     title = 'No 2012 Placements to ' + t2.title() + ' 2014'
-    plot_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
-    plot_file = '/shared_projects/MBARI/' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, colors[1:], True)
 
 
@@ -199,3 +199,5 @@ if __name__ == '__main__':
     # _generate_spectrum_set_of_graphs('domain')
     # _generate_spectrum_set_of_graphs('division')
     _generate_domain_colored_set_of_graphs('domain')
+    _generate_domain_colored_set_of_graphs('division')
+    _generate_domain_colored_set_of_graphs('lowest_classification')

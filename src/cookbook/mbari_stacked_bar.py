@@ -6,6 +6,7 @@ matplotlib.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 
 from matplotlib import pyplot as plt
 import pandas as pd
+import numpy as np
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file
 
@@ -237,6 +238,22 @@ def _new_and_lost_placements():
     _plot_data(data_file, plot_file, title, colors[1:], True)
 
 
+def _taxa_depth_histogram(df, field, title, color='green'):
+    s = df[field]
+    s[s == 'None'] = 0
+    depths = s.values.astype(np.float)
+
+    bins = range(0, 25, 1)
+    plt.hist(depths, bins=bins, facecolor=color, normed=1)
+
+    plt.xlabel(r'Taxa Depth')
+    plt.ylabel(r'Frequency')
+    plt.title(title)
+    plt.grid(True)
+
+    plt.savefig('/shared_projects/MBARI/' + field + '_histogram.pdf')
+
+
 if __name__ == '__main__':
     # _generate_spectrum_set_of_graphs('domain')
     # _generate_spectrum_set_of_graphs('division')
@@ -245,4 +262,9 @@ if __name__ == '__main__':
     # _generate_domain_colored_set_of_graphs('division')
     # _generate_domain_colored_set_of_graphs('class')
     # _generate_domain_colored_set_of_graphs('lowest_classification')
-    _new_and_lost_placements()
+
+    # _new_and_lost_placements()
+
+    d = read_df_from_file('/data/MBARI_merged.tsv', low_memory=False)
+    # _taxa_depth_histogram(d, 'taxa_depth_12', '2012')
+    _taxa_depth_histogram(d, 'taxa_depth_14', '2014', 'blue')

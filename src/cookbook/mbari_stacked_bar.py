@@ -102,23 +102,14 @@ def _generate_spectrum_set_of_graphs(level):
     _plot_data(data_file, plot_file, title, colors, True)
 
 
-def _generate_domain_colored_set_of_graphs(level):
+# not that interesting, as fuzzy contribution is swamped by confident
+# keep it around in case I drill down to it for some other reason
+def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     # TODO ech 2015-07-15 a lot of copy and paste, which maybe gets cleaned up if this becomes more standard
-
     df = _get_and_clean_data(level)
 
     # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
     colors = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
-
-    t = 'all'
-    d2 = _massage_data(df)
-    data_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = t.title() + ' 2012 Placements to 2014'
-    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors)
-    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors, True)
 
     t = 'fuzzy'
     a = df[df['placement_type_12'] == t]
@@ -195,9 +186,63 @@ def _generate_domain_colored_set_of_graphs(level):
     _plot_data(data_file, plot_file, title, colors[1:], True)
 
 
+def _generate_domain_colored_set_of_graphs(level):
+    df = _get_and_clean_data(level)
+
+    # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
+    colors = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
+
+    # all of specific level
+    t = 'all'
+    d2 = _massage_data(df)
+    data_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements.csv'
+    write_df_to_file(d2, data_file)
+    title = t.title() + ' 2012 Placements to 2014'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_bar.pdf'
+    _plot_data(data_file, plot_file, title, colors)
+    plot_file = '/shared_projects/MBARI/' + level + '_level_' + t + '_placements_scaled_bar.pdf'
+    _plot_data(data_file, plot_file, title, colors, True)
+
+    # where did new placements come from? redundant, as it is last column of above graphs
+    a = df[df['domain_name_12'] == 'zNone']
+    d2 = _massage_data(a)
+    data_file = '/shared_projects/MBARI/' + level + '_level_new_placements.csv'
+    write_df_to_file(d2, data_file)
+    title = 'New Placements 2014'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_new_placements_bar.pdf'
+    _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
+    plot_file = '/shared_projects/MBARI/' + level + '_level_new_placements_scaled_bar.pdf'
+    _plot_data(data_file, plot_file, title, colors[1:], True)
+
+    # where did placements get lost from?
+    a = df[df['domain_name_14'] == 'zNone']
+    d2 = _massage_data(a)
+    data_file = '/shared_projects/MBARI/' + level + '_level_lost_placements.csv'
+    write_df_to_file(d2, data_file)
+    title = 'Lost Placements 2014'
+    plot_file = '/shared_projects/MBARI/' + level + '_level_lost_placements_bar.pdf'
+    _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
+    plot_file = '/shared_projects/MBARI/' + level + '_level_lost_placements_scaled_bar.pdf'
+    _plot_data(data_file, plot_file, title, colors[1:], True)
+
+
+def _new_and_lost_placements():
+    # data file was hand constructed from two others
+    data_file = '/shared_projects/MBARI/domain_level/domain_level_lost_new_placements.csv'
+    title = 'New and Lost Placements by Domain'
+    colors = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
+    plot_file = '/shared_projects/MBARI/domain_level/domain_level_lost_new_placements_bar.pdf'
+    _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
+    plot_file = '/shared_projects/MBARI/domain_level/domain_level_lost_new_placements_scaled_bar.pdf'
+    _plot_data(data_file, plot_file, title, colors[1:], True)
+
+
 if __name__ == '__main__':
-    _generate_spectrum_set_of_graphs('domain')
-    _generate_spectrum_set_of_graphs('division')
+    # _generate_spectrum_set_of_graphs('domain')
+    # _generate_spectrum_set_of_graphs('division')
+
     # _generate_domain_colored_set_of_graphs('domain')
-    _generate_domain_colored_set_of_graphs('division')
+    # _generate_domain_colored_set_of_graphs('division')
+    # _generate_domain_colored_set_of_graphs('class')
     # _generate_domain_colored_set_of_graphs('lowest_classification')
+    _new_and_lost_placements()

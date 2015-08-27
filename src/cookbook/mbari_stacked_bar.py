@@ -22,9 +22,9 @@ def _get_and_clean_data(level):
     return d
 
 
-def _massage_data(df):
+def _massage_data(df, level='domain'):
     # group, reshape and replace missing values
-    b = pd.DataFrame(df.groupby(['domain_name_12', 'domain_name_14']).size())
+    b = pd.DataFrame(df.groupby([level + '_name_12', level + '_name_14']).size())
     c = b.unstack()
     c.fillna(0, inplace=True)  # replace NaN
 
@@ -87,11 +87,11 @@ def _get_n_colors_in_hex(n=5):
 def _generate_spectrum_set_of_graphs(level):
     df = _get_and_clean_data(level)
 
-    d2 = _massage_data(df)
+    d2 = _massage_data(df, level)
 
     num_rows = len(d2.index)
     colors = _get_n_colors_in_hex(num_rows)
-    colors.insert(0, '#bfbfbf')
+    colors.insert(0, '#bfbfbf')  # start with grey color for 'same' category
 
     data_file = '/shared_projects/MBARI/' + level + '_placements.csv'
     write_df_to_file(d2, data_file)
@@ -196,8 +196,8 @@ def _generate_domain_colored_set_of_graphs(level):
 
 
 if __name__ == '__main__':
-    # _generate_spectrum_set_of_graphs('domain')
-    # _generate_spectrum_set_of_graphs('division')
-    _generate_domain_colored_set_of_graphs('domain')
+    _generate_spectrum_set_of_graphs('domain')
+    _generate_spectrum_set_of_graphs('division')
+    # _generate_domain_colored_set_of_graphs('domain')
     _generate_domain_colored_set_of_graphs('division')
-    _generate_domain_colored_set_of_graphs('lowest_classification')
+    # _generate_domain_colored_set_of_graphs('lowest_classification')

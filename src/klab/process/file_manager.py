@@ -117,6 +117,7 @@ def _prune_unwanted_rows(df):
 
 
 # TODO ech 2015-02-13 - not sure how these are creeping into the 2012 data - build test with relevant files
+# TODO ech 2015-10-28 - don't actually see these in the 2012 data anymore
 # TODO ech 2015-02-14 - will need to deal with dups across clusters (KOGs & TIGRs, etc)
 def _fix_dup_problem_with_hack(df):
     # data_frame.sort(columns=['fragment_id', 'cluster', 'classification', 'like_weight_ratio'],
@@ -130,12 +131,12 @@ def _fix_dup_problem_with_hack(df):
 def create_placements(dir, out_file=None):
     raw_data = _build_data_frame_from_jplace_files(dir)
     pruned_data = _prune_unwanted_rows(raw_data)
-    deduped_data = _fix_dup_problem_with_hack(pruned_data)  # um, yeah....
+    # deduped_data = _fix_dup_problem_with_hack(pruned_data)
     # coerce CLASSIFICATION_COLUMN to int - will be needed later when matching
-    deduped_data[CLASSIFICATION_COLUMN] = deduped_data[CLASSIFICATION_COLUMN].astype(int)
+    pruned_data[CLASSIFICATION_COLUMN] = pruned_data[CLASSIFICATION_COLUMN].astype(int)
     if out_file:
-        write_df_to_file(deduped_data, out_file)
-    return deduped_data
+        write_df_to_file(pruned_data, out_file)
+    return pruned_data
 
 
 if __name__ == '__main__':
@@ -146,6 +147,6 @@ if __name__ == '__main__':
 
     create_placements(dir=args.directory, out_file=args.out_file)
 
-    # -d '/placeholder/test/data' -o '/placeholder/test/data/test_placements.tsv'
-    # -d '/data/2012_MBARI_COGs' -o '/shared_data/2012_placements.tsv'
-    # -d '/data/2014_MBARI_COGs' -o '/shared_data/2014_placements.tsv'
+    # -d 'data' -o 'data/test_placements.tsv'
+    # -d '/data/2012_MBARI_COGs' -o '/data/2012_placements.tsv'
+    # -d '/data/2014_MBARI_COGs' -o '/data/2014_placements.tsv'

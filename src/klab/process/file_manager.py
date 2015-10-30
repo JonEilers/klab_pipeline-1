@@ -12,7 +12,7 @@ except ImportError:
 CLASSIFICATION_COLUMN = 'classification'
 
 
-def _get_files(root_directory, extension='.jplace'):
+def get_files(root_directory, extension='.jplace'):
     filtered_files = []
     extension_length = len(extension)
     for root, subdirList, files in os.walk(os.path.abspath(root_directory)):
@@ -65,7 +65,7 @@ def write_df_to_file(df, file_name, write_index=False):
 
 def _build_data_frame_from_jplace_files(root):
     column_names = ['fragment_id', 'cluster']
-    files = _get_files(root)
+    files = get_files(root)
     if not files:
         raise Exception('No jplace files were found.')
 

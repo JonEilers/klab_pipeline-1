@@ -1,18 +1,19 @@
 # klab_pipeline
-Combination of the good parts of DAP and package_compare. Clearly the name is, 
-well, a placeholder.
+Combination of the good parts of DAP and package_compare.
 
 ## Migrated packages
  * **klab.process**
-    - ref package validation
-    - other stuff from DAP
+    - jplace files -> pandas data frames
+    - taxonmical lineage
+    - derived information (counts, confidence type)
  * **klab.analysis** - the good stuff, what happens after processing
     - diversity
+    - edpl 
  * **data**
-    - NCBI data and code
+    - NCBI data and code to fetch it
+* **lib**
+    - third party code    
  * **cookbook** - one-off code that was useful for something and might be again
-    - mbari
-    - seastar
     - **junk_drawer** - Ryan's quick dump of DAP code, to be organized later
 
 

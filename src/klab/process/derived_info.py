@@ -17,7 +17,6 @@ def standardize_column_headers(df):
     return df.rename(columns=lambda x: x.strip().lower().replace(' ', '_'), inplace=True)
 
 
-# Might use posterior probability metric instead of like weight ratio
 def add_placement_type_column(df, best_column='like_weight_ratio', next_best_column='next_best_lwr',
                               ci=CONFIDENCE_INTERVAL):
     df['placement_type'] = FUZZY

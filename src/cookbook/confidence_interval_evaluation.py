@@ -8,7 +8,6 @@ import pandas as pd
 from klab.process.derived_info import add_placement_type_column
 from klab.process.file_manager import read_df_from_file, write_df_to_file
 
-
 matplotlib.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 import matplotlib.pyplot as plt
 

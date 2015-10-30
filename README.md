@@ -4,7 +4,7 @@ Combination of the good parts of DAP and package_compare.
 ## Migrated packages
  * **klab.process**
     - jplace files -> pandas data frames
-    - taxonmical lineage
+    - taxonomical lineage
     - derived information (counts, confidence type)
  * **klab.analysis** - the good stuff, what happens after processing
     - diversity

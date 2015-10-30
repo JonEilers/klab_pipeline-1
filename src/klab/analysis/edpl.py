@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
 import argparse
+import os
 import subprocess
 
-from klab.process.file_manager import get_files
+import pandas as pd
+
+from klab.process.file_manager import get_files, write_df_to_file
 
 """
 Calculates Expected Distance between Placement Locations using pplacer guppy utility.
@@ -12,24 +15,25 @@ Inspired by Ryan's EDPL_calc.py
 """
 
 
-def calculate_edpl(out_file, dir):
-    jplace_file_list = get_files(dir)
+def calculate_edpl(root):
+    file_list = get_files(root_directory=root, extension='.jplace')
+    file_list.sort()
 
-    print ('%d files to run...' % len(jplace_file_list))
+    print ('%d files to run...' % len(file_list))
 
-    edpl_list = []
-    for jplace in jplace_file_list:
-        print ('processing %s...' % jplace)
+    data = []
+    for f in file_list:
+        print ('processing %s...' % f)
+        file_name = os.path.basename(f)
+        cluster = file_name.split('.')[0]  # name of cluster is first part of file name
+        edpl_out = subprocess.check_output(['guppy', 'edpl', f], stderr=subprocess.STDOUT)
+        for edpl in edpl_out.split('\n'):
+            if edpl:
+                row = [cluster]
+                row.extend(edpl.split())
+                data.append(row)
 
-        if jplace.split('.')[-1] == 'jplace':
-            gene = jplace.split('.')[0]
-            edpl_out = subprocess.check_output(['guppy', 'edpl', jplace], stderr=subprocess.STDOUT)
-            for edpl in edpl_out.split('\n'):
-                if edpl.replace(' ', '') != '':
-                    edpl_list.append(gene + ',' + ','.join(filter(None, edpl.split(' '))))
-    output = open(out_file, 'w')
-    output.write('\n'.join(edpl_list))
-    output.close()
+    return pd.DataFrame(data=data, columns=['cluster', 'id', 'edpl'])
 
 
 if __name__ == '__main__':
@@ -38,4 +42,5 @@ if __name__ == '__main__':
     parser.add_argument('-out_file', help='output file', required=True)
     args = parser.parse_args()
 
-    calculate_edpl(dir=args.directory, out_file=args.out_file)
+    df = calculate_edpl(root=args.directory)
+    write_df_to_file(df, args.out_file)

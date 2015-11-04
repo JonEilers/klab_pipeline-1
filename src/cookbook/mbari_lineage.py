@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-from klab.process.file_manager import create_placements, write_df_to_file
+import pandas as pd
+
+from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file
 from klab.process.lineage import create_lineage
 
 
@@ -25,12 +27,21 @@ def _add_mbari_location_column(df):
     return df
 
 
-def create_mbari_lineage_files(base):
+def _add_edpl_column(df, edpl_df):
+    return pd.merge(df, edpl_df, on=['fragment_id', 'cluster'], how='outer')
+
+
+def create_mbari_lineage_files(base, edpl=None):
     jplace_dir = base + 'analysis'
     lineage_file = base + 'placements_with_lineage.tsv'
 
     p = create_placements(dir=jplace_dir)
-    l = create_lineage(ncbi_dir='/placeholder/src/data', placements=p)
+    if edpl:
+        edpl = read_df_from_file(edpl)
+        p2 = _add_edpl_column(p, edpl)
+    else:
+        p2 = p
+    l = create_lineage(ncbi_dir='/Users/ehervol/Projects/WWU/klab_pipeline/src/data', placements=p2)
     _add_mbari_size_column(l)
     _add_mbari_location_column(l)
     write_df_to_file(l, lineage_file)
@@ -38,5 +49,7 @@ def create_mbari_lineage_files(base):
 
 
 if __name__ == '__main__':
-    create_mbari_lineage_files('/data/2014_MBARI_cog_')
-    create_mbari_lineage_files('/data/2012_MBARI_cog_')
+    create_mbari_lineage_files(base='/Users/ehervol/Projects/WWU/MBARI_data/2012_MBARI_cog_',
+                               edpl='/Users/ehervol/Projects/WWU/MBARI_data/2012_mbari_edpl.tsv')
+    create_mbari_lineage_files(base='/Users/ehervol/Projects/WWU/MBARI_data/2014_MBARI_cog_',
+                               edpl='/Users/ehervol/Projects/WWU/MBARI_data/2014_mbari_edpl.tsv')

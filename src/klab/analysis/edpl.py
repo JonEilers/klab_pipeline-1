@@ -33,7 +33,7 @@ def calculate_edpl(root):
                 row.extend(edpl.split())
                 data.append(row)
 
-    return pd.DataFrame(data=data, columns=['cluster', 'id', 'edpl'])
+    return pd.DataFrame(data=data, columns=['cluster', 'fragment_id', 'edpl'])
 
 
 if __name__ == '__main__':

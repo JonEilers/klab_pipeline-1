@@ -249,9 +249,28 @@ def _taxa_depth_histogram(df, field, title, color='green'):
     plt.xlabel(r'Taxa Depth')
     plt.ylabel(r'Frequency')
     plt.title(title)
+    plt.axis([0, 25, 0, 0.35])
     plt.grid(True)
 
-    plt.savefig('/shared_projects/MBARI/' + field + '_histogram.pdf')
+    plt.savefig('/Users/ehervol/Dropbox/shared_projects/MBARI/' + field + '_histogram.pdf')
+
+
+def _edpl_histogram(df, field, title, color='green'):
+    s = df[field]
+    s[s == 'None'] = 0
+    depths = s.values.astype(np.float)
+
+    bin_width = 0.01
+    bins = np.arange(0, 1 + bin_width, bin_width)
+    plt.hist(depths, bins=bins, facecolor=color, normed=1)
+
+    plt.xlabel(r'EDPL')
+    plt.ylabel(r'Frequency')
+    plt.title(title)
+    plt.axis([0, 1, 0, 45])
+    plt.grid(True)
+
+    plt.savefig('/Users/ehervol/Dropbox/shared_projects/MBARI/' + field + '_histogram.pdf')
 
 
 if __name__ == '__main__':
@@ -265,6 +284,8 @@ if __name__ == '__main__':
 
     # _new_and_lost_placements()
 
-    d = read_df_from_file('/data/MBARI_merged.tsv', low_memory=False)
-    # _taxa_depth_histogram(d, 'taxa_depth_12', '2012')
+    d = read_df_from_file('/Users/ehervol/Projects/WWU/MBARI_data//MBARI_merged.tsv', low_memory=False)
+    # _taxa_depth_histogram(d, 'taxa_depth_12', '2012', 'green')
     _taxa_depth_histogram(d, 'taxa_depth_14', '2014', 'blue')
+    # _edpl_histogram(d, 'edpl_12', '2012', 'green')
+    # _edpl_histogram(d, 'edpl_14', '2014', 'blue')

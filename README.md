@@ -11,7 +11,7 @@ Combination of the good parts of DAP and package_compare.
     - edpl 
  * **data**
     - NCBI data and code to fetch it
-* **lib**
+ * **lib**
     - third party code    
  * **cookbook** - one-off code that was useful for something and might be again
     - **junk_drawer** - Ryan's quick dump of DAP code, to be organized later

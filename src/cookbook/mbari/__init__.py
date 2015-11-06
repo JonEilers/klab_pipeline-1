@@ -1,4 +1,4 @@
-# directory where anaylsis goes
+# shared directory where analysis goes
 MBARI_ANALYSIS_DIR = '/Users/ehervol/Dropbox/shared_projects/MBARI/'
 
 # directory where big data files (jplace, etc) live

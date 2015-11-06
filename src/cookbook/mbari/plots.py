@@ -14,6 +14,9 @@ from lib.stacked_bar_graph import StackedBarGrapher
 
 MBARI_MERGED_FILE = MBARI_DATA_DIR + 'MBARI_merged.tsv'
 
+# ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
+DOMAIN_COLORS = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
+
 
 def _get_and_clean_data(level):
     d = read_df_from_file(MBARI_MERGED_FILE, low_memory=False)
@@ -111,9 +114,6 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     # TODO ech 2015-07-15 a lot of copy and paste, which maybe gets cleaned up if this becomes more standard
     df = _get_and_clean_data(level)
 
-    # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
-    colors = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
-
     t = 'fuzzy'
     a = df[df['placement_type_12'] == t]
     d2 = _massage_data(a)
@@ -121,9 +121,9 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     write_df_to_file(d2, data_file)
     title = t.title() + ' 2012 Placements to 2014'
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors, True)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
     t = 'confident'
     a = df[df['placement_type_12'] == t]
@@ -132,9 +132,9 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     write_df_to_file(d2, data_file)
     title = t.title() + ' 2012 Placements to 2014'
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors, True)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
     t1 = 'confident'
     t2 = 'confident'
@@ -145,9 +145,9 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     write_df_to_file(d2, data_file)
     title = t1.title() + ' 2012 Placements to ' + t2.title() + ' 2014'
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t1 + '_' + t2 + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors, True)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
     t1 = 'confident'
     t2 = 'fuzzy'
@@ -158,9 +158,9 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     write_df_to_file(d2, data_file)
     title = t1.title() + ' 2012 Placements to ' + t2.title() + ' 2014'
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t1 + '_' + t2 + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors, True)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
     t1 = 'none'
     t2 = 'confident'
@@ -171,9 +171,9 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     write_df_to_file(d2, data_file)
     title = 'No 2012 Placements to ' + t2.title() + ' 2014'
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t1 + '_' + t2 + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:])  # there are no 'Same' columns, so skip first color
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:], True)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
 
     t1 = 'none'
     t2 = 'fuzzy'
@@ -184,16 +184,13 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     write_df_to_file(d2, data_file)
     title = 'No 2012 Placements to ' + t2.title() + ' 2014'
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t1 + '_' + t2 + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:])  # there are no 'Same' columns, so skip first color
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:], True)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
 
 
 def _generate_domain_colored_set_of_graphs(level):
     df = _get_and_clean_data(level)
-
-    # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
-    colors = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
 
     # all of specific level
     t = 'all'
@@ -202,42 +199,19 @@ def _generate_domain_colored_set_of_graphs(level):
     write_df_to_file(d2, data_file)
     title = t.title() + ' 2012 Placements to 2014'
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
     plot_file = MBARI_ANALYSIS_DIR + level + '_level_' + t + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors, True)
-
-    # where did new placements come from? redundant, as it is last column of above graphs
-    a = df[df['domain_name_12'] == 'zNone']
-    d2 = _massage_data(a)
-    data_file = MBARI_ANALYSIS_DIR + level + '_level_new_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = 'New Placements 2014'
-    plot_file = MBARI_ANALYSIS_DIR + level + '_level_new_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
-    plot_file = MBARI_ANALYSIS_DIR + level + '_level_new_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:], True)
-
-    # where did placements get lost from?
-    a = df[df['domain_name_14'] == 'zNone']
-    d2 = _massage_data(a)
-    data_file = MBARI_ANALYSIS_DIR + level + '_level_lost_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = 'Lost Placements 2014'
-    plot_file = MBARI_ANALYSIS_DIR + level + '_level_lost_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
-    plot_file = MBARI_ANALYSIS_DIR + level + '_level_lost_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:], True)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
 
 def _new_and_lost_placements():
     # data file was hand constructed from two others
     data_file = MBARI_ANALYSIS_DIR + 'domain_level/domain_level_lost_new_placements.csv'
     title = 'New and Lost Placements by Domain'
-    colors = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
     plot_file = MBARI_ANALYSIS_DIR + 'domain_level/domain_level_lost_new_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:])  # there are no 'Same' columns, so skip first color
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:])  # there are no 'Same' columns, so skip first color
     plot_file = MBARI_ANALYSIS_DIR + 'domain_level/domain_level_lost_new_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors[1:], True)
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
 
 
 def _taxa_depth_histogram(df, field, title, color='green'):
@@ -257,20 +231,20 @@ def _taxa_depth_histogram(df, field, title, color='green'):
     plt.savefig(MBARI_ANALYSIS_DIR + field + '_histogram.pdf')
     plt.close()
 
-
+# TODO ech 2015-11-05 - change y axis to percent values
 def _edpl_histogram(df, field, title, color='green'):
     s = df[field]
     s[s == 'None'] = 0
     depths = s.values.astype(np.float)
 
-    bin_width = 0.01
+    bin_width = 0.02
     bins = np.arange(0, 1 + bin_width, bin_width)
     plt.hist(depths, bins=bins, facecolor=color, normed=1)
 
     plt.xlabel(r'EDPL')
     plt.ylabel(r'Percent')
     plt.title(title)
-    plt.axis([0, 1, 0, 45])
+    plt.axis([0, 1, 0, 25])
     plt.grid(True)
 
     plt.savefig(MBARI_ANALYSIS_DIR + field + '_histogram.pdf')
@@ -281,15 +255,14 @@ if __name__ == '__main__':
     # _generate_spectrum_set_of_graphs('domain')
     # _generate_spectrum_set_of_graphs('division')
 
-    # _generate_domain_colored_set_of_graphs('domain')
-    # _generate_domain_colored_set_of_graphs('division')
-    # _generate_domain_colored_set_of_graphs('class')
-    # _generate_domain_colored_set_of_graphs('lowest_classification')
+    _generate_domain_colored_set_of_graphs('domain')
+    _new_and_lost_placements()
+    _generate_domain_colored_set_of_graphs('division')
+    _generate_domain_colored_set_of_graphs('class')
+    _generate_domain_colored_set_of_graphs('lowest_classification')
 
-    # _new_and_lost_placements()
-
-    d = read_df_from_file(MBARI_MERGED_FILE, low_memory=False)
-    _taxa_depth_histogram(d, 'taxa_depth_12', '2012', 'green')
-    _taxa_depth_histogram(d, 'taxa_depth_14', '2014', 'blue')
-    _edpl_histogram(d, 'edpl_14', '2014', 'blue')
-    _edpl_histogram(d, 'edpl_12', '2012', 'green')
+    # d = read_df_from_file(MBARI_MERGED_FILE, low_memory=False)
+    # _taxa_depth_histogram(d, 'taxa_depth_12', '2012', 'green')
+    # _taxa_depth_histogram(d, 'taxa_depth_14', '2014', 'blue')
+    # _edpl_histogram(d, 'edpl_14', '2014', 'blue')
+    # _edpl_histogram(d, 'edpl_12', '2012', 'green')

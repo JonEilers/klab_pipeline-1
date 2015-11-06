@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 def confidence_interval_evaluation(df_file):
     df = read_df_from_file(df_file)
     d = []
-    n = 40
+    n = 25
     for i in range(1, n):
         interval = i / n
         add_placement_type_column(df=df, ci=interval)
@@ -59,6 +59,8 @@ def plot_confidence_interval_evaluation(df, image_file):
 
     plt.xlabel('confidence interval')
     fig.savefig(image_file)
+    plt.close(fig)
+    del fig
 
 
 if __name__ == '__main__':
@@ -69,4 +71,4 @@ if __name__ == '__main__':
     write_df_to_file(df, MBARI_ANALYSIS_DIR + 'confidence_interval_comparison.tsv')
 
     # df = read_df_from_file(MBARI_ANALYSIS_DIR + 'confidence_interval_comparison.tsv')
-    plot_confidence_interval_evaluation(df, MBARI_ANALYSIS_DIR + 'confidence_interval_comparison.png')
+    plot_confidence_interval_evaluation(df, MBARI_ANALYSIS_DIR + 'confidence_interval_comparison.pdf')

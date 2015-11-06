@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+from __future__ import division
+
 import matplotlib
+from matplotlib.ticker import FuncFormatter
 
 matplotlib.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 
@@ -8,7 +11,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 
-from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR
+from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR, COLOR_2012, COLOR_2014
 from klab.process.file_manager import read_df_from_file, write_df_to_file
 from lib.stacked_bar_graph import StackedBarGrapher
 
@@ -214,16 +217,25 @@ def _new_and_lost_placements():
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
 
 
-def _taxa_depth_histogram(df, field, title, color='green'):
+def _to_percent(y):
+    s = str(y * 100)
+    # The percent symbol needs escaping in latex
+    if matplotlib.rcParams['text.usetex'] is True:
+        return s + r'$\%$'
+    else:
+        return s + '%'
+
+
+def _taxa_depth_histogram(df, field, title, color):
     s = df[field]
     s[s == 'None'] = 0
-    depths = s.values.astype(np.float)
-
+    values = s.values.astype(np.float)
+    weights = np.zeros_like(values) + 1 / len(df.index)
     bins = range(0, 25, 1)
-    plt.hist(depths, bins=bins, facecolor=color, normed=1)
+    plt.hist(values, bins=bins, weights=weights, facecolor=color)
 
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(_to_percent))
     plt.xlabel(r'Taxa Depth')
-    plt.ylabel(r'Frequency')
     plt.title(title)
     plt.axis([0, 25, 0, 0.35])
     plt.grid(True)
@@ -231,20 +243,20 @@ def _taxa_depth_histogram(df, field, title, color='green'):
     plt.savefig(MBARI_ANALYSIS_DIR + field + '_histogram.pdf')
     plt.close()
 
-# TODO ech 2015-11-05 - change y axis to percent values
-def _edpl_histogram(df, field, title, color='green'):
+
+def _edpl_histogram(df, field, title, color):
     s = df[field]
     s[s == 'None'] = 0
-    depths = s.values.astype(np.float)
-
+    values = s.values.astype(np.float)
+    weights = np.zeros_like(values) + 1 / len(df.index)
     bin_width = 0.02
     bins = np.arange(0, 1 + bin_width, bin_width)
-    plt.hist(depths, bins=bins, facecolor=color, normed=1)
+    plt.hist(values, bins=bins, weights=weights, facecolor=color)
 
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(_to_percent))
     plt.xlabel(r'EDPL')
-    plt.ylabel(r'Percent')
     plt.title(title)
-    plt.axis([0, 1, 0, 25])
+    plt.axis([0, 1, 0, 0.5])
     plt.grid(True)
 
     plt.savefig(MBARI_ANALYSIS_DIR + field + '_histogram.pdf')
@@ -255,14 +267,14 @@ if __name__ == '__main__':
     # _generate_spectrum_set_of_graphs('domain')
     # _generate_spectrum_set_of_graphs('division')
 
-    _generate_domain_colored_set_of_graphs('domain')
-    _new_and_lost_placements()
-    _generate_domain_colored_set_of_graphs('division')
-    _generate_domain_colored_set_of_graphs('class')
-    _generate_domain_colored_set_of_graphs('lowest_classification')
+    # _generate_domain_colored_set_of_graphs('domain')
+    # _new_and_lost_placements()
+    # _generate_domain_colored_set_of_graphs('division')
+    # _generate_domain_colored_set_of_graphs('class')
+    # _generate_domain_colored_set_of_graphs('lowest_classification')
 
-    # d = read_df_from_file(MBARI_MERGED_FILE, low_memory=False)
-    # _taxa_depth_histogram(d, 'taxa_depth_12', '2012', 'green')
-    # _taxa_depth_histogram(d, 'taxa_depth_14', '2014', 'blue')
-    # _edpl_histogram(d, 'edpl_14', '2014', 'blue')
-    # _edpl_histogram(d, 'edpl_12', '2012', 'green')
+    d = read_df_from_file(MBARI_MERGED_FILE, low_memory=False)
+    _taxa_depth_histogram(d, 'taxa_depth_12', '2012', COLOR_2012)
+    _taxa_depth_histogram(d, 'taxa_depth_14', '2014', COLOR_2014)
+    _edpl_histogram(d, 'edpl_12', '2012', COLOR_2012)
+    _edpl_histogram(d, 'edpl_14', '2014', COLOR_2014)

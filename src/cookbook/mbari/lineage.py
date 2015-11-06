@@ -2,6 +2,7 @@
 
 import pandas as pd
 
+from cookbook.mbari import MBARI_DATA_DIR, NCBI_DATA_DIR
 from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file
 from klab.process.lineage import create_lineage
 
@@ -41,7 +42,7 @@ def create_mbari_lineage_files(base, edpl=None):
         p2 = _add_edpl_column(p, edpl)
     else:
         p2 = p
-    l = create_lineage(ncbi_dir='/Users/ehervol/Projects/WWU/klab_pipeline/src/data', placements=p2)
+    l = create_lineage(ncbi_dir=NCBI_DATA_DIR, placements=p2)
     _add_mbari_size_column(l)
     _add_mbari_location_column(l)
     write_df_to_file(l, lineage_file)
@@ -49,7 +50,5 @@ def create_mbari_lineage_files(base, edpl=None):
 
 
 if __name__ == '__main__':
-    create_mbari_lineage_files(base='/Users/ehervol/Projects/WWU/MBARI_data/2012_MBARI_cog_',
-                               edpl='/Users/ehervol/Projects/WWU/MBARI_data/2012_mbari_edpl.tsv')
-    create_mbari_lineage_files(base='/Users/ehervol/Projects/WWU/MBARI_data/2014_MBARI_cog_',
-                               edpl='/Users/ehervol/Projects/WWU/MBARI_data/2014_mbari_edpl.tsv')
+    create_mbari_lineage_files(base=MBARI_DATA_DIR + '2012_MBARI_cog_', edpl=MBARI_DATA_DIR + '2012_mbari_edpl.tsv')
+    create_mbari_lineage_files(base=MBARI_DATA_DIR + '2014_MBARI_cog_', edpl=MBARI_DATA_DIR + '2014_mbari_edpl.tsv')

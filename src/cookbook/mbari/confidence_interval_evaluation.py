@@ -5,6 +5,7 @@ from __future__ import division
 import matplotlib
 import pandas as pd
 
+from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR
 from klab.process.derived_info import add_placement_type_column
 from klab.process.file_manager import read_df_from_file, write_df_to_file
 
@@ -61,11 +62,11 @@ def plot_confidence_interval_evaluation(df, image_file):
 
 
 if __name__ == '__main__':
-    df2012 = confidence_interval_evaluation('/shared_data/2012_placements.tsv')
-    df2014 = confidence_interval_evaluation('/shared_data/2014_placements.tsv')
+    df2012 = confidence_interval_evaluation(MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage.tsv')
+    df2014 = confidence_interval_evaluation(MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage.tsv')
     # merge two data frames and save
     df = pd.merge(df2012, df2014, on='confidence_interval', how='outer', suffixes=('_12', '_14'))
-    write_df_to_file(df, '/shared_data/confidence_interval_comparison.tsv')
+    write_df_to_file(df, MBARI_ANALYSIS_DIR + 'confidence_interval_comparison.tsv')
 
-    # df = read_df_from_file('/shared_data/confidence_interval_comparison.tsv')
-    plot_confidence_interval_evaluation(df, '/shared_data/confidence_interval_comparison.png')
+    # df = read_df_from_file(MBARI_ANALYSIS_DIR + 'confidence_interval_comparison.tsv')
+    plot_confidence_interval_evaluation(df, MBARI_ANALYSIS_DIR + 'confidence_interval_comparison.png')

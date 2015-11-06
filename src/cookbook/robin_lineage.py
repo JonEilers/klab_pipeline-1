@@ -8,7 +8,7 @@ import sys
 
 from klab.process.derived_info import group_and_count, FUZZY, CONFIDENT
 from klab.process.file_manager import write_df_to_file, create_placements
-from cookbook.mbari_lineage import create_mbari_lineage_files
+from cookbook.mbari.lineage import create_mbari_lineage_files
 from klab.process.lineage import create_lineage
 
 

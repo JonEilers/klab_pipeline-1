@@ -264,8 +264,7 @@ def _create_side_by_side_histogram(bins, series1, series2, xlabel, title, file_n
         plt.xlim(xlim)
     plt.grid(True)
     _remove_top_right_lines_and_ticks()
-    plt.legend()
-    # plt.legend(loc=2)  # upper left
+    plt.legend(bbox_to_anchor=(0.9, 0.9))
 
     plt.savefig(MBARI_ANALYSIS_DIR + file_name)
     plt.close()

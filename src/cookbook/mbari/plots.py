@@ -246,13 +246,19 @@ def _remove_top_right_lines_and_ticks():
     plot.yaxis.set_ticks_position('left')
 
 
-def _create_side_by_side_histogram(bins, series1, series2, xlabel, title, file_name, xlim=None):
+def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_name, xlim=None, method='overlap'):
     values, weights = _get_values_and_weights(series1)
-    n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left', label='2012')
+    if method == 'overlap':
+        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor='b', label='2012', alpha=0.6)
+    else:
+        n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left', label='2012')
     # print n
     # print n.sum()
     values, weights = _get_values_and_weights(series2)
-    n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid', label='2014')
+    if method == 'overlap':
+        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor='r', label='2014', alpha=0.6)
+    else:
+        n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid', label='2014')
     # print n
     # print n.sum()
     # print '======='
@@ -273,7 +279,7 @@ def _create_side_by_side_histogram(bins, series1, series2, xlabel, title, file_n
 def _create_taxa_depth_histogram(df12, df14, domain_filter):
     bins = range(0, 25, 1)
     file_name = domain_filter.lower() + '_taxa_depth_histogram.pdf'
-    _create_side_by_side_histogram(bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
+    _create_comparison_histogram(bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
                                    title=domain_filter + r' Taxa Depth per Year', xlim=[0, 25], file_name=file_name)
 
 
@@ -281,7 +287,7 @@ def _create_edpl_histogram(df12, df14, domain_filter):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
     file_name = domain_filter.lower() + '_edpl_histogram.pdf'
-    _create_side_by_side_histogram(bins=bins, series1=df12.edpl, series2=df14.edpl,
+    _create_comparison_histogram(bins=bins, series1=df12.edpl, series2=df14.edpl,
                                    xlabel=r'Expected Distance between Placement Locations',
                                    title=domain_filter + r' EDPL per Year', xlim=[-0.02, 1], file_name=file_name)
 
@@ -290,7 +296,7 @@ def _create_lwr_histogram(df12, df14, domain_filter):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
     file_name = domain_filter.lower() + '_lwr_histogram.pdf'
-    _create_side_by_side_histogram(bins=bins, series1=df12.like_weight_ratio, series2=df14.like_weight_ratio,
+    _create_comparison_histogram(bins=bins, series1=df12.like_weight_ratio, series2=df14.like_weight_ratio,
                                    xlabel=r'Like Weight Ratio', title=domain_filter + r' LWR per Year',
                                    xlim=[0, 1], file_name=file_name)
 

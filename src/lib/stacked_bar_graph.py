@@ -158,12 +158,10 @@ class StackedBarGrapher:
         if showFirst != -1:
             showFirst = np.min([showFirst, np.shape(data)[0]])
             data_copy = np.copy(data[:showFirst]).transpose().astype('float')
-            data_shape = np.shape(data_copy)
             if heights is not None:
                 heights = heights[:showFirst]
             if widths is not None:
                 widths = widths[:showFirst]
-            showFirst = -1
         else:
             data_copy = np.copy(data).transpose()
         data_shape = np.shape(data_copy)
@@ -190,7 +188,6 @@ class StackedBarGrapher:
             data_stack /= data_stack[levels - 1]
             if heights is not None:
                 print "WARNING: setting scale and heights does not make sense."
-                heights = None
         elif heights is not None:
             data_copy /= data_stack[levels - 1]
             data_stack /= data_stack[levels - 1]
@@ -198,14 +195,14 @@ class StackedBarGrapher:
                 data_copy[:, i] *= heights[i]
                 data_stack[:, i] *= heights[i]
 
-                # ------------------------------------------------------------------------------
-            # ticks
+        # ------------------------------------------------------------------------------
+        # ticks
 
         if yTicks is not "none":
             # it is either a set of ticks or the number of auto ticks to make
             real_ticks = True
             try:
-                k = len(yTicks[1])
+                len(yTicks[1])
             except:
                 real_ticks = False
 
@@ -221,8 +218,8 @@ class StackedBarGrapher:
                     y_tick_labels = np.array([str(i) for i in y_ticks_at])
                 yTicks = (y_ticks_at, y_tick_labels)
 
-                # ------------------------------------------------------------------------------
-            # plot
+        # ------------------------------------------------------------------------------
+        # plot
 
         if edgeCols is None:
             edgeCols = ["none"] * len(cols)
@@ -287,15 +284,9 @@ class StackedBarGrapher:
 
 
 ###############################################################################
-###############################################################################
-###############################################################################
-###############################################################################
 
 if __name__ == '__main__':
     SBG = StackedBarGrapher()
     SBG.demo()
 
-###############################################################################
-###############################################################################
-###############################################################################
 ###############################################################################

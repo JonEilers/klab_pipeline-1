@@ -27,9 +27,9 @@ def _get_and_clean_data(level):
     d.fillna('None', inplace=True)
 
     # rename for nicer ordering of graphs
-    d['domain_name_14'][d[level + '_name_12'] == d[level + '_name_14']] = 'AAsame'
-    d['domain_name_12'][d['domain_name_12'] == 'None'] = 'zNone'
-    d['domain_name_14'][d['domain_name_14'] == 'None'] = 'zNone'
+    d.ix[d[level + '_name_12'] == d[level + '_name_14'], 'domain_name_14'] = 'AAsame'
+    d.ix[d['domain_name_12'] == 'None', 'domain_name_12'] = 'zNone'
+    d.ix[d['domain_name_14'] == 'None', 'domain_name_14'] = 'zNone'
     return d
 
 
@@ -45,9 +45,8 @@ def _massage_data(df, level='domain'):
     c.rename(columns={'AAsame': 'Same', 'top level': 'Top Level', 'zNone': 'New Placements'}, inplace=True)
 
     # clean up row names
-    c[''][c[''] == 'zNone'] = 'New Placements'
-    c[''][c[''] == 'top level'] = 'Top Level'
-
+    c.ix[c[''] == 'zNone', ''] = 'New Placements'
+    c.ix[c[''] == 'top level', ''] = 'Top Level'
     return c
 
 
@@ -243,45 +242,47 @@ def _remove_top_right_lines_and_ticks():
     plot.yaxis.set_ticks_position('left')
 
 
-def _create_taxa_depth_histogram(df):
-    bins = range(0, 25, 1)
-
-    values, weights = _get_values_and_weights(df['taxa_depth_12'])
+def _create_side_by_side_histogram(bins, series1, series2, xlabel, title, file_name, axes=None):
+    values, weights = _get_values_and_weights(series1)
     plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left', label='2012')
-    values, weights = _get_values_and_weights(df['taxa_depth_14'])
+    values, weights = _get_values_and_weights(series2)
     plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid', label='2014')
 
     plt.gca().yaxis.set_major_formatter(FuncFormatter(_to_percent))
-    plt.xlabel(r'Taxa Depth')
-    plt.title(r'Taxa Depth per Year')
-    plt.axis([0, 25, 0, 0.45])
+    plt.xlabel(xlabel)
+    plt.title(title)
+    if axes:
+        plt.axis(axes)
     plt.grid(True)
     _remove_top_right_lines_and_ticks()
     plt.legend()
+    # plt.legend(loc=2)  # upper left
 
-    plt.savefig(MBARI_ANALYSIS_DIR + 'taxa_depth_histogram.pdf')
+    plt.savefig(MBARI_ANALYSIS_DIR + file_name)
     plt.close()
+
+
+def _create_taxa_depth_histogram(df):
+    bins = range(0, 25, 1)
+    _create_side_by_side_histogram(bins=bins, series1=df.taxa_depth_12, series2=df.taxa_depth_14, xlabel=r'Taxa Depth',
+                                   title=r'Taxa Depth per Year', axes=[0, 25, 0, 0.45],
+                                   file_name='taxa_depth_histogram.pdf')
 
 
 def _create_edpl_histogram(df):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
+    _create_side_by_side_histogram(bins=bins, series1=df.edpl_12, series2=df.edpl_14,
+                                   xlabel=r'Expected Distance between Placement Locations',
+                                   title=r'EDPL per Year', axes=[-0.02, 1, 0, 0.45], file_name='edpl_histogram.pdf')
 
-    values, weights = _get_values_and_weights(df['edpl_12'])
-    plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left', label='2012')
-    values, weights = _get_values_and_weights(df['edpl_14'])
-    plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid', label='2014')
 
-    plt.gca().yaxis.set_major_formatter(FuncFormatter(_to_percent))
-    plt.xlabel(r'EDPL')
-    plt.title(r'EDPL per Year')
-    plt.axis([-0.02, 1, 0, 0.45])
-    plt.grid(True)
-    _remove_top_right_lines_and_ticks()
-    plt.legend()
-
-    plt.savefig(MBARI_ANALYSIS_DIR + 'edpl_histogram.pdf')
-    plt.close()
+def _create_lwr_histogram(df):
+    bin_width = 0.04
+    bins = np.arange(0, 1 + bin_width, bin_width)
+    _create_side_by_side_histogram(bins=bins, series1=df.like_weight_ratio_12, series2=df.like_weight_ratio_14,
+                                   xlabel=r'Like Weight Ratio', title=r'LWR per Year', axes=[0, 1, 0, 0.2],
+                                   file_name='lwr_histogram.pdf')
 
 
 if __name__ == '__main__':
@@ -297,3 +298,4 @@ if __name__ == '__main__':
     d = read_df_from_file(MBARI_MERGED_FILE, low_memory=False)
     _create_taxa_depth_histogram(d)
     _create_edpl_histogram(d)
+    _create_lwr_histogram(d)

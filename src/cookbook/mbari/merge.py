@@ -5,7 +5,7 @@ import pandas as pd
 from cookbook.mbari import MBARI_DATA_DIR
 from klab.process.file_manager import write_df_to_file, read_df_from_file
 
-TOP_LEVEL = 'Top Level'
+TOP_LEVEL = 'top level'  # start with a lower case letter to sort after domains when graphing
 
 
 def _merge_mbari_data():

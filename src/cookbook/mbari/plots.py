@@ -2,14 +2,14 @@
 
 from __future__ import division
 
+import pandas as pd
+import numpy as np
 import matplotlib
 from matplotlib.ticker import FuncFormatter
 
 matplotlib.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 
 from matplotlib import pyplot as plt
-import pandas as pd
-import numpy as np
 
 from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR, COLOR_2012, COLOR_2014
 from klab.process.file_manager import read_df_from_file, write_df_to_file
@@ -94,10 +94,14 @@ def _get_n_colors_in_hex(n=5):
 
 
 # uses spectrum of colors at a greater level of detail
-def _generate_spectrum_set_of_graphs(level):
+def _generate_euk_spectrum_set_of_graphs(level):
     df = _get_and_clean_data(level)
+    t1 = 'Eukaryota'
+    t2 = 'Eukaryota'
+    a = df[df['domain_name_12'] == t1]
+    a = a[a['domain_name_14'] == t2]
 
-    d2 = _massage_data(df, level)
+    d2 = _massage_data(a, level)
 
     num_rows = len(d2.index)
     colors = _get_n_colors_in_hex(num_rows)
@@ -105,7 +109,7 @@ def _generate_spectrum_set_of_graphs(level):
 
     data_file = MBARI_ANALYSIS_DIR + level + '_placements.csv'
     write_df_to_file(d2, data_file)
-    title = level.title() + ' 2012 to 2014 Placements'
+    title = 'Eukaryota ' + level.title() + ' 2012 to 2014 Placements'
     plot_file = MBARI_ANALYSIS_DIR + level + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, colors)
     plot_file = MBARI_ANALYSIS_DIR + level + '_placements_scaled_bar.pdf'
@@ -242,17 +246,22 @@ def _remove_top_right_lines_and_ticks():
     plot.yaxis.set_ticks_position('left')
 
 
-def _create_side_by_side_histogram(bins, series1, series2, xlabel, title, file_name, axes=None):
+def _create_side_by_side_histogram(bins, series1, series2, xlabel, title, file_name, xlim=None):
     values, weights = _get_values_and_weights(series1)
-    plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left', label='2012')
+    n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left', label='2012')
+    # print n
+    # print n.sum()
     values, weights = _get_values_and_weights(series2)
-    plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid', label='2014')
+    n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid', label='2014')
+    # print n
+    # print n.sum()
+    # print '======='
 
     plt.gca().yaxis.set_major_formatter(FuncFormatter(_to_percent))
     plt.xlabel(xlabel)
     plt.title(title)
-    if axes:
-        plt.axis(axes)
+    if xlim:
+        plt.xlim(xlim)
     plt.grid(True)
     _remove_top_right_lines_and_ticks()
     plt.legend()
@@ -262,40 +271,55 @@ def _create_side_by_side_histogram(bins, series1, series2, xlabel, title, file_n
     plt.close()
 
 
-def _create_taxa_depth_histogram(df):
+def _create_taxa_depth_histogram(df12, df14, domain_filter):
     bins = range(0, 25, 1)
-    _create_side_by_side_histogram(bins=bins, series1=df.taxa_depth_12, series2=df.taxa_depth_14, xlabel=r'Taxa Depth',
-                                   title=r'Taxa Depth per Year', axes=[0, 25, 0, 0.45],
-                                   file_name='taxa_depth_histogram.pdf')
+    file_name = domain_filter.lower() + '_taxa_depth_histogram.pdf'
+    _create_side_by_side_histogram(bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
+                                   title=domain_filter + r' Taxa Depth per Year', xlim=[0, 25], file_name=file_name)
 
 
-def _create_edpl_histogram(df):
+def _create_edpl_histogram(df12, df14, domain_filter):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
-    _create_side_by_side_histogram(bins=bins, series1=df.edpl_12, series2=df.edpl_14,
+    file_name = domain_filter.lower() + '_edpl_histogram.pdf'
+    _create_side_by_side_histogram(bins=bins, series1=df12.edpl, series2=df14.edpl,
                                    xlabel=r'Expected Distance between Placement Locations',
-                                   title=r'EDPL per Year', axes=[-0.02, 1, 0, 0.45], file_name='edpl_histogram.pdf')
+                                   title=domain_filter + r' EDPL per Year', xlim=[-0.02, 1], file_name=file_name)
 
 
-def _create_lwr_histogram(df):
+def _create_lwr_histogram(df12, df14, domain_filter):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
-    _create_side_by_side_histogram(bins=bins, series1=df.like_weight_ratio_12, series2=df.like_weight_ratio_14,
-                                   xlabel=r'Like Weight Ratio', title=r'LWR per Year', axes=[0, 1, 0, 0.2],
-                                   file_name='lwr_histogram.pdf')
+    file_name = domain_filter.lower() + '_lwr_histogram.pdf'
+    _create_side_by_side_histogram(bins=bins, series1=df12.like_weight_ratio, series2=df14.like_weight_ratio,
+                                   xlabel=r'Like Weight Ratio', title=domain_filter + r' LWR per Year',
+                                   xlim=[0, 1], file_name=file_name)
 
 
-if __name__ == '__main__':
-    # _generate_spectrum_set_of_graphs('domain')
-    # _generate_spectrum_set_of_graphs('division')
-
-    # _generate_domain_colored_set_of_graphs('domain')
-    # _new_and_lost_placements()
+def create_stacked_charts():
+    _generate_domain_colored_set_of_graphs('domain')
+    _new_and_lost_placements()
     # _generate_domain_colored_set_of_graphs('division')
     # _generate_domain_colored_set_of_graphs('class')
     # _generate_domain_colored_set_of_graphs('lowest_classification')
 
-    d = read_df_from_file(MBARI_MERGED_FILE, low_memory=False)
-    _create_taxa_depth_histogram(d)
-    _create_edpl_histogram(d)
-    _create_lwr_histogram(d)
+
+def create_histograms(domain_filter='All'):
+    d12 = read_df_from_file(MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage.tsv', low_memory=False)
+    d14 = read_df_from_file(MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage.tsv', low_memory=False)
+    if domain_filter != 'All':
+        d12 = d12[d12.domain_name == domain_filter]
+        d14 = d14[d14.domain_name == domain_filter]
+
+    _create_lwr_histogram(d12, d14, domain_filter)
+    _create_taxa_depth_histogram(d12, d14, domain_filter)
+    _create_edpl_histogram(d12, d14, domain_filter)
+
+
+if __name__ == '__main__':
+    # _generate_euk_spectrum_set_of_graphs('division')
+
+    # create_stacked_charts()
+    create_histograms()
+    create_histograms('Eukaryota')
+    create_histograms('Bacteria')

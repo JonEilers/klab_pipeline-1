@@ -65,12 +65,12 @@ def build_similarity_frame(node_dict, abundance):
 
 
 if __name__ == '__main__':
-    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('/klab_pipeline/src/data')
-    placements = create_placements('/shared_projects/seastar/data/bm_ssu_analysis')
+    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('../../data')
+    placements = create_placements('/Users/ehervol/Dropbox/shared_projects/seastar/data/bm_ssu_analysis')
     add_name_column(placements, CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN, name_dict, deleted_list)
 
     abundance = group_and_count(placements, [CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN])
-    write_df_to_file(abundance, '/klab_pipeline/test/diversity/abundance.tsv')
+    write_df_to_file(abundance, '../../../test/abundance.tsv')
 
     similarity = build_similarity_frame(node_dict, abundance)
-    write_df_to_file(similarity, '/klab_pipeline/test/diversity/similarity_matrix.tsv')
+    write_df_to_file(similarity, '../../../test/similarity_matrix.tsv')

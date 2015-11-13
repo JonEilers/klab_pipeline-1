@@ -3,6 +3,7 @@
 import pandas as pd
 
 from cookbook.mbari import MBARI_DATA_DIR, NCBI_DATA_DIR
+from klab.process.derived_info import add_placement_type_column
 from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file
 from klab.process.lineage import create_lineage
 
@@ -43,6 +44,7 @@ def create_mbari_lineage_files(base, edpl=None):
     else:
         p2 = p
     l = create_lineage(ncbi_dir=NCBI_DATA_DIR, placements=p2)
+    add_placement_type_column(l)
     _add_mbari_size_column(l)
     _add_mbari_location_column(l)
     write_df_to_file(l, lineage_file)

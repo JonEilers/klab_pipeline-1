@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+from klab.process.derived_info import add_placement_type_column
 
-from klab.process.file_manager import create_placements
+from klab.process.file_manager import create_placements, write_df_to_file
 from klab.process.lineage import create_lineage
 
 
@@ -14,7 +15,10 @@ def create_lineage_files(base):
     lineage_file = base + 'placements_with_lineage.tsv'
 
     p = create_placements(dir=jplace_dir)
-    create_lineage(ncbi_dir='/placeholder/src/data', placements=p, out_file=lineage_file)
+    l = create_lineage(ncbi_dir='/placeholder/src/data', placements=p)
+    add_placement_type_column(l)
+    write_df_to_file(l, lineage_file)
+
 
 # ech 2015-03-06 - take the repetition out of rebuilding the seastar data
 if __name__ == '__main__':

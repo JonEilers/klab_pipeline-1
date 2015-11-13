@@ -22,7 +22,7 @@ def get_files(root_directory, extension='.jplace'):
     return filtered_files
 
 
-def _get_contents(file_name):
+def _get_json_contents(file_name):
     f = open(file_name)
     json_data = None
     try:
@@ -72,7 +72,7 @@ def _build_data_frame_from_jplace_files(root):
     # TODO ech 2015-01-24 - create cluster/tree table (maybe)
     data = []
     for path in files:
-        contents = _get_contents(path)
+        contents = _get_json_contents(path)
         if contents:
             file_name = os.path.basename(path)
             cluster = file_name.split('.')[0]  # name of cluster is first part of file name

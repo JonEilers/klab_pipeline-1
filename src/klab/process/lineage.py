@@ -129,7 +129,6 @@ def create_lineage(ncbi_dir, placements, out_file=None):
     add_name_column(lineage_frame, CLASSIFICATION_COLUMN, 'lowest_classification_name', name_dict, deleted_list)
 
     df = pd.merge(left=placements, right=lineage_frame, on=CLASSIFICATION_COLUMN, how='left')
-    add_placement_type_column(df)
     if out_file:
         write_df_to_file(df, out_file)
     return df

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 import argparse
+import os
 
 import pandas as pd
 
 from klab.process.file_manager import get_files, read_df_from_file
 from klab.process.lineage import create_lineage
-from klab.process.derived_info import group_and_count
 
 """
 Reads the tax_map files from a reference package to get normalization counts for placements.
@@ -22,11 +22,14 @@ def get_tax_map_info(root):
     df = pd.DataFrame()
     for f in file_list:
         print ('processing %s...' % f)
+        file_name = os.path.basename(f)
+        cluster = file_name.split('.')[0]  # name of cluster is first part of file name
         d = read_df_from_file(f)
+        d['cluster'] = pd.Series(cluster, index=d.index)  # add cluster column
         df = df.append(d)
-    result = pd.DataFrame(df.tax_id)
-    result.rename(columns={'tax_id': 'classification'}, inplace=True)
-    return result
+    df.drop('seqname', axis=1, inplace=True)  # drop uneeded column
+    df.rename(columns={'tax_id': 'classification'}, inplace=True)  # rename for consistency with lineage code
+    return df
 
 
 if __name__ == '__main__':
@@ -37,6 +40,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     d2 = get_tax_map_info(root=args.directory)
-    # TODO ech 2015-11-12 - not sure about grouping or not...
-    d3 = group_and_count(d2, ['classification'])
-    l = create_lineage(ncbi_dir=args.ncbi_directory, placements=d3, out_file=args.out_file)
+    create_lineage(ncbi_dir=args.ncbi_directory, placements=d2, out_file=args.out_file)

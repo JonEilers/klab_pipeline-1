@@ -260,6 +260,7 @@ def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_nam
     else:
         n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', rwidth=0.4,
                            align='left')
+    # print file_name
     # print n
     # print n.sum()
     values, weights = _get_values_and_weights(series2)
@@ -294,12 +295,15 @@ def _create_taxa_depth_histogram(df12, df14, domain_filter):
 
 
 def _create_edpl_histogram(df12, df14, domain_filter):
-    bin_width = 0.04
-    bins = np.arange(0, 1 + bin_width, bin_width)
+    min_lim = 0
+    max_lim = 2  # manual range (clips a long tail with few values)
+    num_bins = 40
+    bin_width = (max_lim - min_lim) / num_bins
+    bins = np.arange(min_lim, max_lim + bin_width, bin_width)
     file_name = domain_filter.lower() + '_edpl_histogram.pdf'
     _create_comparison_histogram(bins=bins, series1=df12.edpl, series2=df14.edpl,
                                  xlabel=r'Expected Distance between Placement Locations',
-                                 title=domain_filter + r' EDPL per Year', xlim=[0, 1], file_name=file_name,
+                                 title=domain_filter + r' EDPL per Year', file_name=file_name, xlim=[min_lim, max_lim],
                                  output_dir=MBARI_ANALYSIS_DIR + 'edpl_histograms/')
 
 
@@ -343,6 +347,20 @@ def create_histograms(domain_filter='All'):
     _create_edpl_histogram(d12, d14, domain_filter)
 
 
+def create_edpl_post_prob_scatter(year):
+    df = read_df_from_file(MBARI_DATA_DIR + year + '_MBARI_cog_placements_with_lineage.tsv')
+    plt.scatter(df.post_prob, df.edpl, c='cyan')
+    plt.title(year)
+    plt.xlabel('Posterior Probability')
+    plt.xlim(-0.025, 1.025)
+    plt.ylabel('EDPL')
+    plt.ylim(0, 10)  # manual range (one outlier in 2014 > 10)
+    _remove_top_right_lines_and_ticks()
+
+    plt.savefig(MBARI_ANALYSIS_DIR + year + '_edpl_pp_scatter.png')
+    plt.close()
+
+
 if __name__ == '__main__':
     # _generate_euk_spectrum_set_of_graphs('division')
 
@@ -353,3 +371,6 @@ if __name__ == '__main__':
     create_histograms('Bacteria')
     create_histograms('Archaea')
     create_histograms('Viruses')
+
+    # create_edpl_post_prob_scatter('2012')
+    # create_edpl_post_prob_scatter('2014')

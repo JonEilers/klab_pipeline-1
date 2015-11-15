@@ -26,7 +26,7 @@ def calculate_edpl(root):
         print ('processing %s...' % f)
         file_name = os.path.basename(f)
         cluster = file_name.split('.')[0]  # name of cluster is first part of file name
-        edpl_out = subprocess.check_output(['guppy', 'edpl', f], stderr=subprocess.STDOUT)
+        edpl_out = subprocess.check_output(['guppy', 'edpl', '--pp', f], stderr=subprocess.STDOUT)
         for edpl in edpl_out.split('\n'):
             if edpl:
                 row = [cluster]

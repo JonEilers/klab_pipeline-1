@@ -6,5 +6,5 @@ MBARI_DATA_DIR = '/Users/ehervol/Projects/WWU/MBARI_data/'
 
 NCBI_DATA_DIR = '/Users/ehervol/Projects/WWU/klab_pipeline/src/data'
 
-COLOR_2012 = 'green'
-COLOR_2014 = 'cyan'
+COLOR_2012 = 'blue'
+COLOR_2014 = 'red'

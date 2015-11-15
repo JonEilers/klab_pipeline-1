@@ -256,18 +256,18 @@ def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_nam
                                  xlim=None, method='overlap'):
     values, weights = _get_values_and_weights(series1)
     if method == 'overlap':
-        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor='b', label='2012', alpha=0.6)
+        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', alpha=0.6)
     else:
-        n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left',
-                           label='2012')
+        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', rwidth=0.4,
+                           align='left')
     # print n
     # print n.sum()
     values, weights = _get_values_and_weights(series2)
     if method == 'overlap':
-        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor='r', label='2014', alpha=0.6)
+        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2014, label='2014', alpha=0.6)
     else:
-        n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid',
-                           label='2014')
+        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2014', rwidth=0.4,
+                           align='mid')
     # print n
     # print n.sum()
     # print '======='
@@ -299,7 +299,7 @@ def _create_edpl_histogram(df12, df14, domain_filter):
     file_name = domain_filter.lower() + '_edpl_histogram.pdf'
     _create_comparison_histogram(bins=bins, series1=df12.edpl, series2=df14.edpl,
                                  xlabel=r'Expected Distance between Placement Locations',
-                                 title=domain_filter + r' EDPL per Year', xlim=[-0.02, 1], file_name=file_name,
+                                 title=domain_filter + r' EDPL per Year', xlim=[0, 1], file_name=file_name,
                                  output_dir=MBARI_ANALYSIS_DIR + 'edpl_histograms/')
 
 
@@ -346,10 +346,10 @@ def create_histograms(domain_filter='All'):
 if __name__ == '__main__':
     # _generate_euk_spectrum_set_of_graphs('division')
 
-    create_stacked_charts()
-    
-    # create_histograms('All')
-    # create_histograms('Eukaryota')
-    # create_histograms('Bacteria')
-    # create_histograms('Archaea')
-    # create_histograms('Viruses')
+    # create_stacked_charts()
+
+    create_histograms('All')
+    create_histograms('Eukaryota')
+    create_histograms('Bacteria')
+    create_histograms('Archaea')
+    create_histograms('Viruses')

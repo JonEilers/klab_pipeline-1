@@ -246,19 +246,22 @@ def _remove_top_right_lines_and_ticks():
     plot.yaxis.set_ticks_position('left')
 
 
-def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_name, xlim=None, method='overlap'):
+def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_name, output_dir=MBARI_ANALYSIS_DIR,
+                                 xlim=None, method='overlap'):
     values, weights = _get_values_and_weights(series1)
     if method == 'overlap':
         n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor='b', label='2012', alpha=0.6)
     else:
-        n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left', label='2012')
+        n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2012, align='left',
+                           label='2012')
     # print n
     # print n.sum()
     values, weights = _get_values_and_weights(series2)
     if method == 'overlap':
         n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor='r', label='2014', alpha=0.6)
     else:
-        n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid', label='2014')
+        n, b, p = plt.hist(values, bins=bins, weights=weights, rwidth=0.4, facecolor=COLOR_2014, align='mid',
+                           label='2014')
     # print n
     # print n.sum()
     # print '======='
@@ -272,7 +275,7 @@ def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_nam
     _remove_top_right_lines_and_ticks()
     plt.legend(bbox_to_anchor=(0.9, 0.9))
 
-    plt.savefig(MBARI_ANALYSIS_DIR + file_name)
+    plt.savefig(output_dir + file_name)
     plt.close()
 
 
@@ -280,7 +283,8 @@ def _create_taxa_depth_histogram(df12, df14, domain_filter):
     bins = range(0, 25, 1)
     file_name = domain_filter.lower() + '_taxa_depth_histogram.pdf'
     _create_comparison_histogram(bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
-                                   title=domain_filter + r' Taxa Depth per Year', xlim=[0, 25], file_name=file_name)
+                                 title=domain_filter + r' Taxa Depth per Year', xlim=[0, 25], file_name=file_name,
+                                 output_dir=MBARI_ANALYSIS_DIR + 'taxa_depth_histograms/')
 
 
 def _create_edpl_histogram(df12, df14, domain_filter):
@@ -288,8 +292,9 @@ def _create_edpl_histogram(df12, df14, domain_filter):
     bins = np.arange(0, 1 + bin_width, bin_width)
     file_name = domain_filter.lower() + '_edpl_histogram.pdf'
     _create_comparison_histogram(bins=bins, series1=df12.edpl, series2=df14.edpl,
-                                   xlabel=r'Expected Distance between Placement Locations',
-                                   title=domain_filter + r' EDPL per Year', xlim=[-0.02, 1], file_name=file_name)
+                                 xlabel=r'Expected Distance between Placement Locations',
+                                 title=domain_filter + r' EDPL per Year', xlim=[-0.02, 1], file_name=file_name,
+                                 output_dir=MBARI_ANALYSIS_DIR + 'edpl_histograms/')
 
 
 def _create_lwr_histogram(df12, df14, domain_filter):
@@ -297,8 +302,18 @@ def _create_lwr_histogram(df12, df14, domain_filter):
     bins = np.arange(0, 1 + bin_width, bin_width)
     file_name = domain_filter.lower() + '_lwr_histogram.pdf'
     _create_comparison_histogram(bins=bins, series1=df12.like_weight_ratio, series2=df14.like_weight_ratio,
-                                   xlabel=r'Like Weight Ratio', title=domain_filter + r' LWR per Year',
-                                   xlim=[0, 1], file_name=file_name)
+                                 xlabel=r'Like Weight Ratio', title=domain_filter + r' LWR per Year', xlim=[0, 1],
+                                 file_name=file_name, output_dir=MBARI_ANALYSIS_DIR + 'lwr_histograms/')
+
+
+def _create_post_prob_histogram(df12, df14, domain_filter):
+    bin_width = 0.04
+    bins = np.arange(0, 1 + bin_width, bin_width)
+    file_name = domain_filter.lower() + '_post_prob_histogram.pdf'
+    _create_comparison_histogram(bins=bins, series1=df12.post_prob, series2=df14.post_prob,
+                                 xlabel=r'Posterior Probability',
+                                 title=domain_filter + r' Posterior Probability per Year', xlim=[0, 1],
+                                 file_name=file_name, output_dir=MBARI_ANALYSIS_DIR + 'post_prob_histograms/')
 
 
 def create_stacked_charts():
@@ -317,6 +332,7 @@ def create_histograms(domain_filter='All'):
         d14 = d14[d14.domain_name == domain_filter]
 
     _create_lwr_histogram(d12, d14, domain_filter)
+    _create_post_prob_histogram(d12, d14, domain_filter)
     _create_taxa_depth_histogram(d12, d14, domain_filter)
     _create_edpl_histogram(d12, d14, domain_filter)
 

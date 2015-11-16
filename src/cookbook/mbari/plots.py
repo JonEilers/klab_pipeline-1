@@ -320,13 +320,13 @@ def _create_edpl_histogram(df12, df14, domain_filter):
                                  output_dir=MBARI_ANALYSIS_DIR + 'edpl_histograms/')
 
 
-def _create_lwr_histogram(df12, df14, domain_filter):
-    bin_width = 0.04
-    bins = np.arange(0, 1 + bin_width, bin_width)
-    file_name = domain_filter.lower() + '_lwr_histogram.pdf'
-    _create_comparison_histogram(bins=bins, series1=df12.like_weight_ratio, series2=df14.like_weight_ratio,
-                                 xlabel=r'Like Weight Ratio', title=domain_filter + r' LWR per Year', xlim=[0, 1],
-                                 file_name=file_name, output_dir=MBARI_ANALYSIS_DIR + 'lwr_histograms/')
+# def _create_lwr_histogram(df12, df14, domain_filter):
+#     bin_width = 0.04
+#     bins = np.arange(0, 1 + bin_width, bin_width)
+#     file_name = domain_filter.lower() + '_lwr_histogram.pdf'
+#     _create_comparison_histogram(bins=bins, series1=df12.like_weight_ratio, series2=df14.like_weight_ratio,
+#                                  xlabel=r'Like Weight Ratio', title=domain_filter + r' LWR per Year', xlim=[0, 1],
+#                                  file_name=file_name, output_dir=MBARI_ANALYSIS_DIR + 'lwr_histograms/')
 
 
 def _create_post_prob_histogram(df12, df14, domain_filter):
@@ -360,17 +360,21 @@ def create_histograms(domain_filter='All'):
     _create_edpl_histogram(d12, d14, domain_filter)
 
 
-def create_edpl_post_prob_scatter(year):
+def create_edpl_post_prob_scatter(year, domain_filter='All'):
     df = read_df_from_file(MBARI_DATA_DIR + year + '_MBARI_cog_placements_with_lineage.tsv')
+    if domain_filter != 'All':
+        df = df[df.domain_name == domain_filter]
     plt.scatter(df.post_prob, df.edpl, c='cyan')
-    plt.title(year)
+    plt.title(year + ' ' + domain_filter.title())
     plt.xlabel('Posterior Probability')
     plt.xlim(-0.025, 1.025)
     plt.ylabel('EDPL')
     plt.ylim(0, 10)  # manual range (one outlier in 2014 > 10)
     _remove_top_right_lines_and_ticks()
 
-    plt.savefig(MBARI_ANALYSIS_DIR + year + '_edpl_pp_scatter.png')
+    out_file = MBARI_ANALYSIS_DIR + 'scatter_plots/' + year + '_' + domain_filter.lower() + '_edpl_pp_scatter.png'
+    _ensure_dir(out_file)
+    plt.savefig(out_file)
     plt.close()
 
 
@@ -385,5 +389,13 @@ if __name__ == '__main__':
     create_histograms('Archaea')
     create_histograms('Viruses')
 
-    # create_edpl_post_prob_scatter('2012')
-    # create_edpl_post_prob_scatter('2014')
+    create_edpl_post_prob_scatter('2012', 'All')
+    create_edpl_post_prob_scatter('2014', 'All')
+    create_edpl_post_prob_scatter('2012', 'Eukaryota')
+    create_edpl_post_prob_scatter('2014', 'Eukaryota')
+    create_edpl_post_prob_scatter('2012', 'Bacteria')
+    create_edpl_post_prob_scatter('2014', 'Bacteria')
+    create_edpl_post_prob_scatter('2012', 'Archaea')
+    create_edpl_post_prob_scatter('2014', 'Archaea')
+    create_edpl_post_prob_scatter('2012', 'Viruses')
+    create_edpl_post_prob_scatter('2014', 'Viruses')

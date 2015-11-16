@@ -2,6 +2,8 @@
 
 from __future__ import division
 
+import os
+
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -22,6 +24,12 @@ from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR, COLOR_2012, COLOR
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
 DOMAIN_COLORS = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
+
+
+def _ensure_dir(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
 
 
 def _get_and_clean_data(level):
@@ -210,12 +218,14 @@ def _generate_domain_colored_set_of_graphs(level):
     file_path = _mbari_file_path(level) + t
     d2 = _massage_data(df)
     data_file = file_path + '_placements.csv'
+    _ensure_dir(data_file)
     write_df_to_file(d2, data_file)
     title = t.title() + ' 2012 Placements to 2014'
     plot_file = file_path + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
-    plot_file = file_path + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
+    if level == 'domain':  # not relevant for lower levels
+        plot_file = file_path + '_placements_scaled_bar.pdf'
+        _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
 
 def _new_and_lost_placements(level):
@@ -284,6 +294,7 @@ def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_nam
     _remove_top_right_lines_and_ticks()
     plt.legend(bbox_to_anchor=(0.9, 0.9))
 
+    _ensure_dir(output_dir + file_name)
     plt.savefig(output_dir + file_name)
     plt.close()
 
@@ -366,13 +377,13 @@ def create_edpl_post_prob_scatter(year):
 if __name__ == '__main__':
     # _generate_euk_spectrum_set_of_graphs('division')
 
-    # create_stacked_charts()
+    create_stacked_charts()
 
-    # create_histograms('All')
-    # create_histograms('Eukaryota')
-    # create_histograms('Bacteria')
-    # create_histograms('Archaea')
-    # create_histograms('Viruses')
+    create_histograms('All')
+    create_histograms('Eukaryota')
+    create_histograms('Bacteria')
+    create_histograms('Archaea')
+    create_histograms('Viruses')
 
-    create_edpl_post_prob_scatter('2012')
-    create_edpl_post_prob_scatter('2014')
+    # create_edpl_post_prob_scatter('2012')
+    # create_edpl_post_prob_scatter('2014')

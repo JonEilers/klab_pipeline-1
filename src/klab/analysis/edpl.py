@@ -15,7 +15,7 @@ Inspired by Ryan's EDPL_calc.py
 """
 
 
-def calculate_edpl(root):
+def _calculate_edpl(root):
     file_list = get_files(root_directory=root, extension='.jplace')
     file_list.sort()
 
@@ -26,6 +26,7 @@ def calculate_edpl(root):
         print ('processing %s...' % f)
         file_name = os.path.basename(f)
         cluster = file_name.split('.')[0]  # name of cluster is first part of file name
+        # call "guppy edpl --pp" to calculate edpl
         edpl_out = subprocess.check_output(['guppy', 'edpl', '--pp', f], stderr=subprocess.STDOUT)
         for edpl in edpl_out.split('\n'):
             if edpl:
@@ -36,11 +37,17 @@ def calculate_edpl(root):
     return pd.DataFrame(data=data, columns=['cluster', 'fragment_id', 'edpl'])
 
 
+def get_edpl(root_directory, out_file=None):
+    df = _calculate_edpl(root=root_directory)
+    if out_file:
+        write_df_to_file(df, out_file)
+    return df
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-directory', help='directory with .jplace files', required=True)
     parser.add_argument('-out_file', help='output file', required=True)
     args = parser.parse_args()
 
-    df = calculate_edpl(root=args.directory)
-    write_df_to_file(df, args.out_file)
+    get_edpl(root_directory=args.directory, out_file=args.out_file)

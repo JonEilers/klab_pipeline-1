@@ -3,12 +3,12 @@
 #########################
 # Robin specific requests
 #########################
+import argparse
 import os
-import sys
 
 from klab.process.derived_info import group_and_count, FUZZY, CONFIDENT
 from klab.process.file_manager import write_df_to_file, create_placements
-from cookbook.mbari.lineage import create_mbari_lineage_files
+from cookbook.mbari.transform_mbari_data import create_mbari_lineage_files
 from klab.process.lineage import create_lineage
 
 
@@ -40,11 +40,11 @@ def _create_lineage_and_count_files_for_robin(ncbi_dir, input_dir, output_dir):
 
 
 if __name__ == '__main__':
-    # first argument is full path to directory where ncbi data files live
-    # second argument is full path to directory containing jplace files (finds them recursively)
-    # third argument is output directory
-    ncbi_dir = sys.argv[1]
-    input_dir = sys.argv[2]
-    output_dir = sys.argv[3]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-ncbi_directory', help='directory with NCBI data files', required=True)
+    parser.add_argument('-placement_directory', help='directory with sequence placement files', required=True)
+    parser.add_argument('-out_directory', help='output directory', required=True)
+    args = parser.parse_args()
 
-    _create_lineage_and_count_files_for_robin(ncbi_dir, input_dir, output_dir)
+    _create_lineage_and_count_files_for_robin(ncbi_dir=args.ncbi_directory, input_dir=args.placement_directory,
+                                              output_dir=args.out_directory)

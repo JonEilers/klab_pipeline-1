@@ -5,25 +5,27 @@ from __future__ import division
 import pandas as pd
 import numpy as np
 import matplotlib
-from matplotlib.ticker import FuncFormatter
 
 matplotlib.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 
+from matplotlib.ticker import FuncFormatter
 from matplotlib import pyplot as plt
 
-from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR, COLOR_2012, COLOR_2014
 from klab.process.file_manager import read_df_from_file, write_df_to_file
+from klab.process.derived_info import CONFIDENT, FUZZY
 from lib.stacked_bar_graph import StackedBarGrapher
+from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
+    MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE
 
-MBARI_MERGED_FILE = MBARI_DATA_DIR + 'MBARI_merged.tsv'
-# MBARI_MERGED_FILE = MBARI_DATA_DIR + 'mbari_test_merged.tsv'
+
+# MBARI_12_14_MERGED_FILE = MBARI_DATA_DIR + 'mbari_test_merged.tsv'
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
 DOMAIN_COLORS = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
 
 
 def _get_and_clean_data(level):
-    d = read_df_from_file(MBARI_MERGED_FILE, low_memory=False)
+    d = read_df_from_file(MBARI_12_14_MERGED_FILE, low_memory=False)
     d.fillna('None', inplace=True)
 
     # rename for nicer ordering of graphs
@@ -127,7 +129,7 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     df = _get_and_clean_data(level)
     file_path = _mbari_file_path(level)
 
-    t = 'fuzzy'
+    t = FUZZY
     a = df[df['placement_type_12'] == t]
     d2 = _massage_data(a)
     data_file = file_path + t + '_placements.csv'
@@ -138,7 +140,7 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     plot_file = file_path + t + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
-    t = 'confident'
+    t = CONFIDENT
     a = df[df['placement_type_12'] == t]
     d2 = _massage_data(a)
     data_file = file_path + t + '_placements.csv'
@@ -149,8 +151,8 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     plot_file = file_path + t + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
-    t1 = 'confident'
-    t2 = 'confident'
+    t1 = CONFIDENT
+    t2 = CONFIDENT
     a = df[df['placement_type_12'] == t1]
     a = a[a['placement_type_14'] == t2]
     d2 = _massage_data(a)
@@ -162,8 +164,8 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     plot_file = file_path + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
-    t1 = 'confident'
-    t2 = 'fuzzy'
+    t1 = CONFIDENT
+    t2 = FUZZY
     a = df[df['placement_type_12'] == t1]
     a = a[a['placement_type_14'] == t2]
     d2 = _massage_data(a)
@@ -176,7 +178,7 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
     t1 = 'none'
-    t2 = 'confident'
+    t2 = CONFIDENT
     a = df[df['placement_type_12'] == t1.title()]
     a = a[a['placement_type_14'] == t2]
     d2 = _massage_data(a)
@@ -189,7 +191,7 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
 
     t1 = 'none'
-    t2 = 'fuzzy'
+    t2 = FUZZY
     a = df[df['placement_type_12'] == t1.title()]
     a = a[a['placement_type_14'] == t2]
     d2 = _massage_data(a)
@@ -335,13 +337,13 @@ def create_stacked_charts():
 
 
 def create_histograms(domain_filter='All'):
-    d12 = read_df_from_file(MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage.tsv', low_memory=False)
-    d14 = read_df_from_file(MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage.tsv', low_memory=False)
+    d12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
+    d14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
     if domain_filter != 'All':
         d12 = d12[d12.domain_name == domain_filter]
         d14 = d14[d14.domain_name == domain_filter]
 
-    _create_lwr_histogram(d12, d14, domain_filter)
+    # _create_lwr_histogram(d12, d14, domain_filter)
     _create_post_prob_histogram(d12, d14, domain_filter)
     _create_taxa_depth_histogram(d12, d14, domain_filter)
     _create_edpl_histogram(d12, d14, domain_filter)
@@ -366,11 +368,11 @@ if __name__ == '__main__':
 
     # create_stacked_charts()
 
-    create_histograms('All')
-    create_histograms('Eukaryota')
-    create_histograms('Bacteria')
-    create_histograms('Archaea')
-    create_histograms('Viruses')
+    # create_histograms('All')
+    # create_histograms('Eukaryota')
+    # create_histograms('Bacteria')
+    # create_histograms('Archaea')
+    # create_histograms('Viruses')
 
-    # create_edpl_post_prob_scatter('2012')
-    # create_edpl_post_prob_scatter('2014')
+    create_edpl_post_prob_scatter('2012')
+    create_edpl_post_prob_scatter('2014')

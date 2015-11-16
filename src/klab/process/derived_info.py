@@ -4,6 +4,8 @@ from __future__ import division
 
 import pandas as pd
 
+from klab.process.file_manager import PLACEMENT_COLUMN, NEXT_BEST_PLACEMENT_COLUMN
+
 CONFIDENCE_INTERVAL = 0.05  # magic number
 CONFIDENT = 'confident'
 FUZZY = 'fuzzy'
@@ -17,7 +19,7 @@ def standardize_column_headers(df):
     return df.rename(columns=lambda x: x.strip().lower().replace(' ', '_'), inplace=True)
 
 
-def add_placement_type_column(df, best_column='like_weight_ratio', next_best_column='next_best_lwr',
+def add_placement_type_column(df, best_column=PLACEMENT_COLUMN, next_best_column=NEXT_BEST_PLACEMENT_COLUMN,
                               ci=CONFIDENCE_INTERVAL):
     df['placement_type'] = FUZZY
     df.loc[abs(df[best_column] - df[next_best_column]) >= ci, ['placement_type']] = CONFIDENT

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import os
-import pandas as pd
 import argparse
+
+import pandas as pd
 
 try:
     import simplejson as json
@@ -10,6 +11,8 @@ except ImportError:
     import json  # simplejson has better feedback on parsing failures
 
 CLASSIFICATION_COLUMN = 'classification'
+PLACEMENT_COLUMN = 'post_prob'
+NEXT_BEST_PLACEMENT_COLUMN = 'next_best_pp'
 
 
 def get_files(root_directory, extension='.jplace'):
@@ -103,12 +106,12 @@ def _build_data_frame_from_jplace_files(root):
 
 def _prune_unwanted_rows(df):
     # shift some columns up to do easier comparison
-    df['next_best_lwr'] = df['like_weight_ratio'].shift(-1)  # 'next like_weight_ratio'
+    df[NEXT_BEST_PLACEMENT_COLUMN] = df[PLACEMENT_COLUMN].shift(-1)  # 'next posterior probability'
     df['nfid'] = df['fragment_id'].shift(-1)  # 'next fragment_id'
 
-    single_placements = df.like_weight_ratio == 1
+    single_placements = df[PLACEMENT_COLUMN] == 1
     best_placements = df.fragment_id == df.nfid
-    df.loc[single_placements, ['next_best_lwr']] = 0  # clear next_best_like_weight_ratio for single placements
+    df.loc[single_placements, [NEXT_BEST_PLACEMENT_COLUMN]] = 0  # clear next best posterior probability for single placements
 
     good_stuff = df[single_placements | best_placements]
     r = good_stuff.ix[:, :-1]  # drop next_fragment_id column
@@ -120,7 +123,7 @@ def _prune_unwanted_rows(df):
 # TODO ech 2015-10-28 - don't actually see these in the 2012 data anymore
 # TODO ech 2015-02-14 - will need to deal with dups across clusters (KOGs & TIGRs, etc)
 def _fix_dup_problem_with_hack(df):
-    # data_frame.sort(columns=['fragment_id', 'cluster', 'classification', 'like_weight_ratio'],
+    # data_frame.sort(columns=['fragment_id', 'cluster', CLASSIFICATION_COLUMN, PLACEMENT_COLUMN],
     # ascending=[True, True, True, False], inplace=True)
     # TODO ech 2015-02-13 - can probably use 'drop_duplicates' here
     grouped = df.groupby(['fragment_id'])

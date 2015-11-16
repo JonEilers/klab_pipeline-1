@@ -5,7 +5,7 @@ import os
 
 import pandas as pd
 
-from klab.process.file_manager import get_files, read_df_from_file
+from klab.process.file_manager import get_files, read_df_from_file, CLASSIFICATION_COLUMN
 from klab.process.lineage import create_lineage
 
 """
@@ -13,10 +13,9 @@ Reads the tax_map files from a reference package to get normalization counts for
 """
 
 
-def get_tax_map_info(root):
+def _get_tax_map_info(root):
     file_list = get_files(root_directory=root, extension='tax_map.csv')
     file_list.sort()
-
     print ('%d files to run...' % len(file_list))
 
     df = pd.DataFrame()
@@ -27,9 +26,15 @@ def get_tax_map_info(root):
         d = read_df_from_file(f)
         d['cluster'] = pd.Series(cluster, index=d.index)  # add cluster column
         df = df.append(d)
+
     df.drop('seqname', axis=1, inplace=True)  # drop uneeded column
-    df.rename(columns={'tax_id': 'classification'}, inplace=True)  # rename for consistency with lineage code
+    df.rename(columns={'tax_id': CLASSIFICATION_COLUMN}, inplace=True)  # rename for consistency with lineage code
     return df
+
+
+def get_ref_package_placements(root_directory, ncbi_directory, out_file=None):
+    d2 = _get_tax_map_info(root_directory)
+    return create_lineage(ncbi_dir=ncbi_directory, placements=d2, out_file=out_file)
 
 
 if __name__ == '__main__':
@@ -39,5 +44,5 @@ if __name__ == '__main__':
     parser.add_argument('-out_file', help='output file', required=True)
     args = parser.parse_args()
 
-    d2 = get_tax_map_info(root=args.directory)
-    create_lineage(ncbi_dir=args.ncbi_directory, placements=d2, out_file=args.out_file)
+    get_ref_package_placements(root_directory=args.directory, ncbi_directory=args.ncbi_directory,
+                               out_file=args.out_file)

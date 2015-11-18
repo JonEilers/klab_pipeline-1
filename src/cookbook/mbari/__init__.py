@@ -17,8 +17,8 @@ MBARI_12_14_MERGED_FILE = MBARI_DATA_DIR + 'MBARI_merged.tsv'
 MBARI_2012_EDPL_FILE = MBARI_DATA_DIR + '2012_mbari_edpl.tsv'
 MBARI_2014_EDPL_FILE = MBARI_DATA_DIR + '2014_mbari_edpl.tsv'
 
-MBARI_2012_REF_PKG_FILE = MBARI_DATA_DIR + '2012_mbari_ref_package_placements.tsv'
-MBARI_2014_REF_PKG_FILE = MBARI_DATA_DIR + '2014_mbari_ref_package_placements.tsv'
+MBARI_2012_REF_PKG_FILE = MBARI_DATA_DIR + '2012_ref_pkg_placements.tsv'
+MBARI_2014_REF_PKG_FILE = MBARI_DATA_DIR + '2014_ref_pkg_placements.tsv'
 
 # shared directory where analysis goes
 MBARI_ANALYSIS_DIR = '/Users/ehervol/Dropbox/shared_projects/MBARI/'

@@ -320,15 +320,6 @@ def _create_edpl_histogram(df12, df14, domain_filter):
                                  output_dir=MBARI_ANALYSIS_DIR + 'edpl_histograms/')
 
 
-# def _create_lwr_histogram(df12, df14, domain_filter):
-#     bin_width = 0.04
-#     bins = np.arange(0, 1 + bin_width, bin_width)
-#     file_name = domain_filter.lower() + '_lwr_histogram.pdf'
-#     _create_comparison_histogram(bins=bins, series1=df12.like_weight_ratio, series2=df14.like_weight_ratio,
-#                                  xlabel=r'Like Weight Ratio', title=domain_filter + r' LWR per Year', xlim=[0, 1],
-#                                  file_name=file_name, output_dir=MBARI_ANALYSIS_DIR + 'lwr_histograms/')
-
-
 def _create_post_prob_histogram(df12, df14, domain_filter):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
@@ -354,7 +345,6 @@ def create_histograms(domain_filter='All'):
         d12 = d12[d12.domain_name == domain_filter]
         d14 = d14[d14.domain_name == domain_filter]
 
-    # _create_lwr_histogram(d12, d14, domain_filter)
     _create_post_prob_histogram(d12, d14, domain_filter)
     _create_taxa_depth_histogram(d12, d14, domain_filter)
     _create_edpl_histogram(d12, d14, domain_filter)

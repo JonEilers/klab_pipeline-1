@@ -5,12 +5,12 @@ import pandas as pd
 
 from klab.analysis.edpl import get_edpl
 from klab.analysis.ref_package_placements import get_ref_package_placements
-from klab.process.derived_info import add_placement_type_column
+from klab.process.derived_info import add_placement_type_column, group_and_count
 from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file
 from klab.process.lineage import create_lineage
 from cookbook.mbari import NCBI_DATA_DIR, MBARI_2012_BASE, MBARI_2014_BASE, MBARI_2012_EDPL_FILE, \
     MBARI_2014_EDPL_FILE, MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_MERGED_FILE, \
-    MBARI_2012_REF_PKG_FILE, MBARI_2012_PACKAGE_DIR, MBARI_2014_PACKAGE_DIR, MBARI_2014_REF_PKG_FILE
+    MBARI_2012_REF_PKG_FILE, MBARI_2012_PACKAGE_DIR, MBARI_2014_PACKAGE_DIR, MBARI_2014_REF_PKG_FILE, MBARI_DATA_DIR
 
 TOP_LEVEL = 'top level'  # start with a lower case letter to sort after domains when graphing
 
@@ -63,6 +63,22 @@ def _merge_mbari_data(file_12, file_14, result):
     write_df_to_file(df, result)
 
 
+def _merge_reference_package_data(file_12, file_14, result):
+    d = read_df_from_file(file_12)
+    d2 = d.drop_duplicates('classification')
+    d12 = group_and_count(d2, ['domain_name'])
+
+    d = read_df_from_file(file_14)
+    d2 = d.drop_duplicates('classification')
+    d14 = group_and_count(d2, ['domain_name'])
+
+    df = pd.merge(d12, d14, on='domain_name', how='outer', suffixes=('_12', '_14'))
+    df = df[df['domain_name'] != 'other sequences']
+    df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
+    df['change'] = df['2014'] / df['2012']
+    write_df_to_file(df, result)
+
+
 def create_mbari_lineage_files(base, edpl=None):
     jplace_dir = base + 'analysis'
     lineage_file = base + 'placements_with_lineage.tsv'
@@ -98,6 +114,11 @@ if __name__ == '__main__':
     if not os.path.isfile(MBARI_2014_REF_PKG_FILE):
         get_ref_package_placements(root_directory=MBARI_2014_PACKAGE_DIR, ncbi_directory=NCBI_DATA_DIR,
                                    out_file=MBARI_2014_REF_PKG_FILE)
+
+    # binned and merged ref package counts
+    if not os.path.isfile(MBARI_DATA_DIR + 'mbari_ref_counts.tsv'):
+        _merge_reference_package_data(MBARI_2012_REF_PKG_FILE, MBARI_2014_REF_PKG_FILE,
+                                      MBARI_DATA_DIR + 'mbari_ref_counts.tsv')
 
     # lineage and derived data
     if not os.path.isfile(MBARI_2012_LINEAGE_FILE):

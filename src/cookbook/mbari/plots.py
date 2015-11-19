@@ -127,51 +127,15 @@ def _generate_euk_spectrum_set_of_graphs(level):
 
 
 def _mbari_file_path(level):
-    return MBARI_ANALYSIS_DIR + level + '_level/' + level + '_level_'
+    return MBARI_ANALYSIS_DIR + 'figure_2/' + level + '_level_'
 
 
 # not that interesting, as fuzzy contribution is swamped by confident
 # keep it around in case I drill down to it for some other reason
 def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
-    # TODO ech 2015-07-15 a lot of copy and paste, which maybe gets cleaned up if this becomes more standard
     df = _get_and_clean_data(level)
     file_path = _mbari_file_path(level)
 
-    t = FUZZY
-    a = df[df['placement_type_12'] == t]
-    d2 = _massage_data(a)
-    data_file = file_path + t + '_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = t.title() + ' 2012 Placements to 2014'
-    plot_file = file_path + t + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
-    plot_file = file_path + t + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
-
-    t = CONFIDENT
-    a = df[df['placement_type_12'] == t]
-    d2 = _massage_data(a)
-    data_file = file_path + t + '_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = t.title() + ' 2012 Placements to 2014'
-    plot_file = file_path + t + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
-    plot_file = file_path + t + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
-
-    t1 = CONFIDENT
-    t2 = CONFIDENT
-    a = df[df['placement_type_12'] == t1]
-    a = a[a['placement_type_14'] == t2]
-    d2 = _massage_data(a)
-    data_file = file_path + t1 + '_' + t2 + '_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = t1.title() + ' 2012 Placements to ' + t2.title() + ' 2014'
-    plot_file = file_path + t1 + '_' + t2 + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
-    plot_file = file_path + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
-
     t1 = CONFIDENT
     t2 = FUZZY
     a = df[df['placement_type_12'] == t1]
@@ -184,32 +148,6 @@ def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
     plot_file = file_path + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
-
-    t1 = 'none'
-    t2 = CONFIDENT
-    a = df[df['placement_type_12'] == t1.title()]
-    a = a[a['placement_type_14'] == t2]
-    d2 = _massage_data(a)
-    data_file = file_path + t1 + '_' + t2 + '_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = 'No 2012 Placements to ' + t2.title() + ' 2014'
-    plot_file = file_path + t1 + '_' + t2 + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:])  # there are no 'Same' columns, so skip first color
-    plot_file = file_path + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
-
-    t1 = 'none'
-    t2 = FUZZY
-    a = df[df['placement_type_12'] == t1.title()]
-    a = a[a['placement_type_14'] == t2]
-    d2 = _massage_data(a)
-    data_file = file_path + t1 + '_' + t2 + '_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = 'No 2012 Placements to ' + t2.title() + ' 2014'
-    plot_file = file_path + t1 + '_' + t2 + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:])  # there are no 'Same' columns, so skip first color
-    plot_file = file_path + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
 
 
 def _generate_domain_colored_set_of_graphs(level):
@@ -223,9 +161,8 @@ def _generate_domain_colored_set_of_graphs(level):
     title = t.title() + ' 2012 Placements to 2014'
     plot_file = file_path + '_placements_bar.pdf'
     _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
-    if level == 'domain':  # not relevant for lower levels
-        plot_file = file_path + '_placements_scaled_bar.pdf'
-        _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
+    plot_file = file_path + '_placements_scaled_bar.pdf'
+    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
 
 
 def _new_and_lost_placements(level):
@@ -264,26 +201,18 @@ def _remove_top_right_lines_and_ticks():
     plot.yaxis.set_ticks_position('left')
 
 
-def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_name, output_dir=MBARI_ANALYSIS_DIR,
-                                 xlim=None, method='overlap'):
+def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_name,
+                                 output_dir=MBARI_ANALYSIS_DIR + 'figure_3/', xlim=None, method='overlap'):
     values, weights = _get_values_and_weights(series1)
     if method == 'overlap':
-        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', alpha=0.6)
+        plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', alpha=0.6)
     else:
-        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', rwidth=0.4,
-                           align='left')
-    # print file_name
-    # print n
-    # print n.sum()
+        plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', rwidth=0.4, align='left')
     values, weights = _get_values_and_weights(series2)
     if method == 'overlap':
-        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2014, label='2014', alpha=0.6)
+        plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2014, label='2014', alpha=0.6)
     else:
-        n, b, p = plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2014', rwidth=0.4,
-                           align='mid')
-    # print n
-    # print n.sum()
-    # print '======='
+        plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2014', rwidth=0.4, align='mid')
 
     plt.gca().yaxis.set_major_formatter(FuncFormatter(_to_percent))
     plt.xlabel(xlabel)
@@ -303,8 +232,7 @@ def _create_taxa_depth_histogram(df12, df14, domain_filter):
     bins = range(0, 25, 1)
     file_name = domain_filter.lower() + '_taxa_depth_histogram.pdf'
     _create_comparison_histogram(bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
-                                 title=domain_filter + r' Taxa Depth per Year', xlim=[0, 25], file_name=file_name,
-                                 output_dir=MBARI_ANALYSIS_DIR + 'taxa_depth_histograms/')
+                                 title=domain_filter + r' Taxa Depth per Year', xlim=[0, 25], file_name=file_name)
 
 
 def _create_edpl_histogram(df12, df14, domain_filter):
@@ -316,8 +244,7 @@ def _create_edpl_histogram(df12, df14, domain_filter):
     file_name = domain_filter.lower() + '_edpl_histogram.pdf'
     _create_comparison_histogram(bins=bins, series1=df12.edpl, series2=df14.edpl,
                                  xlabel=r'Expected Distance between Placement Locations',
-                                 title=domain_filter + r' EDPL per Year', file_name=file_name, xlim=[min_lim, max_lim],
-                                 output_dir=MBARI_ANALYSIS_DIR + 'edpl_histograms/')
+                                 title=domain_filter + r' EDPL per Year', file_name=file_name, xlim=[min_lim, max_lim])
 
 
 def _create_post_prob_histogram(df12, df14, domain_filter):
@@ -325,16 +252,13 @@ def _create_post_prob_histogram(df12, df14, domain_filter):
     bins = np.arange(0, 1 + bin_width, bin_width)
     file_name = domain_filter.lower() + '_post_prob_histogram.pdf'
     _create_comparison_histogram(bins=bins, series1=df12.post_prob, series2=df14.post_prob,
-                                 xlabel=r'Posterior Probability',
-                                 title=domain_filter + r' Posterior Probability per Year', xlim=[0, 1],
-                                 file_name=file_name, output_dir=MBARI_ANALYSIS_DIR + 'post_prob_histograms/')
+                                 xlabel=r'Posterior Probability', file_name=file_name, xlim=[0, 1],
+                                 title=domain_filter + r' Posterior Probability per Year')
 
 
 def create_stacked_charts():
     _generate_domain_colored_set_of_graphs('domain')
     _new_and_lost_placements('domain')
-    _generate_domain_colored_set_of_graphs('division')
-    _generate_domain_colored_set_of_graphs('class')
     _generate_domain_colored_set_of_graphs('lowest_classification')
 
 
@@ -346,11 +270,11 @@ def create_histograms(domain_filter='All'):
         d14 = d14[d14.domain_name == domain_filter]
 
     _create_post_prob_histogram(d12, d14, domain_filter)
-    _create_taxa_depth_histogram(d12, d14, domain_filter)
     _create_edpl_histogram(d12, d14, domain_filter)
+    _create_taxa_depth_histogram(d12, d14, domain_filter)
 
 
-def create_edpl_post_prob_scatter(year, domain_filter='All', bins=500):
+def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
     df = read_df_from_file(MBARI_DATA_DIR + year + '_MBARI_cog_placements_with_lineage.tsv')
     if domain_filter != 'All':
         df = df[df.domain_name == domain_filter]
@@ -365,7 +289,7 @@ def create_edpl_post_prob_scatter(year, domain_filter='All', bins=500):
     plt.ylabel('EDPL')
     _remove_top_right_lines_and_ticks()
 
-    out_file = MBARI_ANALYSIS_DIR + 'scatter_plots/' + year + '_' + domain_filter.lower() + '_edpl_pp_scatter.png'
+    out_file = MBARI_ANALYSIS_DIR + 'figure_4/' + year + '_' + domain_filter.lower() + '_edpl_pp_scatter.png'
     _ensure_dir(out_file)
     plt.savefig(out_file)
     plt.close()
@@ -379,8 +303,6 @@ if __name__ == '__main__':
     create_histograms('All')
     create_histograms('Eukaryota')
     create_histograms('Bacteria')
-    # create_histograms('Archaea')
-    # create_histograms('Viruses')
 
     create_edpl_post_prob_scatter('2012', 'All')
     create_edpl_post_prob_scatter('2014', 'All')
@@ -388,7 +310,3 @@ if __name__ == '__main__':
     create_edpl_post_prob_scatter('2014', 'Eukaryota')
     create_edpl_post_prob_scatter('2012', 'Bacteria')
     create_edpl_post_prob_scatter('2014', 'Bacteria')
-    # create_edpl_post_prob_scatter('2012', 'Archaea')
-    # create_edpl_post_prob_scatter('2014', 'Archaea')
-    # create_edpl_post_prob_scatter('2012', 'Viruses')
-    # create_edpl_post_prob_scatter('2014', 'Viruses')

@@ -350,16 +350,19 @@ def create_histograms(domain_filter='All'):
     _create_edpl_histogram(d12, d14, domain_filter)
 
 
-def create_edpl_post_prob_scatter(year, domain_filter='All'):
+def create_edpl_post_prob_scatter(year, domain_filter='All', bins=500):
     df = read_df_from_file(MBARI_DATA_DIR + year + '_MBARI_cog_placements_with_lineage.tsv')
     if domain_filter != 'All':
         df = df[df.domain_name == domain_filter]
-    plt.scatter(df.post_prob, df.edpl, c='cyan')
-    plt.title(year + ' ' + domain_filter.title())
+    # bin on posterior probability
+    df['bin'] = pd.cut(df.post_prob, bins)
+    d = df.groupby('bin').agg({'post_prob': [np.size, np.mean], 'edpl': [np.mean]})
+    plt.scatter(d['post_prob', 'mean'], d['edpl', 'mean'], c='cyan')
+    plt.title(year + ' ' + domain_filter.title() + ' (' + str(bins) + ' bins)')
+    plt.ylim(-0.025, 1.025)
     plt.xlabel('Posterior Probability')
     plt.xlim(-0.025, 1.025)
     plt.ylabel('EDPL')
-    plt.ylim(0, 10)  # manual range (one outlier in 2014 > 10)
     _remove_top_right_lines_and_ticks()
 
     out_file = MBARI_ANALYSIS_DIR + 'scatter_plots/' + year + '_' + domain_filter.lower() + '_edpl_pp_scatter.png'
@@ -376,8 +379,8 @@ if __name__ == '__main__':
     create_histograms('All')
     create_histograms('Eukaryota')
     create_histograms('Bacteria')
-    create_histograms('Archaea')
-    create_histograms('Viruses')
+    # create_histograms('Archaea')
+    # create_histograms('Viruses')
 
     create_edpl_post_prob_scatter('2012', 'All')
     create_edpl_post_prob_scatter('2014', 'All')
@@ -385,7 +388,7 @@ if __name__ == '__main__':
     create_edpl_post_prob_scatter('2014', 'Eukaryota')
     create_edpl_post_prob_scatter('2012', 'Bacteria')
     create_edpl_post_prob_scatter('2014', 'Bacteria')
-    create_edpl_post_prob_scatter('2012', 'Archaea')
-    create_edpl_post_prob_scatter('2014', 'Archaea')
-    create_edpl_post_prob_scatter('2012', 'Viruses')
-    create_edpl_post_prob_scatter('2014', 'Viruses')
+    # create_edpl_post_prob_scatter('2012', 'Archaea')
+    # create_edpl_post_prob_scatter('2014', 'Archaea')
+    # create_edpl_post_prob_scatter('2012', 'Viruses')
+    # create_edpl_post_prob_scatter('2014', 'Viruses')

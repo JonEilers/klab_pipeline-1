@@ -193,85 +193,58 @@ def _get_values_and_weights(series):
     return values, weights
 
 
-def _remove_top_right_lines_and_ticks():
-    plot = plt.gca()
+def _remove_top_right_lines_and_ticks(plot=plt.gca()):
     plot.spines['right'].set_visible(False)
     plot.spines['top'].set_visible(False)
     plot.xaxis.set_ticks_position('bottom')
     plot.yaxis.set_ticks_position('left')
 
 
-def _create_comparison_histogram(bins, series1, series2, xlabel, title, file_name,
-                                 output_dir=MBARI_ANALYSIS_DIR + 'figure_3/', xlim=None, method='overlap'):
+def _create_comparison_histogram(a, bins, series1, series2, xlabel, title=None, xlim=None, ylim=None, method='overlap'):
     values, weights = _get_values_and_weights(series1)
     if method == 'overlap':
-        plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', alpha=0.6)
+        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', alpha=0.6)
     else:
-        plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', rwidth=0.4, align='left')
+        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', rwidth=0.4, align='left')
     values, weights = _get_values_and_weights(series2)
     if method == 'overlap':
-        plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2014, label='2014', alpha=0.6)
+        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2014, label='2014', alpha=0.6)
     else:
-        plt.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2014', rwidth=0.4, align='mid')
+        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2014', rwidth=0.4, align='mid')
 
-    plt.gca().yaxis.set_major_formatter(FuncFormatter(_to_percent))
-    plt.xlabel(xlabel)
-    plt.title(title)
+    a.yaxis.set_major_formatter(FuncFormatter(_to_percent))
+    a.set_xlabel(xlabel)
+    if title:
+        a.set_title(title)
     if xlim:
-        plt.xlim(xlim)
-    plt.grid(True)
-    _remove_top_right_lines_and_ticks()
-    plt.legend(bbox_to_anchor=(0.9, 0.9))
-
-    _ensure_dir(output_dir + file_name)
-    plt.savefig(output_dir + file_name)
-    plt.close()
+        a.set_xlim(xlim)
+    if ylim:
+        a.set_ylim(ylim)
+    a.grid(True)
+    a.legend(bbox_to_anchor=(0.95, 0.95))
 
 
-def _create_taxa_depth_histogram(df12, df14, domain_filter):
+def _create_taxa_depth_histogram(a, df12, df14):
     bins = range(0, 25, 1)
-    file_name = domain_filter.lower() + '_taxa_depth_histogram.pdf'
-    _create_comparison_histogram(bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
-                                 title=domain_filter + r' Taxa Depth per Year', xlim=[0, 25], file_name=file_name)
+    _create_comparison_histogram(a, bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
+                                 xlim=[0, 25], ylim=[0, 0.5])
 
 
-def _create_edpl_histogram(df12, df14, domain_filter):
+def _create_edpl_histogram(a, df12, df14):
     min_lim = 0
     max_lim = 2  # manual range (clips a long tail with few values)
     num_bins = 40
     bin_width = (max_lim - min_lim) / num_bins
     bins = np.arange(min_lim, max_lim + bin_width, bin_width)
-    file_name = domain_filter.lower() + '_edpl_histogram.pdf'
-    _create_comparison_histogram(bins=bins, series1=df12.edpl, series2=df14.edpl,
-                                 xlabel=r'Expected Distance between Placement Locations',
-                                 title=domain_filter + r' EDPL per Year', file_name=file_name, xlim=[min_lim, max_lim])
+    _create_comparison_histogram(a, bins=bins, series1=df12.edpl, series2=df14.edpl, xlabel=r'EDPL',
+                                 xlim=[min_lim, max_lim], ylim=[0, 0.5])
 
 
-def _create_post_prob_histogram(df12, df14, domain_filter):
+def _create_post_prob_histogram(a, df12, df14, title):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
-    file_name = domain_filter.lower() + '_post_prob_histogram.pdf'
-    _create_comparison_histogram(bins=bins, series1=df12.post_prob, series2=df14.post_prob,
-                                 xlabel=r'Posterior Probability', file_name=file_name, xlim=[0, 1],
-                                 title=domain_filter + r' Posterior Probability per Year')
-
-
-def create_stacked_charts():
-    _generate_domain_colored_set_of_graphs('domain')
-    _new_and_lost_placements('domain')
-    _generate_domain_colored_set_of_graphs('lowest_classification')
-
-
-def create_histograms(domain_filter='All'):
-    d12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
-    d14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
-    if domain_filter != 'All':
-        d12 = d12[d12.domain_name == domain_filter]
-        d14 = d14[d14.domain_name == domain_filter]
-
-    _create_post_prob_histogram(d12, d14, domain_filter)
-    _create_edpl_histogram(d12, d14, domain_filter)
-    _create_taxa_depth_histogram(d12, d14, domain_filter)
+    _create_comparison_histogram(a, bins=bins, series1=df12.post_prob, series2=df14.post_prob,
+                                 xlabel=r'Posterior Probability', xlim=[0, 1], ylim=[0, 0.25], title=title)
 
 
 def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
@@ -282,31 +255,74 @@ def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
     df['bin'] = pd.cut(df.post_prob, bins)
     d = df.groupby('bin').agg({'post_prob': [np.size, np.mean], 'edpl': [np.mean]})
     plt.scatter(d['post_prob', 'mean'], d['edpl', 'mean'], c='cyan')
-    plt.title(year + ' ' + domain_filter.title() + ' (' + str(bins) + ' bins)')
+    plt.title(year + ' ' + domain_filter.title())
     plt.ylim(-0.025, 1.025)
-    plt.xlabel('Posterior Probability')
+    plt.xlabel('Posterior Probability (' + str(bins) + ' bins)')
     plt.xlim(-0.025, 1.025)
     plt.ylabel('EDPL')
-    _remove_top_right_lines_and_ticks()
+    # _remove_top_right_lines_and_ticks()
 
-    out_file = MBARI_ANALYSIS_DIR + 'figure_4/' + year + '_' + domain_filter.lower() + '_edpl_pp_scatter.png'
+    out_file = MBARI_ANALYSIS_DIR + 'figure_4/' + year + '_' + domain_filter.lower() + '_edpl_pp_scatter.pdf'
     _ensure_dir(out_file)
     plt.savefig(out_file)
     plt.close()
 
 
-if __name__ == '__main__':
-    # _generate_euk_spectrum_set_of_graphs('division')
+# Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
+def create_figure_1():
+    pass
 
-    create_stacked_charts()
 
-    create_histograms('All')
-    create_histograms('Eukaryota')
-    create_histograms('Bacteria')
+# Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
+def create_figure_2():
+    _generate_domain_colored_set_of_graphs('domain')
+    _new_and_lost_placements('domain')
+    _generate_domain_colored_set_of_graphs('lowest_classification')
 
-    create_edpl_post_prob_scatter('2012', 'All')
-    create_edpl_post_prob_scatter('2014', 'All')
+
+# Figure 3 is six histograms: (post_prob, edpl, taxa_depth) x (euks, bacteria)
+def create_figure_3():
+    df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
+    df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
+    f, axarr = plt.subplots(3, 2)
+
+    domain_filter = 'Eukaryota'
+    d12 = df12[df12.domain_name == domain_filter]
+    d14 = df14[df14.domain_name == domain_filter]
+    _create_post_prob_histogram(axarr[0, 0], d12, d14, domain_filter)
+    _create_edpl_histogram(axarr[1, 0], d12, d14)
+    _create_taxa_depth_histogram(axarr[2, 0], d12, d14)
+
+    domain_filter = 'Bacteria'
+    d12 = df12[df12.domain_name == domain_filter]
+    d14 = df14[df14.domain_name == domain_filter]
+    _create_post_prob_histogram(axarr[0, 1], d12, d14, domain_filter)
+    _create_edpl_histogram(axarr[1, 1], d12, d14)
+    _create_taxa_depth_histogram(axarr[2, 1], d12, d14)
+
+    # hide all y-axis labels for plots on the right
+    plt.setp([a.get_yticklabels() for a in axarr[:, 1]], visible=False)
+    plt.tight_layout()
+
+    out_file = MBARI_ANALYSIS_DIR + 'figure_3.pdf'
+    _ensure_dir(out_file)
+    plt.savefig(out_file)
+    plt.close()
+
+
+# Figure 4 is two scatterplots: (edpl/post_prob) x (euks, bacteria)
+def create_figure_4():
     create_edpl_post_prob_scatter('2012', 'Eukaryota')
     create_edpl_post_prob_scatter('2014', 'Eukaryota')
     create_edpl_post_prob_scatter('2012', 'Bacteria')
     create_edpl_post_prob_scatter('2014', 'Bacteria')
+
+
+if __name__ == '__main__':
+    # create_figure_1()
+
+    # create_figure_2()
+
+    create_figure_3()
+
+    # create_figure_4()

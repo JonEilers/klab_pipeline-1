@@ -10,8 +10,9 @@ import matplotlib as mpl
 
 mpl.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 
-from matplotlib.ticker import FuncFormatter
 from matplotlib import pyplot as plt
+from matplotlib import rcParams
+from matplotlib.ticker import FuncFormatter
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file
 from klab.process.derived_info import CONFIDENT, FUZZY
@@ -193,11 +194,14 @@ def _get_values_and_weights(series):
     return values, weights
 
 
-def _remove_top_right_lines_and_ticks(plot=plt.gca()):
-    plot.spines['right'].set_visible(False)
-    plot.spines['top'].set_visible(False)
-    plot.xaxis.set_ticks_position('bottom')
-    plot.yaxis.set_ticks_position('left')
+def _adjust_ticks_and_labels(plot=plt.gca()):
+    plot.tick_params(
+        axis='both',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        length=0,  # length of tick is 0 - turn them all off
+    )
+    plot.tick_params(axis='x', labelsize=8)
+    plot.tick_params(axis='y', labelsize=8)
 
 
 def _create_comparison_histogram(a, bins, series1, series2, xlabel, title=None, xlim=None, ylim=None, method='overlap'):
@@ -307,7 +311,8 @@ def create_figure_3():
     plt.setp(axarr[0, 1].get_yticklabels(), visible=False)
     plt.setp(axarr[1, 1].get_yticklabels(), visible=False)
     # hide top and right ticks for all subplots
-    [_remove_top_right_lines_and_ticks(axarr[x, y]) for x in range(3) for y in range(2)]
+    [_adjust_ticks_and_labels(axarr[x, y]) for x in range(3) for y in range(2)]
+
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_3.pdf'
@@ -325,12 +330,13 @@ def create_figure_4():
 
 
 if __name__ == '__main__':
-    plt.style.use('ggplot')
-
     # create_figure_1()
 
     # create_figure_2()
 
-    create_figure_3()
-
     # create_figure_4()
+
+    plt.style.use('ggplot')
+    rcParams['xtick.direction'] = 'in'  # even turned off, they take space, so reduce that by directing in
+    rcParams['ytick.direction'] = 'in'
+    create_figure_3()

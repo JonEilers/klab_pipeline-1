@@ -305,14 +305,14 @@ def create_figure_3():
     _create_edpl_histogram(axarr[1, 1], d12, d14)
     _create_taxa_depth_histogram(axarr[2, 1], d12, d14)
 
-    # put legend in lower right subplot
-    axarr[2, 1].legend(bbox_to_anchor=(0.95, 0.95))
-    # hide y-tick labels
+    # put legend in lower right subplot and set font size
+    legend = axarr[2, 1].legend(bbox_to_anchor=(0.95, 0.95))
+    plt.setp(legend.get_texts(), fontsize='10')
+    # adjust ticks and labels for all subplots
+    [_adjust_ticks_and_labels(axarr[x, y]) for x in range(len(axarr)) for y in range(len(axarr[0]))]
+    # hide y-tick labels for a couple subplots
     plt.setp(axarr[0, 1].get_yticklabels(), visible=False)
     plt.setp(axarr[1, 1].get_yticklabels(), visible=False)
-    # hide top and right ticks for all subplots
-    [_adjust_ticks_and_labels(axarr[x, y]) for x in range(3) for y in range(2)]
-
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_3.pdf'

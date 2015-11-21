@@ -11,7 +11,6 @@ import matplotlib as mpl
 mpl.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 
 from matplotlib import pyplot as plt
-from matplotlib import rcParams
 from matplotlib.ticker import FuncFormatter
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file
@@ -194,14 +193,15 @@ def _get_values_and_weights(series):
     return values, weights
 
 
-def _adjust_ticks_and_labels(plot=plt.gca()):
-    plot.tick_params(
+def _adjust_ticks_and_labels(ax=plt.gca()):
+    ax.tick_params(
         axis='both',  # changes apply to the x-axis
         which='both',  # both major and minor ticks are affected
         length=0,  # length of tick is 0 - turn them all off
+        direction='in',  # takes up visual space, so turn in anyway
     )
-    plot.tick_params(axis='x', labelsize=8)
-    plot.tick_params(axis='y', labelsize=8)
+    ax.tick_params(axis='x', labelsize=8)
+    ax.tick_params(axis='y', labelsize=8)
 
 
 def _create_comparison_histogram(a, bins, series1, series2, xlabel, title=None, xlim=None, ylim=None, method='overlap'):
@@ -225,6 +225,7 @@ def _create_comparison_histogram(a, bins, series1, series2, xlabel, title=None, 
     if ylim:
         a.set_ylim(ylim)
     a.grid(True)
+    _adjust_ticks_and_labels(a)
 
 
 def _create_taxa_depth_histogram(a, df12, df14):
@@ -308,11 +309,10 @@ def create_figure_3():
     # put legend in lower right subplot and set font size
     legend = axarr[2, 1].legend(bbox_to_anchor=(0.95, 0.95))
     plt.setp(legend.get_texts(), fontsize='10')
-    # adjust ticks and labels for all subplots
-    [_adjust_ticks_and_labels(axarr[x, y]) for x in range(len(axarr)) for y in range(len(axarr[0]))]
     # hide y-tick labels for a couple subplots
     plt.setp(axarr[0, 1].get_yticklabels(), visible=False)
     plt.setp(axarr[1, 1].get_yticklabels(), visible=False)
+    # remove dead space
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_3.pdf'
@@ -337,6 +337,4 @@ if __name__ == '__main__':
     # create_figure_4()
 
     plt.style.use('ggplot')
-    rcParams['xtick.direction'] = 'in'  # even turned off, they take space, so reduce that by directing in
-    rcParams['ytick.direction'] = 'in'
     create_figure_3()

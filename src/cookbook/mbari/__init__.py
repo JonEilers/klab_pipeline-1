@@ -1,4 +1,3 @@
-
 MBARI_2012_PACKAGE_DIR = '/home/kodnerr/share/refpkgs/refpkgs022212/COG'
 MBARI_2014_PACKAGE_DIR = '/home/kodnerr/share/refpkgs/refpkgs_2014-10-20/COG_refpkg_08182014'
 
@@ -23,5 +22,5 @@ MBARI_2014_REF_PKG_FILE = MBARI_DATA_DIR + '2014_ref_pkg_placements.tsv'
 # shared directory where analysis goes
 MBARI_ANALYSIS_DIR = '/Users/ehervol/Dropbox/shared_projects/MBARI/'
 
-COLOR_2012 = 'blue'
-COLOR_2014 = 'red'
+COLOR_2012 = 'red'
+COLOR_2014 = 'blue'

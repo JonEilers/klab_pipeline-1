@@ -6,9 +6,9 @@ import os
 
 import pandas as pd
 import numpy as np
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
+mpl.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 
 from matplotlib.ticker import FuncFormatter
 from matplotlib import pyplot as plt
@@ -178,9 +178,9 @@ def _new_and_lost_placements(level):
 
 
 def _to_percent(y, position):
-    s = str(y * 100)
+    s = str(y * 100).split('.')[0]  # only take integer part
     # The percent symbol needs escaping in latex
-    if matplotlib.rcParams['text.usetex'] is True:
+    if mpl.rcParams['text.usetex'] is True:
         return s + r'$\%$'
     else:
         return s + '%'
@@ -203,12 +203,12 @@ def _remove_top_right_lines_and_ticks(plot=plt.gca()):
 def _create_comparison_histogram(a, bins, series1, series2, xlabel, title=None, xlim=None, ylim=None, method='overlap'):
     values, weights = _get_values_and_weights(series1)
     if method == 'overlap':
-        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', alpha=0.6)
+        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', alpha=0.5)
     else:
         a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', rwidth=0.4, align='left')
     values, weights = _get_values_and_weights(series2)
     if method == 'overlap':
-        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2014, label='2014', alpha=0.6)
+        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2014, label='2014', alpha=0.5)
     else:
         a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2014', rwidth=0.4, align='mid')
 
@@ -221,13 +221,12 @@ def _create_comparison_histogram(a, bins, series1, series2, xlabel, title=None, 
     if ylim:
         a.set_ylim(ylim)
     a.grid(True)
-    a.legend(bbox_to_anchor=(0.95, 0.95))
 
 
 def _create_taxa_depth_histogram(a, df12, df14):
     bins = range(0, 25, 1)
     _create_comparison_histogram(a, bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
-                                 xlim=[0, 25], ylim=[0, 0.5])
+                                 xlim=[0, 25])
 
 
 def _create_edpl_histogram(a, df12, df14):
@@ -282,6 +281,8 @@ def create_figure_2():
 
 # Figure 3 is six histograms: (post_prob, edpl, taxa_depth) x (euks, bacteria)
 def create_figure_3():
+    # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
+    # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
     f, axarr = plt.subplots(3, 2)
@@ -300,8 +301,13 @@ def create_figure_3():
     _create_edpl_histogram(axarr[1, 1], d12, d14)
     _create_taxa_depth_histogram(axarr[2, 1], d12, d14)
 
-    # hide all y-axis labels for plots on the right
-    plt.setp([a.get_yticklabels() for a in axarr[:, 1]], visible=False)
+    # put legend in lower right subplot
+    axarr[2, 1].legend(bbox_to_anchor=(0.95, 0.95))
+    # hide y-tick labels
+    plt.setp(axarr[0, 1].get_yticklabels(), visible=False)
+    plt.setp(axarr[1, 1].get_yticklabels(), visible=False)
+    # hide top and right ticks for all subplots
+    [_remove_top_right_lines_and_ticks(axarr[x, y]) for x in range(3) for y in range(2)]
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_3.pdf'
@@ -319,6 +325,8 @@ def create_figure_4():
 
 
 if __name__ == '__main__':
+    plt.style.use('ggplot')
+
     # create_figure_1()
 
     # create_figure_2()

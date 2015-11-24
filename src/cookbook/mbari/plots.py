@@ -274,14 +274,13 @@ def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
 
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
 def create_figure_1():
+    fig, axes = plt.subplots(nrows=3, ncols=1)
+
     d3 = read_df_from_file('/Users/ehervol/Projects/WWU/MBARI_data/mbari_ref_counts.tsv')
-    d3.plot('domain_name', ['2012', '2014'], kind='bar')
-    plt.title('Unique Reference Sequences by Domain')
-    plt.xlabel('')
-    _ensure_dir(MBARI_ANALYSIS_DIR + 'figure_1/1_a.pdf')
-    plt.tight_layout()
-    plt.savefig(MBARI_ANALYSIS_DIR + 'figure_1/1_a.pdf')
-    plt.close()
+    subplot = axes[0]
+    d3.plot.bar(x='domain_name', y=['2012', '2014'], ax=subplot)
+    subplot.set_title('Unique Reference Sequences by Domain')
+    subplot.set_xlabel('')
 
     # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
     # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
@@ -297,22 +296,25 @@ def create_figure_1():
     # merge 2012 and 2014 data
     df = pd.merge(df12, df14, on='domain_name', how='outer', suffixes=('_12', '_14'))
     df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
-    df.plot('domain_name', ['2012', '2014'], kind='bar')
-    plt.title('Unique Placements by Domain')
-    plt.xlabel('')
-    plt.tight_layout()
-    plt.savefig(MBARI_ANALYSIS_DIR + 'figure_1/1_b.pdf')
-    plt.close()
+
+    subplot = axes[1]
+    df.plot.bar(x='domain_name', y=['2012', '2014'], ax=subplot)
+    subplot.set_title('Unique Placements by Domain')
+    subplot.set_xlabel('')
 
     # normalize data
     d = pd.merge(d3, df, on='domain_name', how='outer', suffixes=('_ref', '_domain'))
     d['2012'] = d['2012_domain'] / d['2012_ref']
     d['2014'] = d['2014_domain'] / d['2014_ref']
-    d.plot('domain_name', ['2012', '2014'], kind='bar')
-    plt.title('Normalized Placements by Domain')
-    plt.xlabel('')
+
+    subplot = axes[2]
+    d.plot.bar(x='domain_name', y=['2012', '2014'], ax=subplot)
+    subplot.set_title('Normalized Placements by Domain')
+    subplot.set_xlabel('')
+
+    _ensure_dir(MBARI_ANALYSIS_DIR + 'figure_1.pdf')
     plt.tight_layout()
-    plt.savefig(MBARI_ANALYSIS_DIR + 'figure_1/1_c.pdf')
+    plt.savefig(MBARI_ANALYSIS_DIR + 'figure_1.pdf')
     plt.close()
 
 
@@ -329,28 +331,28 @@ def create_figure_3():
     # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
-    f, axarr = plt.subplots(3, 2)
+    fig, axes = plt.subplots(nrows=3, ncols=2)
 
     domain_filter = 'Eukaryota'
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
-    _create_post_prob_histogram(axarr[0, 0], d12, d14, domain_filter)
-    _create_edpl_histogram(axarr[1, 0], d12, d14)
-    _create_taxa_depth_histogram(axarr[2, 0], d12, d14)
+    _create_post_prob_histogram(axes[0, 0], d12, d14, domain_filter)
+    _create_edpl_histogram(axes[1, 0], d12, d14)
+    _create_taxa_depth_histogram(axes[2, 0], d12, d14)
 
     domain_filter = 'Bacteria'
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
-    _create_post_prob_histogram(axarr[0, 1], d12, d14, domain_filter)
-    _create_edpl_histogram(axarr[1, 1], d12, d14)
-    _create_taxa_depth_histogram(axarr[2, 1], d12, d14)
+    _create_post_prob_histogram(axes[0, 1], d12, d14, domain_filter)
+    _create_edpl_histogram(axes[1, 1], d12, d14)
+    _create_taxa_depth_histogram(axes[2, 1], d12, d14)
 
     # put legend in lower right subplot and set font size
-    legend = axarr[2, 1].legend(bbox_to_anchor=(0.95, 0.95))
+    legend = axes[2, 1].legend(bbox_to_anchor=(0.95, 0.95))
     plt.setp(legend.get_texts(), fontsize='10')
     # hide y-tick labels for a couple subplots
-    plt.setp(axarr[0, 1].get_yticklabels(), visible=False)
-    plt.setp(axarr[1, 1].get_yticklabels(), visible=False)
+    plt.setp(axes[0, 1].get_yticklabels(), visible=False)
+    plt.setp(axes[1, 1].get_yticklabels(), visible=False)
     # remove dead space
     plt.tight_layout()
 

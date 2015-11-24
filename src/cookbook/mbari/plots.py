@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file
-from klab.process.derived_info import CONFIDENT, FUZZY
+from klab.process.derived_info import CONFIDENT, FUZZY, group_and_count
 from lib.stacked_bar_graph import StackedBarGrapher
 from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
     MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE
@@ -274,7 +274,46 @@ def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
 
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
 def create_figure_1():
-    pass
+    d3 = read_df_from_file('/Users/ehervol/Projects/WWU/MBARI_data/mbari_ref_counts.tsv')
+    d3.plot('domain_name', ['2012', '2014'], kind='bar')
+    plt.title('Unique Reference Sequences by Domain')
+    plt.xlabel('')
+    _ensure_dir(MBARI_ANALYSIS_DIR + 'figure_1/1_a.pdf')
+    plt.tight_layout()
+    plt.savefig(MBARI_ANALYSIS_DIR + 'figure_1/1_a.pdf')
+    plt.close()
+
+    # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
+    # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
+    # filter by domain and drop dups for 2012 and 2014 data
+    d = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
+    d.drop_duplicates('classification', inplace=True)
+    df = d[d['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
+    df12 = group_and_count(df, ['domain_name'])
+    d = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
+    d.drop_duplicates('classification', inplace=True)
+    df = d[d['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
+    df14 = group_and_count(df, ['domain_name'])
+    # merge 2012 and 2014 data
+    df = pd.merge(df12, df14, on='domain_name', how='outer', suffixes=('_12', '_14'))
+    df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
+    df.plot('domain_name', ['2012', '2014'], kind='bar')
+    plt.title('Unique Placements by Domain')
+    plt.xlabel('')
+    plt.tight_layout()
+    plt.savefig(MBARI_ANALYSIS_DIR + 'figure_1/1_b.pdf')
+    plt.close()
+
+    # normalize data
+    d = pd.merge(d3, df, on='domain_name', how='outer', suffixes=('_ref', '_domain'))
+    d['2012'] = d['2012_domain'] / d['2012_ref']
+    d['2014'] = d['2014_domain'] / d['2014_ref']
+    d.plot('domain_name', ['2012', '2014'], kind='bar')
+    plt.title('Normalized Placements by Domain')
+    plt.xlabel('')
+    plt.tight_layout()
+    plt.savefig(MBARI_ANALYSIS_DIR + 'figure_1/1_c.pdf')
+    plt.close()
 
 
 # Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
@@ -330,11 +369,11 @@ def create_figure_4():
 
 
 if __name__ == '__main__':
-    # create_figure_1()
+    plt.style.use('ggplot')
+    create_figure_1()
 
     # create_figure_2()
 
     # create_figure_4()
 
-    plt.style.use('ggplot')
-    create_figure_3()
+    # create_figure_3()

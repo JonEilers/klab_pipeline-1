@@ -73,7 +73,7 @@ def _merge_reference_package_data(file_12, file_14, result):
     d14 = group_and_count(d2, ['domain_name'])
 
     df = pd.merge(d12, d14, on='domain_name', how='outer', suffixes=('_12', '_14'))
-    df = df[df['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota', 'Viruses'])]
+    df = df[df['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
     df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
     df['change'] = df['2014'] / df['2012']
     write_df_to_file(df, result)

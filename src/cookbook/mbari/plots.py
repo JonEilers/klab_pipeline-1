@@ -236,12 +236,12 @@ def _create_taxa_depth_histogram(a, df12, df14):
 
 def _create_edpl_histogram(a, df12, df14):
     min_lim = 0
-    max_lim = 1  # manual range (clips a long tail with few values)
+    max_lim = 1.2  # manual range (clips a long tail with few values)
     num_bins = 40
     bin_width = (max_lim - min_lim) / num_bins
     bins = np.arange(min_lim, max_lim + bin_width, bin_width)
     _create_comparison_histogram(a, bins=bins, series1=df12.edpl, series2=df14.edpl, xlabel=r'EDPL',
-                                 xlim=[min_lim, max_lim], ylim=[0, 0.4])
+                                 xlim=[min_lim, max_lim], ylim=[0, 0.45])
 
 
 def _create_post_prob_histogram(a, df12, df14):
@@ -298,7 +298,7 @@ def create_figure_1():
 
     d3 = read_df_from_file('/Users/ehervol/Projects/WWU/MBARI_data/mbari_ref_counts.tsv')
     subplot = axes[0]
-    subplot.set_title('Unique Reference Sequences by Domain')
+    subplot.set_title('Unique Reference Sequences by Domain', fontsize=12)
     _side_by_side_bar(subplot, d3, x=x, y=y, colors=c)
 
     # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
@@ -317,7 +317,7 @@ def create_figure_1():
     df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
 
     subplot = axes[1]
-    subplot.set_title('Unique Placements by Domain')
+    subplot.set_title('Unique Placements by Domain', fontsize=12)
     _side_by_side_bar(subplot, df, x=x, y=y, colors=c)
 
     # normalize data
@@ -326,12 +326,12 @@ def create_figure_1():
     d['2014'] = d['2014_domain'] / d['2014_ref']
 
     subplot = axes[2]
-    subplot.set_title('Normalized Placements by Domain')
+    subplot.set_title('Normalized Placements by Domain', fontsize=12)
     _side_by_side_bar(subplot, d, x=x, y=y, colors=c)
 
     # put legend in lower right subplot and set font size
     legend = axes[0].legend(loc='upper right')
-    plt.setp(legend.get_texts(), fontsize='10')
+    plt.setp(legend.get_texts(), fontsize=10)
     # hide x-tick labels for a couple subplots
     plt.setp(axes[0].get_xticklabels(), visible=False)
     plt.setp(axes[1].get_xticklabels(), visible=False)
@@ -376,7 +376,7 @@ def create_figure_3():
 
     # put legend in lower right subplot and set font size
     legend = axes[2, 1].legend(loc='upper right')
-    plt.setp(legend.get_texts(), fontsize='10')
+    plt.setp(legend.get_texts(), fontsize=10)
     # hide y-tick labels for a couple subplots
     plt.setp(axes[0, 1].get_yticklabels(), visible=False)
     plt.setp(axes[1, 1].get_yticklabels(), visible=False)

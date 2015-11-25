@@ -236,12 +236,12 @@ def _create_taxa_depth_histogram(a, df12, df14):
 
 def _create_edpl_histogram(a, df12, df14):
     min_lim = 0
-    max_lim = 2  # manual range (clips a long tail with few values)
+    max_lim = 1  # manual range (clips a long tail with few values)
     num_bins = 40
     bin_width = (max_lim - min_lim) / num_bins
     bins = np.arange(min_lim, max_lim + bin_width, bin_width)
     _create_comparison_histogram(a, bins=bins, series1=df12.edpl, series2=df14.edpl, xlabel=r'EDPL',
-                                 xlim=[min_lim, max_lim], ylim=[0, 0.5])
+                                 xlim=[min_lim, max_lim], ylim=[0, 0.4])
 
 
 def _create_post_prob_histogram(a, df12, df14):

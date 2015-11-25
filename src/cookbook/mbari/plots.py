@@ -244,11 +244,11 @@ def _create_edpl_histogram(a, df12, df14):
                                  xlim=[min_lim, max_lim], ylim=[0, 0.5])
 
 
-def _create_post_prob_histogram(a, df12, df14, title):
+def _create_post_prob_histogram(a, df12, df14):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
     _create_comparison_histogram(a, bins=bins, series1=df12.post_prob, series2=df14.post_prob,
-                                 xlabel=r'Posterior Probability', xlim=[0, 1], ylim=[0, 0.25], title=title)
+                                 xlabel=r'Posterior Probability', xlim=[0, 1], ylim=[0, 0.25])
 
 
 def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
@@ -272,15 +272,34 @@ def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
     plt.close()
 
 
+def _side_by_side_bar(subplot, df, x, y, colors):
+    categories = df[x].unique()
+    n = len(categories)
+    bars = len(y)
+    gap = 0.33
+    width = (1 - gap) / bars
+    alpha = 0.6
+    xticks = range(1, n + 1)
+
+    for i in range(0, bars):
+        pos = [x - (1 - gap) / 2. + i * width for x in xticks]
+        subplot.bar(pos, df[y[i]], gap, color=colors[i], label=y[i], alpha=alpha)
+    subplot.set_xticks(xticks)
+    subplot.set_xticklabels(categories)
+    _adjust_ticks_and_labels(subplot)
+
+
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
 def create_figure_1():
     fig, axes = plt.subplots(nrows=3, ncols=1)
+    x = 'domain_name'
+    y = ['2012', '2014']
+    c = [COLOR_2012, COLOR_2014]
 
     d3 = read_df_from_file('/Users/ehervol/Projects/WWU/MBARI_data/mbari_ref_counts.tsv')
     subplot = axes[0]
-    d3.plot.bar(x='domain_name', y=['2012', '2014'], ax=subplot)
     subplot.set_title('Unique Reference Sequences by Domain')
-    subplot.set_xlabel('')
+    _side_by_side_bar(subplot, d3, x=x, y=y, colors=c)
 
     # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
     # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
@@ -298,9 +317,8 @@ def create_figure_1():
     df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
 
     subplot = axes[1]
-    df.plot.bar(x='domain_name', y=['2012', '2014'], ax=subplot)
     subplot.set_title('Unique Placements by Domain')
-    subplot.set_xlabel('')
+    _side_by_side_bar(subplot, df, x=x, y=y, colors=c)
 
     # normalize data
     d = pd.merge(d3, df, on='domain_name', how='outer', suffixes=('_ref', '_domain'))
@@ -308,13 +326,20 @@ def create_figure_1():
     d['2014'] = d['2014_domain'] / d['2014_ref']
 
     subplot = axes[2]
-    d.plot.bar(x='domain_name', y=['2012', '2014'], ax=subplot)
     subplot.set_title('Normalized Placements by Domain')
-    subplot.set_xlabel('')
+    _side_by_side_bar(subplot, d, x=x, y=y, colors=c)
 
-    _ensure_dir(MBARI_ANALYSIS_DIR + 'figure_1.pdf')
+    # put legend in lower right subplot and set font size
+    legend = axes[0].legend(loc='upper right')
+    plt.setp(legend.get_texts(), fontsize='10')
+    # hide x-tick labels for a couple subplots
+    plt.setp(axes[0].get_xticklabels(), visible=False)
+    plt.setp(axes[1].get_xticklabels(), visible=False)
     plt.tight_layout()
-    plt.savefig(MBARI_ANALYSIS_DIR + 'figure_1.pdf')
+
+    out_file = MBARI_ANALYSIS_DIR + 'figure_1.pdf'
+    _ensure_dir(out_file)
+    plt.savefig(out_file)
     plt.close()
 
 
@@ -336,19 +361,21 @@ def create_figure_3():
     domain_filter = 'Eukaryota'
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
-    _create_post_prob_histogram(axes[0, 0], d12, d14, domain_filter)
+    axes[0, 0].set_title(domain_filter)
+    _create_post_prob_histogram(axes[0, 0], d12, d14)
     _create_edpl_histogram(axes[1, 0], d12, d14)
     _create_taxa_depth_histogram(axes[2, 0], d12, d14)
 
     domain_filter = 'Bacteria'
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
-    _create_post_prob_histogram(axes[0, 1], d12, d14, domain_filter)
+    axes[0, 1].set_title(domain_filter)
+    _create_post_prob_histogram(axes[0, 1], d12, d14)
     _create_edpl_histogram(axes[1, 1], d12, d14)
     _create_taxa_depth_histogram(axes[2, 1], d12, d14)
 
     # put legend in lower right subplot and set font size
-    legend = axes[2, 1].legend(bbox_to_anchor=(0.95, 0.95))
+    legend = axes[2, 1].legend(loc='upper right')
     plt.setp(legend.get_texts(), fontsize='10')
     # hide y-tick labels for a couple subplots
     plt.setp(axes[0, 1].get_yticklabels(), visible=False)
@@ -376,6 +403,6 @@ if __name__ == '__main__':
 
     # create_figure_2()
 
-    # create_figure_4()
+    create_figure_3()
 
-    # create_figure_3()
+    # create_figure_4()

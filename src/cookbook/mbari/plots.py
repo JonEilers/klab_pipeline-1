@@ -201,7 +201,7 @@ def _create_comparison_histogram(subplot, bins, series1, color1, series2, color2
                  linewidth=0.5, edgecolor='white')
 
     subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
-    subplot.set_xlabel(xlabel)
+    subplot.set_xlabel(xlabel, fontsize=10)
     if xlim:
         subplot.set_xlim(xlim)
     if ylim:
@@ -284,7 +284,7 @@ def create_figure_1():
 
     d3 = read_df_from_file('/Users/ehervol/Projects/WWU/MBARI_data/mbari_ref_counts.tsv')
     subplot = axes[0]
-    subplot.set_title('Unique Reference Sequences by Domain', fontsize=12)
+    subplot.set_title('Unique Reference Sequences by Domain')
     _side_by_side_bar(subplot, d3, x=x, y=y, colors=c)
 
     # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
@@ -303,7 +303,7 @@ def create_figure_1():
     df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
 
     subplot = axes[1]
-    subplot.set_title('Unique Placements by Domain', fontsize=12)
+    subplot.set_title('Unique Placements by Domain')
     _side_by_side_bar(subplot, df, x=x, y=y, colors=c)
 
     # normalize data
@@ -312,7 +312,7 @@ def create_figure_1():
     d['2014'] = d['2014_domain'] / d['2014_ref']
 
     subplot = axes[2]
-    subplot.set_title('Normalized Placements by Domain', fontsize=12)
+    subplot.set_title('Normalized Placements by Domain')
     _side_by_side_bar(subplot, d, x=x, y=y, colors=c)
 
     # put legend in lower right subplot and set font size
@@ -344,7 +344,7 @@ def create_figure_3():
     df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
     fig, axes = plt.subplots(nrows=3, ncols=2)
 
-    domain_filter = 'Eukaryota'
+    domain_filter = 'Bacteria'
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
     axes[0, 0].set_title(domain_filter)
@@ -352,7 +352,7 @@ def create_figure_3():
     _create_edpl_histogram(axes[1, 0], d12, d14)
     _create_taxa_depth_histogram(axes[2, 0], d12, d14)
 
-    domain_filter = 'Bacteria'
+    domain_filter = 'Eukaryota'
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
     axes[0, 1].set_title(domain_filter)
@@ -385,11 +385,12 @@ def create_figure_4():
 
 if __name__ == '__main__':
     style_overrides = {
-        'axes.facecolor': '.92',
-        'legend.frameon': True,
-        'text.color': '.1',
-        'xtick.color': '.4',
-        'ytick.color': '.4',
+        'axes.facecolor': '0.92',  # similar to ggplot
+        'legend.frameon': True,  # good when gridlines are on - separates legend from background
+        'text.color': '0.1',  # not quite black
+        'axes.labelcolor': '0.3',  # lighter grey than text
+        'xtick.color': '0.4',  # lighter grey than text or label
+        'ytick.color': '0.4',
     }
     sns.set_style('darkgrid', style_overrides)
 

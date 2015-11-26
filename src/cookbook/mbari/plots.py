@@ -386,29 +386,36 @@ def create_figure_4():
     fig, axes = plt.subplots(nrows=2, ncols=1)
 
     subplot = axes[0]
-    divider_x = 0.28  # eyeballed estimate
     domain_filter = 'Bacteria'
-    print _calc_split(df12, divider_x, domain_filter), '2012 ' + domain_filter
-    print _calc_split(df14, divider_x, domain_filter), '2014 ' + domain_filter
-    print
-
     create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, domain_filter)
     create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, domain_filter)
+
+    divider_x = 0.28  # eyeballed estimate
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
+    l12, r12 = _calc_split(df12, divider_x, domain_filter)
+    l14, r14 = _calc_split(df14, divider_x, domain_filter)
+    subplot.text(0.12, 0.81, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.65, 0.81, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.12, 0.68, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.65, 0.68, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
 
     subplot = axes[1]
-    divider_x = 0.75  # eyeballed estimate
     domain_filter = 'Eukaryota'
-    print _calc_split(df12, divider_x, domain_filter), '2012 ' + domain_filter
-    print _calc_split(df14, divider_x, domain_filter), '2014 ' + domain_filter
-
     create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, domain_filter)
     create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, domain_filter)
+
+    divider_x = 0.75  # eyeballed estimate
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
+    l12, r12 = _calc_split(df12, divider_x, domain_filter)
+    l14, r14 = _calc_split(df14, divider_x, domain_filter)
+    subplot.text(0.45, 0.81, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.85, 0.81, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.45, 0.68, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.85, 0.68, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
 
     # put legend in upper right subplot and set font size
     legend = axes[0].legend(loc='upper right')
-    plt.setp(legend.get_texts(), fontsize=10)
+    plt.setp(legend.get_texts(), fontsize=12)
     # hide x-tick labels for top subplot
     # plt.setp(axes[0].get_xticklabels(), visible=False)
     # remove dead space

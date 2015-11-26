@@ -369,6 +369,16 @@ def create_figure_3():
     plt.close()
 
 
+def _calc_split(df, divider, domain_filter):
+    d1 = df[df.domain_name == domain_filter].copy()
+    d1['bin'] = pd.cut(d1.post_prob, [0, divider, 1])
+    d = d1.groupby('bin').agg({'post_prob': [np.size]})
+    tot = d['post_prob', 'size'].sum()
+    l = d['post_prob', 'size'][0] / tot
+    r = d['post_prob', 'size'][1] / tot
+    return l, r
+
+
 # Figure 4 is two scatterplots: (edpl/post_prob) x (euks, bacteria)
 def create_figure_4():
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
@@ -377,14 +387,23 @@ def create_figure_4():
 
     subplot = axes[0]
     divider_x = 0.28  # eyeballed estimate
-    create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, 'Bacteria')
-    create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, 'Bacteria')
+    domain_filter = 'Bacteria'
+    print _calc_split(df12, divider_x, domain_filter), '2012 ' + domain_filter
+    print _calc_split(df14, divider_x, domain_filter), '2014 ' + domain_filter
+    print
+
+    create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, domain_filter)
+    create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, domain_filter)
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
 
     subplot = axes[1]
     divider_x = 0.75  # eyeballed estimate
-    create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, 'Eukaryota')
-    create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, 'Eukaryota')
+    domain_filter = 'Eukaryota'
+    print _calc_split(df12, divider_x, domain_filter), '2012 ' + domain_filter
+    print _calc_split(df14, divider_x, domain_filter), '2014 ' + domain_filter
+
+    create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, domain_filter)
+    create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, domain_filter)
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
 
     # put legend in upper right subplot and set font size

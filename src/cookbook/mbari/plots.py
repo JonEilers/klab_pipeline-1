@@ -4,11 +4,13 @@ from __future__ import division
 
 import os
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import matplotlib as mpl
 
 mpl.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
+
+import seaborn as sns
 
 from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
@@ -18,9 +20,6 @@ from klab.process.derived_info import CONFIDENT, FUZZY, group_and_count
 from lib.stacked_bar_graph import StackedBarGrapher
 from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
     MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE
-
-
-# MBARI_12_14_MERGED_FILE = MBARI_DATA_DIR + 'mbari_test_merged.tsv'
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
 DOMAIN_COLORS = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
@@ -193,45 +192,28 @@ def _get_values_and_weights(series):
     return values, weights
 
 
-def _adjust_ticks_and_labels(ax=plt.gca()):
-    ax.tick_params(
-        axis='both',  # changes apply to the x-axis
-        which='both',  # both major and minor ticks are affected
-        length=0,  # length of tick is 0 - turn them all off
-        direction='in',  # takes up visual space, so turn in anyway
-    )
-    ax.tick_params(axis='x', labelsize=8)
-    ax.tick_params(axis='y', labelsize=8)
-
-
-def _create_comparison_histogram(a, bins, series1, series2, xlabel, title=None, xlim=None, ylim=None, method='overlap'):
+def _create_comparison_histogram(subplot, bins, series1, color1, series2, color2, xlabel, xlim=None, ylim=None):
     values, weights = _get_values_and_weights(series1)
-    if method == 'overlap':
-        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', alpha=0.5)
-    else:
-        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2012', rwidth=0.4, align='left')
+    subplot.hist(values, bins=bins, weights=weights, facecolor=color1, label='2012', alpha=0.5,
+                 linewidth=0.5, edgecolor='white')
     values, weights = _get_values_and_weights(series2)
-    if method == 'overlap':
-        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2014, label='2014', alpha=0.5)
-    else:
-        a.hist(values, bins=bins, weights=weights, facecolor=COLOR_2012, label='2014', rwidth=0.4, align='mid')
+    subplot.hist(values, bins=bins, weights=weights, facecolor=color2, label='2014', alpha=0.5,
+                 linewidth=0.5, edgecolor='white')
 
-    a.yaxis.set_major_formatter(FuncFormatter(_to_percent))
-    a.set_xlabel(xlabel)
-    if title:
-        a.set_title(title)
+    subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
+    subplot.set_xlabel(xlabel)
     if xlim:
-        a.set_xlim(xlim)
+        subplot.set_xlim(xlim)
     if ylim:
-        a.set_ylim(ylim)
-    a.grid(True)
-    _adjust_ticks_and_labels(a)
+        subplot.set_ylim(ylim)
+    subplot.tick_params(axis='x', labelsize=8)
+    subplot.tick_params(axis='y', labelsize=8)
 
 
 def _create_taxa_depth_histogram(a, df12, df14):
     bins = range(0, 25, 1)
-    _create_comparison_histogram(a, bins=bins, series1=df12.taxa_depth, series2=df14.taxa_depth, xlabel=r'Taxa Depth',
-                                 xlim=[0, 25])
+    _create_comparison_histogram(a, bins=bins, series1=df12.taxa_depth, color1=COLOR_2012, series2=df14.taxa_depth,
+                                 color2=COLOR_2014, xlabel=r'Taxa Depth', xlim=[0, 25])
 
 
 def _create_edpl_histogram(a, df12, df14):
@@ -240,15 +222,15 @@ def _create_edpl_histogram(a, df12, df14):
     num_bins = 40
     bin_width = (max_lim - min_lim) / num_bins
     bins = np.arange(min_lim, max_lim + bin_width, bin_width)
-    _create_comparison_histogram(a, bins=bins, series1=df12.edpl, series2=df14.edpl, xlabel=r'EDPL',
-                                 xlim=[min_lim, max_lim], ylim=[0, 0.45])
+    _create_comparison_histogram(a, bins=bins, series1=df12.edpl, color1=COLOR_2012, series2=df14.edpl,
+                                 color2=COLOR_2014, xlabel=r'EDPL', xlim=[min_lim, max_lim], ylim=[0, 0.45])
 
 
 def _create_post_prob_histogram(a, df12, df14):
     bin_width = 0.04
     bins = np.arange(0, 1 + bin_width, bin_width)
-    _create_comparison_histogram(a, bins=bins, series1=df12.post_prob, series2=df14.post_prob,
-                                 xlabel=r'Posterior Probability', xlim=[0, 1], ylim=[0, 0.25])
+    _create_comparison_histogram(a, bins=bins, series1=df12.post_prob, color1=COLOR_2012, series2=df14.post_prob,
+                                 color2=COLOR_2014, xlabel=r'Posterior Probability', xlim=[0, 1], ylim=[0, 0.25])
 
 
 def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
@@ -283,10 +265,11 @@ def _side_by_side_bar(subplot, df, x, y, colors):
 
     for i in range(0, bars):
         pos = [x - (1 - gap) / 2. + i * width for x in xticks]
-        subplot.bar(pos, df[y[i]], gap, color=colors[i], label=y[i], alpha=alpha)
+        subplot.bar(pos, df[y[i]], gap, color=colors[i], label=y[i], alpha=alpha, linewidth=0)
     subplot.set_xticks(xticks)
     subplot.set_xticklabels(categories)
-    _adjust_ticks_and_labels(subplot)
+    subplot.tick_params(axis='x', labelsize=8)
+    subplot.tick_params(axis='y', labelsize=8)
 
 
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
@@ -398,7 +381,15 @@ def create_figure_4():
 
 
 if __name__ == '__main__':
-    plt.style.use('ggplot')
+    style_overrides = {
+        'axes.facecolor': '.92',
+        'legend.frameon': True,
+        'text.color': '.1',
+        'xtick.color': '.4',
+        'ytick.color': '.4',
+    }
+    sns.set_style('darkgrid', style_overrides)
+
     create_figure_1()
 
     # create_figure_2()

@@ -254,12 +254,15 @@ def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
     plt.close()
 
 
-def _side_by_side_bar(subplot, df, x, y, colors):
+def _side_by_side_bar(subplot, df, x, y, colors, gap=None):
     categories = df[x].unique()
     n = len(categories)
     bars = len(y)
-    gap = 0.33
-    width = (1 - gap) / bars
+    if not gap:
+        gap = width = 1 / (bars + 1)
+    else:  # this path needs work
+        width = (1 - gap) / bars
+    width += 0.005  # leave slight space between bars
     alpha = 0.6
     xticks = range(1, n + 1)
 

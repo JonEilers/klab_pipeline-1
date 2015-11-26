@@ -233,25 +233,18 @@ def _create_post_prob_histogram(a, df12, df14):
                                  color2=COLOR_2014, xlabel=r'Posterior Probability', xlim=[0, 1], ylim=[0, 0.25])
 
 
-def create_edpl_post_prob_scatter(year, domain_filter='All', bins=100):
-    df = read_df_from_file(MBARI_DATA_DIR + year + '_MBARI_cog_placements_with_lineage.tsv')
-    if domain_filter != 'All':
-        df = df[df.domain_name == domain_filter]
+def create_edpl_post_prob_scatter(subplot, df, year, color, domain_filter, bins=100):
+    d1 = df[df.domain_name == domain_filter].copy()
     # bin on posterior probability
-    df['bin'] = pd.cut(df.post_prob, bins)
-    d = df.groupby('bin').agg({'post_prob': [np.size, np.mean], 'edpl': [np.mean]})
-    plt.scatter(d['post_prob', 'mean'], d['edpl', 'mean'], c='cyan')
-    plt.title(year + ' ' + domain_filter.title())
-    plt.ylim(-0.025, 1.025)
-    plt.xlabel('Posterior Probability (' + str(bins) + ' bins)')
-    plt.xlim(-0.025, 1.025)
-    plt.ylabel('EDPL')
-    # _remove_top_right_lines_and_ticks()
+    d1['bin'] = pd.cut(d1.post_prob, bins)
+    d = d1.groupby('bin').agg({'post_prob': [np.size, np.mean], 'edpl': [np.mean]})
 
-    out_file = MBARI_ANALYSIS_DIR + 'figure_4/' + year + '_' + domain_filter.lower() + '_edpl_pp_scatter.pdf'
-    _ensure_dir(out_file)
-    plt.savefig(out_file)
-    plt.close()
+    subplot.scatter(d['post_prob', 'mean'], d['edpl', 'mean'], c=color, label=year, alpha=0.8)
+    subplot.set_title(domain_filter.title())
+    subplot.set_ylim(-0.025, 1.025)
+    subplot.set_xlabel('Posterior Probability')
+    subplot.set_xlim(-0.025, 1.025)
+    subplot.set_ylabel('EDPL')
 
 
 def _side_by_side_bar(subplot, df, x, y, colors, gap=None):
@@ -321,6 +314,7 @@ def create_figure_1():
     # hide x-tick labels for a couple subplots
     plt.setp(axes[0].get_xticklabels(), visible=False)
     plt.setp(axes[1].get_xticklabels(), visible=False)
+    # remove dead space
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_1.pdf'
@@ -377,20 +371,44 @@ def create_figure_3():
 
 # Figure 4 is two scatterplots: (edpl/post_prob) x (euks, bacteria)
 def create_figure_4():
-    create_edpl_post_prob_scatter('2012', 'Eukaryota')
-    create_edpl_post_prob_scatter('2014', 'Eukaryota')
-    create_edpl_post_prob_scatter('2012', 'Bacteria')
-    create_edpl_post_prob_scatter('2014', 'Bacteria')
+    df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
+    df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
+    fig, axes = plt.subplots(nrows=2, ncols=1)
+
+    subplot = axes[0]
+    divider_x = 0.28  # eyeballed estimate
+    create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, 'Bacteria')
+    create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, 'Bacteria')
+    subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
+
+    subplot = axes[1]
+    divider_x = 0.75  # eyeballed estimate
+    create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, 'Eukaryota')
+    create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, 'Eukaryota')
+    subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
+
+    # put legend in upper right subplot and set font size
+    legend = axes[0].legend(loc='upper right')
+    plt.setp(legend.get_texts(), fontsize=10)
+    # hide x-tick labels for top subplot
+    # plt.setp(axes[0].get_xticklabels(), visible=False)
+    # remove dead space
+    plt.tight_layout()
+
+    out_file = MBARI_ANALYSIS_DIR + 'figure_4.pdf'
+    _ensure_dir(out_file)
+    plt.savefig(out_file)
+    plt.close()
 
 
 if __name__ == '__main__':
     style_overrides = {
-        'axes.facecolor': '0.92',  # similar to ggplot
-        'legend.frameon': True,  # good when gridlines are on - separates legend from background
         'text.color': '0.1',  # not quite black
         'axes.labelcolor': '0.3',  # lighter grey than text
         'xtick.color': '0.4',  # lighter grey than text or label
         'ytick.color': '0.4',
+        'axes.facecolor': '0.92',  # similar to ggplot
+        'legend.frameon': True,  # good when gridlines are on - separates legend from background
     }
     sns.set_style('darkgrid', style_overrides)
 
@@ -400,4 +418,4 @@ if __name__ == '__main__':
 
     create_figure_3()
 
-    # create_figure_4()
+    create_figure_4()

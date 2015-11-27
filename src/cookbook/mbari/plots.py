@@ -20,11 +20,11 @@ from klab.process.derived_info import group_and_count
 from cookbook.mbari import MBARI_ANALYSIS_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
     MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE
 
-# ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
-DOMAIN_COLORS = ['0.75', 'y', 'g', 'b', 'r', 'c', 'k']  # number is grey scale
+# ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Lost Placements']
+DOMAIN_COLORS = ['0.75', 'y', 'g', 'b', 'k']  # number is grey scale
 
 
-def _ensure_dir(f):
+def _ensure_directory_exists(f):
     d = os.path.dirname(f)
     if not os.path.exists(d):
         os.makedirs(d)
@@ -55,6 +55,8 @@ def _massage_data(df, level='domain'):
     # clean up row names
     c.ix[c[''] == 'zNone', ''] = 'New Placements'
     c.ix[c[''] == 'top level', ''] = 'Top Level'
+    c.columns.name = ''
+    c.set_index([''], inplace=True)  # set index to first column
     return c
 
 
@@ -94,52 +96,37 @@ def _generate_euk_spectrum_set_of_graphs(level):
 
 def _generate_domain_colored_set_of_graphs(level):
     df = _get_and_clean_data(level)
-    df = _massage_data(df)
-    data_file = MBARI_ANALYSIS_DIR + 'figure_2/' + level + '_level_placements.csv'
-    _ensure_dir(data_file)
-    write_df_to_file(df, data_file)
-    d = read_df_from_file(data_file)
-    d.set_index(['Unnamed: 0'], inplace=True)  # set index to first column
+    d = _massage_data(df)
+    a = d['Lost Placements'].tolist()
+    a.insert(0, 0.0)
+    d.loc['Lost Placements'] = a
+    d.drop('Lost Placements', axis=1, inplace=True)
 
-    p = d.plot(kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.05, edgecolor='white')
+    p = d.plot(kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.0, edgecolor='white')
     categories = d.index.tolist()  # index is list of categories
     p.set_xticklabels(categories, rotation='horizontal')
-    p.set_xlabel('')
 
     plt.title('2012 to 2014 Placements')
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_2_' + level + '.pdf'
-    _ensure_dir(out_file)
+    _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
 
     d = d.div(d.sum(axis=1), axis=0)  # scale the data
-    p = d.plot(kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.05, edgecolor='white')
+    p = d.plot(kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.0, edgecolor='white')
     categories = d.index.tolist()  # index is list of categories
     p.set_xticklabels(categories, rotation='horizontal')
-    p.set_xlabel('')
     p.yaxis.set_major_formatter(FuncFormatter(_to_percent))
 
     plt.title('2012 to 2014 Placements')
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_2_' + level + '_scaled.pdf'
-    _ensure_dir(out_file)
+    _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
-
-
-# def _new_and_lost_placements(level):
-#     t = 'new_and_lost'
-#     file_path = _mbari_file_path(level) + t
-#     data file was hand constructed from two others
-#     data_file = file_path + '_placements.csv'
-#     title = 'New and Lost Placements by Domain'
-#     plot_file = file_path + '_placements_bar.pdf'
-#     _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:])  # there are no 'Same' columns, so skip first color
-#     plot_file = file_path + '_placements_scaled_bar.pdf'
-#     _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
 
 
 def _to_percent(y, position):
@@ -284,7 +271,7 @@ def create_figure_1():
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_1.pdf'
-    _ensure_dir(out_file)
+    _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
 
@@ -293,7 +280,6 @@ def create_figure_1():
 def create_figure_2():
     _generate_domain_colored_set_of_graphs('domain')
     _generate_domain_colored_set_of_graphs('lowest_classification')
-    # _new_and_lost_placements('domain')
 
 
 # Figure 3 is six histograms: (post_prob, edpl, taxa_depth) x (euks, bacteria)
@@ -330,7 +316,7 @@ def create_figure_3():
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_3.pdf'
-    _ensure_dir(out_file)
+    _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
 
@@ -388,7 +374,7 @@ def create_figure_4():
     plt.tight_layout()
 
     out_file = MBARI_ANALYSIS_DIR + 'figure_4.pdf'
-    _ensure_dir(out_file)
+    _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
 

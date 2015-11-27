@@ -16,9 +16,8 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file
-from klab.process.derived_info import CONFIDENT, FUZZY, group_and_count
-from lib.stacked_bar_graph import StackedBarGrapher
-from cookbook.mbari import MBARI_ANALYSIS_DIR, MBARI_DATA_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
+from klab.process.derived_info import group_and_count
+from cookbook.mbari import MBARI_ANALYSIS_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
     MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Viruses', 'Top Level', 'New']
@@ -51,44 +50,12 @@ def _massage_data(df, level='domain'):
     # clean up column names
     c.reset_index(inplace=True)
     c.columns = c.columns.get_level_values(1)
-    c.rename(columns={'AAsame': 'Same', 'top level': 'Top Level', 'zNone': 'New Placements'}, inplace=True)
+    c.rename(columns={'AAsame': 'Same', 'top level': 'Top Level', 'zNone': 'Lost Placements'}, inplace=True)
 
     # clean up row names
     c.ix[c[''] == 'zNone', ''] = 'New Placements'
     c.ix[c[''] == 'top level', ''] = 'Top Level'
     return c
-
-
-def _plot_data(data_file, plot_file, title, colors, scale_chart=False):
-    c = read_df_from_file(data_file)
-    c.set_index(['Unnamed: 0'], inplace=True)  # set index to first column
-    if scale_chart:
-        c = c.div(c.sum(axis=1), axis=0)  # normalize the data because sbg ain't so good at that
-
-    sbg = StackedBarGrapher()
-
-    d = c.as_matrix()
-
-    d_labels = list(c.index.values)
-
-    fig = plt.figure()
-
-    ax = fig.add_subplot(111)
-    sbg.stackedBarPlot(ax,
-                       d,
-                       colors,
-                       xLabels=d_labels,
-                       gap=0.05,
-                       endGaps=True,
-                       scale=scale_chart
-                       )
-    plt.title(title)
-
-    fig.subplots_adjust(bottom=0.4)
-    plt.tight_layout()
-    plt.savefig(plot_file)
-    plt.close(fig)
-    del fig
 
 
 def _get_n_colors_in_hex(n=5):
@@ -118,62 +85,61 @@ def _generate_euk_spectrum_set_of_graphs(level):
 
     data_file = MBARI_ANALYSIS_DIR + level + '_placements.csv'
     write_df_to_file(d2, data_file)
-    title = 'Eukaryota ' + level.title() + ' 2012 to 2014 Placements'
-    plot_file = MBARI_ANALYSIS_DIR + level + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors)
-    plot_file = MBARI_ANALYSIS_DIR + level + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, colors, True)
-
-
-def _mbari_file_path(level):
-    return MBARI_ANALYSIS_DIR + 'figure_2/' + level + '_level_'
-
-
-# not that interesting, as fuzzy contribution is swamped by confident
-# keep it around in case I drill down to it for some other reason
-def _generate_domain_colored_set_of_graphs_confident_fuzzy(level):
-    df = _get_and_clean_data(level)
-    file_path = _mbari_file_path(level)
-
-    t1 = CONFIDENT
-    t2 = FUZZY
-    a = df[df['placement_type_12'] == t1]
-    a = a[a['placement_type_14'] == t2]
-    d2 = _massage_data(a)
-    data_file = file_path + t1 + '_' + t2 + '_placements.csv'
-    write_df_to_file(d2, data_file)
-    title = t1.title() + ' 2012 Placements to ' + t2.title() + ' 2014'
-    plot_file = file_path + t1 + '_' + t2 + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
-    plot_file = file_path + t1 + '_' + t2 + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
+    # title = 'Eukaryota ' + level.title() + ' 2012 to 2014 Placements'
+    # plot_file = MBARI_ANALYSIS_DIR + level + '_placements_bar.pdf'
+    # _plot_data(data_file, plot_file, title, colors)
+    # plot_file = MBARI_ANALYSIS_DIR + level + '_placements_scaled_bar.pdf'
+    # _plot_data(data_file, plot_file, title, colors, True)
 
 
 def _generate_domain_colored_set_of_graphs(level):
     df = _get_and_clean_data(level)
-    t = 'all'  # all of specific level
-    file_path = _mbari_file_path(level) + t
-    d2 = _massage_data(df)
-    data_file = file_path + '_placements.csv'
+    df = _massage_data(df)
+    data_file = MBARI_ANALYSIS_DIR + 'figure_2/' + level + '_level_placements.csv'
     _ensure_dir(data_file)
-    write_df_to_file(d2, data_file)
-    title = t.title() + ' 2012 Placements to 2014'
-    plot_file = file_path + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS)
-    plot_file = file_path + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS, True)
+    write_df_to_file(df, data_file)
+    d = read_df_from_file(data_file)
+    d.set_index(['Unnamed: 0'], inplace=True)  # set index to first column
+
+    p = d.plot(kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.05, edgecolor='white')
+    categories = d.index.tolist()  # index is list of categories
+    p.set_xticklabels(categories, rotation='horizontal')
+    p.set_xlabel('')
+
+    plt.title('2012 to 2014 Placements')
+    plt.tight_layout()
+
+    out_file = MBARI_ANALYSIS_DIR + 'figure_2_' + level + '.pdf'
+    _ensure_dir(out_file)
+    plt.savefig(out_file)
+    plt.close()
+
+    d = d.div(d.sum(axis=1), axis=0)  # scale the data
+    p = d.plot(kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.05, edgecolor='white')
+    categories = d.index.tolist()  # index is list of categories
+    p.set_xticklabels(categories, rotation='horizontal')
+    p.set_xlabel('')
+    p.yaxis.set_major_formatter(FuncFormatter(_to_percent))
+
+    plt.title('2012 to 2014 Placements')
+    plt.tight_layout()
+
+    out_file = MBARI_ANALYSIS_DIR + 'figure_2_' + level + '_scaled.pdf'
+    _ensure_dir(out_file)
+    plt.savefig(out_file)
+    plt.close()
 
 
-def _new_and_lost_placements(level):
-    t = 'new_and_lost'
-    file_path = _mbari_file_path(level) + t
-    # data file was hand constructed from two others
-    data_file = file_path + '_placements.csv'
-    title = 'New and Lost Placements by Domain'
-    plot_file = file_path + '_placements_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:])  # there are no 'Same' columns, so skip first color
-    plot_file = file_path + '_placements_scaled_bar.pdf'
-    _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
+# def _new_and_lost_placements(level):
+#     t = 'new_and_lost'
+#     file_path = _mbari_file_path(level) + t
+#     data file was hand constructed from two others
+#     data_file = file_path + '_placements.csv'
+#     title = 'New and Lost Placements by Domain'
+#     plot_file = file_path + '_placements_bar.pdf'
+#     _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:])  # there are no 'Same' columns, so skip first color
+#     plot_file = file_path + '_placements_scaled_bar.pdf'
+#     _plot_data(data_file, plot_file, title, DOMAIN_COLORS[1:], True)
 
 
 def _to_percent(y, position):
@@ -326,8 +292,8 @@ def create_figure_1():
 # Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
 def create_figure_2():
     _generate_domain_colored_set_of_graphs('domain')
-    _new_and_lost_placements('domain')
     _generate_domain_colored_set_of_graphs('lowest_classification')
+    # _new_and_lost_placements('domain')
 
 
 # Figure 3 is six histograms: (post_prob, edpl, taxa_depth) x (euks, bacteria)
@@ -438,10 +404,10 @@ if __name__ == '__main__':
     }
     sns.set_style('darkgrid', style_overrides)
 
-    create_figure_1()
+    # create_figure_1()
 
-    # create_figure_2()
+    create_figure_2()
 
-    create_figure_3()
+    # create_figure_3()
 
-    create_figure_4()
+    # create_figure_4()

@@ -50,13 +50,19 @@ def _massage_data(df, level='domain'):
     # clean up column names
     c.reset_index(inplace=True)
     c.columns = c.columns.get_level_values(1)
-    c.rename(columns={'AAsame': 'Same', 'top level': 'Top Level', 'zNone': 'Lost Placements'}, inplace=True)
+    c.rename(columns={'AAsame': 'Same', 'top level': 'Top Level', 'zNone': 'Lost'}, inplace=True)
 
     # clean up row names
-    c.ix[c[''] == 'zNone', ''] = 'New Placements'
+    c.ix[c[''] == 'zNone', ''] = 'New'
     c.ix[c[''] == 'top level', ''] = 'Top Level'
     c.columns.name = ''
     c.set_index([''], inplace=True)  # set index to first column
+
+    # make last column into last row
+    a = c['Lost'].tolist()
+    a.insert(0, 0.0)
+    c.loc['Lost'] = a
+    c.drop('Lost', axis=1, inplace=True)
     return c
 
 
@@ -97,20 +103,18 @@ def _generate_euk_spectrum_set_of_graphs(level):
 def _generate_domain_stack_plots(sp1, sp2, level):
     df = _get_and_clean_data(level)
     d = _massage_data(df)
-    a = d['Lost Placements'].tolist()
-    a.insert(0, 0.0)
-    d.loc['Lost Placements'] = a
-    d.drop('Lost Placements', axis=1, inplace=True)
     categories = d.index.tolist()  # index is list of categories
 
-    d.plot(ax=sp1, kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.0, edgecolor='white')
+    d.plot(ax=sp1, kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0, legend=False)
     sp1.set_xticklabels(categories, rotation='horizontal')
-    sp1.set_title('2012 to 2014 Placements')
+    sp1.set_title('2012 to 2014 Placement Changes', fontsize=10)
+    sp1.set_ylabel('Placements (thousands)', color='0.4')
+    sp1.yaxis.set_major_formatter(FuncFormatter(_to_thousands))
 
     d = d.div(d.sum(axis=1), axis=0)  # scale the data
-    d.plot(ax=sp2, kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.0, edgecolor='white')
+    d.plot(ax=sp2, kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0, legend=False)
     sp2.set_xticklabels(categories, rotation='horizontal')
-    sp2.set_title('2012 to 2014 Placements')
+    sp2.set_title('2012 to 2014 Placement Changes (scaled)', fontsize=10)
     sp2.yaxis.set_major_formatter(FuncFormatter(_to_percent))
 
 
@@ -121,6 +125,11 @@ def _to_percent(y, position):
         return s + r'$\%$'
     else:
         return s + '%'
+
+
+def _to_thousands(y, position):
+    s = str(y / 1000).split('.')[0]  # only take integer part
+    return s
 
 
 def _get_values_and_weights(series):
@@ -268,9 +277,16 @@ def create_figure_2():
     _generate_domain_stack_plots(axes[0, 0], axes[1, 0], 'domain')
     _generate_domain_stack_plots(axes[0, 1], axes[1, 1], 'lowest_classification')
 
+    # put legend in upper left subplot and set font size
+    legend = axes[0, 0].legend(loc='upper right')
+    plt.setp(legend.get_texts(), fontsize=10)
     # hide x-tick labels for top subplots
     plt.setp(axes[0, 0].get_xticklabels(), visible=False)
     plt.setp(axes[0, 1].get_xticklabels(), visible=False)
+    # hide y-tick labels for right subplots
+    plt.setp(axes[0, 1].get_yticklabels(), visible=False)
+    axes[0, 1].set_ylabel('')
+    plt.setp(axes[1, 1].get_yticklabels(), visible=False)
     # remove dead space
     plt.tight_layout()
 

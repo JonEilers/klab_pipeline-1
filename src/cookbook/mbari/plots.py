@@ -94,39 +94,24 @@ def _generate_euk_spectrum_set_of_graphs(level):
     # _plot_data(data_file, plot_file, title, colors, True)
 
 
-def _generate_domain_colored_set_of_graphs(level):
+def _generate_domain_stack_plots(sp1, sp2, level):
     df = _get_and_clean_data(level)
     d = _massage_data(df)
     a = d['Lost Placements'].tolist()
     a.insert(0, 0.0)
     d.loc['Lost Placements'] = a
     d.drop('Lost Placements', axis=1, inplace=True)
-
-    p = d.plot(kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.0, edgecolor='white')
     categories = d.index.tolist()  # index is list of categories
-    p.set_xticklabels(categories, rotation='horizontal')
 
-    plt.title('2012 to 2014 Placements')
-    plt.tight_layout()
-
-    out_file = MBARI_ANALYSIS_DIR + 'figure_2_' + level + '.pdf'
-    _ensure_directory_exists(out_file)
-    plt.savefig(out_file)
-    plt.close()
+    d.plot(ax=sp1, kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.0, edgecolor='white')
+    sp1.set_xticklabels(categories, rotation='horizontal')
+    sp1.set_title('2012 to 2014 Placements')
 
     d = d.div(d.sum(axis=1), axis=0)  # scale the data
-    p = d.plot(kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.0, edgecolor='white')
-    categories = d.index.tolist()  # index is list of categories
-    p.set_xticklabels(categories, rotation='horizontal')
-    p.yaxis.set_major_formatter(FuncFormatter(_to_percent))
-
-    plt.title('2012 to 2014 Placements')
-    plt.tight_layout()
-
-    out_file = MBARI_ANALYSIS_DIR + 'figure_2_' + level + '_scaled.pdf'
-    _ensure_directory_exists(out_file)
-    plt.savefig(out_file)
-    plt.close()
+    d.plot(ax=sp2, kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0.0, edgecolor='white')
+    sp2.set_xticklabels(categories, rotation='horizontal')
+    sp2.set_title('2012 to 2014 Placements')
+    sp2.yaxis.set_major_formatter(FuncFormatter(_to_percent))
 
 
 def _to_percent(y, position):
@@ -278,8 +263,21 @@ def create_figure_1():
 
 # Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
 def create_figure_2():
-    _generate_domain_colored_set_of_graphs('domain')
-    _generate_domain_colored_set_of_graphs('lowest_classification')
+    fig, axes = plt.subplots(nrows=2, ncols=2)
+
+    _generate_domain_stack_plots(axes[0, 0], axes[1, 0], 'domain')
+    _generate_domain_stack_plots(axes[0, 1], axes[1, 1], 'lowest_classification')
+
+    # hide x-tick labels for top subplots
+    plt.setp(axes[0, 0].get_xticklabels(), visible=False)
+    plt.setp(axes[0, 1].get_xticklabels(), visible=False)
+    # remove dead space
+    plt.tight_layout()
+
+    out_file = MBARI_ANALYSIS_DIR + 'figure_2.pdf'
+    _ensure_directory_exists(out_file)
+    plt.savefig(out_file)
+    plt.close()
 
 
 # Figure 3 is six histograms: (post_prob, edpl, taxa_depth) x (euks, bacteria)
@@ -390,10 +388,10 @@ if __name__ == '__main__':
     }
     sns.set_style('darkgrid', style_overrides)
 
-    # create_figure_1()
+    create_figure_1()
 
     create_figure_2()
 
-    # create_figure_3()
+    create_figure_3()
 
-    # create_figure_4()
+    create_figure_4()

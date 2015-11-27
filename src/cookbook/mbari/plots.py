@@ -60,7 +60,7 @@ def _massage_data(df, level='domain'):
 
     # make last column into last row
     a = c['Lost'].tolist()
-    a.insert(0, 0.0)
+    a.insert(0, 0.0)  # pad first value with a zero
     c.loc['Lost'] = a
     c.drop('Lost', axis=1, inplace=True)
     return c
@@ -103,6 +103,9 @@ def _generate_euk_spectrum_set_of_graphs(level):
 def _generate_domain_stack_plots(sp1, sp2, level):
     df = _get_and_clean_data(level)
     d = _massage_data(df)
+    if level != 'domain':
+        d.drop(d.tail(2).index, inplace=True)  # drop last two rows if not domain level (redundant in all others)
+
     categories = d.index.tolist()  # index is list of categories
     width = 0.92
     gap = 1 - width

@@ -21,7 +21,7 @@ from cookbook.mbari import MBARI_ANALYSIS_DIR, COLOR_2012, COLOR_2014, MBARI_12_
     MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Lost Placements']
-DOMAIN_COLORS = ['0.75', 'y', 'g', 'b', 'k']  # number is grey scale
+DOMAIN_COLORS = ['0.7', 'y', 'g', 'b', 'k']  # number is grey scale
 
 
 def _ensure_directory_exists(f):
@@ -104,18 +104,24 @@ def _generate_domain_stack_plots(sp1, sp2, level):
     df = _get_and_clean_data(level)
     d = _massage_data(df)
     categories = d.index.tolist()  # index is list of categories
+    width = 0.92
+    gap = 1 - width
+    xlim = [0 - gap - (width / 2), len(categories) - (width / 2)]  # leave gap on left edge, gap on right edge
 
-    d.plot(ax=sp1, kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0, legend=False)
+    level_title = level.replace('_', ' ').title() + ' Level'
+    d.plot(ax=sp1, kind='bar', stacked=True, color=DOMAIN_COLORS, width=width, linewidth=0, legend=False, alpha=0.9)
     sp1.set_xticklabels(categories, rotation='horizontal')
-    sp1.set_title('2012 to 2014 Placement Changes', fontsize=10)
+    sp1.set_title(level_title, fontsize=10)
     sp1.set_ylabel('Placements (thousands)', color='0.4')
     sp1.yaxis.set_major_formatter(FuncFormatter(_to_thousands))
+    sp1.set_xlim(xlim)
 
     d = d.div(d.sum(axis=1), axis=0)  # scale the data
-    d.plot(ax=sp2, kind='bar', stacked=True, color=DOMAIN_COLORS, width=0.95, linewidth=0, legend=False)
+    d.plot(ax=sp2, kind='bar', stacked=True, color=DOMAIN_COLORS, width=width, linewidth=0, legend=False, alpha=0.9)
     sp2.set_xticklabels(categories, rotation='horizontal')
-    sp2.set_title('2012 to 2014 Placement Changes (scaled)', fontsize=10)
+    sp2.set_title('Scaled ' + level_title, fontsize=10)
     sp2.yaxis.set_major_formatter(FuncFormatter(_to_percent))
+    sp2.set_xlim(xlim)
 
 
 def _to_percent(y, position):
@@ -188,9 +194,9 @@ def create_edpl_post_prob_scatter(subplot, df, year, color, domain_filter, bins=
 
     subplot.scatter(d['post_prob', 'mean'], d['edpl', 'mean'], c=color, label=year, alpha=0.8)
     subplot.set_title(domain_filter.title())
-    subplot.set_ylim(-0.025, 1.025)
+    subplot.set_ylim(-0.025, 1.0)
     subplot.set_xlabel('Posterior Probability')
-    subplot.set_xlim(-0.025, 1.025)
+    subplot.set_xlim(-0.01, 1.01)
     subplot.set_ylabel('EDPL')
 
 
@@ -213,6 +219,16 @@ def _side_by_side_bar(subplot, df, x, y, colors, gap=None):
     subplot.set_xticklabels(categories)
     subplot.tick_params(axis='x', labelsize=8)
     subplot.tick_params(axis='y', labelsize=8)
+
+
+def _calc_split(df, divider, domain_filter):
+    d1 = df[df.domain_name == domain_filter].copy()
+    d1['bin'] = pd.cut(d1.post_prob, [0, divider, 1])
+    d = d1.groupby('bin').agg({'post_prob': [np.size]})
+    tot = d['post_prob', 'size'].sum()
+    l = d['post_prob', 'size'][0] / tot
+    r = d['post_prob', 'size'][1] / tot
+    return l, r
 
 
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
@@ -287,6 +303,8 @@ def create_figure_2():
     plt.setp(axes[0, 1].get_yticklabels(), visible=False)
     axes[0, 1].set_ylabel('')
     plt.setp(axes[1, 1].get_yticklabels(), visible=False)
+    # fig.suptitle('2012 to 2014 Placement Changes')
+    # plt.subplots_adjust(top=0.9)  # move subplots down to accomodate title (tight_layout doesn't consider it)
     # remove dead space
     plt.tight_layout()
 
@@ -335,16 +353,6 @@ def create_figure_3():
     plt.close()
 
 
-def _calc_split(df, divider, domain_filter):
-    d1 = df[df.domain_name == domain_filter].copy()
-    d1['bin'] = pd.cut(d1.post_prob, [0, divider, 1])
-    d = d1.groupby('bin').agg({'post_prob': [np.size]})
-    tot = d['post_prob', 'size'].sum()
-    l = d['post_prob', 'size'][0] / tot
-    r = d['post_prob', 'size'][1] / tot
-    return l, r
-
-
 # Figure 4 is two scatterplots: (edpl/post_prob) x (euks, bacteria)
 def create_figure_4():
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
@@ -380,7 +388,7 @@ def create_figure_4():
     subplot.text(0.85, 0.68, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
 
     # put legend in upper right subplot and set font size
-    legend = axes[0].legend(loc='upper right')
+    legend = axes[0].legend(loc='upper right', scatterpoints=3)
     plt.setp(legend.get_texts(), fontsize=12)
     # hide x-tick labels for top subplot
     # plt.setp(axes[0].get_xticklabels(), visible=False)

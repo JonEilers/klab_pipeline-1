@@ -14,6 +14,7 @@ import seaborn as sns
 
 from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
+from matplotlib import gridspec
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file
 from klab.process.derived_info import group_and_count
@@ -118,6 +119,7 @@ def _generate_domain_stack_plots(sp1, sp2, level):
     sp1.set_ylabel('Placements (thousands)', color='0.4')
     sp1.yaxis.set_major_formatter(FuncFormatter(_to_thousands))
     sp1.set_xlim(xlim)
+    sp1.xaxis.grid(False)
 
     d = d.div(d.sum(axis=1), axis=0)  # scale the data
     d.plot(ax=sp2, kind='bar', stacked=True, color=DOMAIN_COLORS, width=width, linewidth=0, legend=False, alpha=0.9)
@@ -125,6 +127,7 @@ def _generate_domain_stack_plots(sp1, sp2, level):
     sp2.set_title('Scaled ' + level_title, fontsize=10)
     sp2.yaxis.set_major_formatter(FuncFormatter(_to_percent))
     sp2.set_xlim(xlim)
+    sp2.xaxis.grid(False)
 
 
 def _to_percent(y, position):
@@ -220,7 +223,7 @@ def _side_by_side_bar(subplot, df, x, y, colors, gap=None):
         subplot.bar(pos, df[y[i]], gap, color=colors[i], label=y[i], alpha=alpha, linewidth=0)
     subplot.set_xticks(xticks)
     subplot.set_xticklabels(categories)
-    subplot.tick_params(axis='x', labelsize=8)
+    subplot.tick_params(axis='x', labelsize=10)
     subplot.tick_params(axis='y', labelsize=8)
 
 
@@ -291,21 +294,25 @@ def create_figure_1():
 
 # Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
 def create_figure_2():
-    fig, axes = plt.subplots(nrows=2, ncols=2)
+    gs = gridspec.GridSpec(2, 2, width_ratios=[5, 3])  # change widths (5 bars on left, 3 on right)
+    ax1 = plt.subplot(gs[0, 0])
+    ax2 = plt.subplot(gs[0, 1])
+    ax3 = plt.subplot(gs[1, 0])
+    ax4 = plt.subplot(gs[1, 1])
 
-    _generate_domain_stack_plots(axes[0, 0], axes[1, 0], 'domain')
-    _generate_domain_stack_plots(axes[0, 1], axes[1, 1], 'lowest_classification')
+    _generate_domain_stack_plots(ax1, ax3, 'domain')
+    _generate_domain_stack_plots(ax2, ax4, 'lowest_classification')
 
     # put legend in upper left subplot and set font size
-    legend = axes[0, 0].legend(loc='upper right')
+    legend = ax1.legend(loc='upper right')
     plt.setp(legend.get_texts(), fontsize=10)
     # hide x-tick labels for top subplots
-    plt.setp(axes[0, 0].get_xticklabels(), visible=False)
-    plt.setp(axes[0, 1].get_xticklabels(), visible=False)
+    plt.setp(ax1.get_xticklabels(), visible=False)
+    plt.setp(ax2.get_xticklabels(), visible=False)
     # hide y-tick labels for right subplots
-    plt.setp(axes[0, 1].get_yticklabels(), visible=False)
-    axes[0, 1].set_ylabel('')
-    plt.setp(axes[1, 1].get_yticklabels(), visible=False)
+    plt.setp(ax2.get_yticklabels(), visible=False)
+    ax2.set_ylabel('')
+    plt.setp(ax4.get_yticklabels(), visible=False)
     # fig.suptitle('2012 to 2014 Placement Changes')
     # plt.subplots_adjust(top=0.9)  # move subplots down to accomodate title (tight_layout doesn't consider it)
     # remove dead space

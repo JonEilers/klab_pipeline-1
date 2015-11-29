@@ -238,7 +238,7 @@ def _calc_split(df, divider, domain_filter):
 
 
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
-def create_figure_1():
+def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
     fig, axes = plt.subplots(nrows=3, ncols=1)
     x = 'domain_name'
     y = ['2012', '2014']
@@ -286,14 +286,13 @@ def create_figure_1():
     # remove dead space
     plt.tight_layout()
 
-    out_file = MBARI_ANALYSIS_DIR + 'figure_1.pdf'
     _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
 
 
 # Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
-def create_figure_2():
+def create_figure_2(out_file=MBARI_ANALYSIS_DIR + 'figure_2.pdf'):
     gs = gridspec.GridSpec(2, 2, width_ratios=[5, 3])  # change widths (5 bars on left, 3 on right)
     ax1 = plt.subplot(gs[0, 0])
     ax2 = plt.subplot(gs[0, 1])
@@ -318,14 +317,13 @@ def create_figure_2():
     # remove dead space
     plt.tight_layout()
 
-    out_file = MBARI_ANALYSIS_DIR + 'figure_2.pdf'
     _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
 
 
 # Figure 3 is six histograms: (post_prob, edpl, taxa_depth) x (euks, bacteria)
-def create_figure_3():
+def create_figure_3(out_file=MBARI_ANALYSIS_DIR + 'figure_3.pdf'):
     # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
     # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
@@ -357,14 +355,13 @@ def create_figure_3():
     # remove dead space
     plt.tight_layout()
 
-    out_file = MBARI_ANALYSIS_DIR + 'figure_3.pdf'
     _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
 
 
 # Figure 4 is two scatterplots: (edpl/post_prob) x (euks, bacteria)
-def create_figure_4():
+def create_figure_4(out_file=MBARI_ANALYSIS_DIR + 'figure_4.pdf'):
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
     fig, axes = plt.subplots(nrows=2, ncols=1)
@@ -405,7 +402,6 @@ def create_figure_4():
     # remove dead space
     plt.tight_layout()
 
-    out_file = MBARI_ANALYSIS_DIR + 'figure_4.pdf'
     _ensure_directory_exists(out_file)
     plt.savefig(out_file)
     plt.close()
@@ -429,3 +425,18 @@ if __name__ == '__main__':
     create_figure_3()
 
     create_figure_4()
+
+    # generate figure 1 in different styles
+    # styles = mpl.style.available
+    # styles.insert(0, u'default')
+    # for style in styles:
+    #     mpl.rcParams.update(mpl.rcParamsDefault)
+    #     if style != 'default':
+    #         plt.style.use(style)
+    #     create_figure_1(MBARI_ANALYSIS_DIR + 'styles/figure1_mpl_' + style + '.pdf')
+
+    # for reasons not worth going into, have to run the mpl and sns code separately
+    # sns_styles = ('darkgrid', 'whitegrid', 'dark', 'white', 'ticks')
+    # for style in sns_styles:
+    #     sns.set_style(style)
+    #     create_figure_1(MBARI_ANALYSIS_DIR + 'styles/figure1_sns_' + style + '.pdf')

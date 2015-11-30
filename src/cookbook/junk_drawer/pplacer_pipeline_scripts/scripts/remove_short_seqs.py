@@ -23,6 +23,7 @@ Features:
 """
 import os
 import sys
+
 from Bio import SeqIO, AlignIO
 
 min_nongap = 0.2
@@ -31,24 +32,27 @@ seq_to_remove = """.?~-*"""
 
 
 def taxid_of_record(record):
-    return(int(record.id.split("|")[0]))
+    return (int(record.id.split("|")[0]))
+
 
 def remove_short_seqs(seed_len, records):
     """
     SeqRecord iterator to remove short sequences. Note that gap is - here.
     """
     for record in records:
-        if (float(len(str(record.seq).translate(None, '-')))/seed_len) < min_nongap:
+        if (float(len(str(record.seq).translate(None, '-'))) / seed_len) < min_nongap:
             print "Ignoring too short seq %s" % record.id
             continue
         yield record
+
 
 def sto_len(fname):
     with open(fname, 'r') as ch:
         return AlignIO.read(ch, "stockholm").get_alignment_length()
 
+
 seed_sto = sys.argv[1]
-assert(".sto" == os.path.splitext(seed_sto)[1]);
+assert (".sto" == os.path.splitext(seed_sto)[1]);
 seed_len = sto_len(seed_sto)
 
 for fname in sys.argv[2:]:

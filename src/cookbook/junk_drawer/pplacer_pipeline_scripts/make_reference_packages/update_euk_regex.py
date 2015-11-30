@@ -1,4 +1,4 @@
-#TAXONOMY
+# TAXONOMY
 path = './'
 taxdump_path = path
 work_path = path
@@ -33,16 +33,16 @@ for k,v in taxDictionary.iteritems():
 	output.write('\t'.join(full_lineage) + '\n')
 output.close()
 '''
-input = open(work_path + 'full_lineage.txt','r')
-output = open(work_path + 'update_18S_taxid_regex.txt','w')
+input = open(work_path + 'full_lineage.txt', 'r')
+output = open(work_path + 'update_18S_taxid_regex.txt', 'w')
 for line in input:
-	splitLine = line.strip('\n').split('\t')
-	if len(splitLine) >= 3:
-		if str(splitLine[-3]) == '2759':
-			if len(splitLine) < 4:
-				output.write('^' + splitLine[0] + '|\n')
-			elif str(splitLine[-4]) != '33154':
-				output.write('^' + splitLine[0] + '|\n')
+    splitLine = line.strip('\n').split('\t')
+    if len(splitLine) >= 3:
+        if str(splitLine[-3]) == '2759':
+            if len(splitLine) < 4:
+                output.write('^' + splitLine[0] + '|\n')
+            elif str(splitLine[-4]) != '33154':
+                output.write('^' + splitLine[0] + '|\n')
 
 output.close()
 input.close()

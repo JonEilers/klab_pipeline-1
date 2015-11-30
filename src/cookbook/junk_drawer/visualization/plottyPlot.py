@@ -6,6 +6,7 @@ import matplotlib.cm as cm
 import numpy as np
 
 
+
 # Global path and directory list
 home_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -63,15 +64,15 @@ def rare_plot(rare_dir):
                             if ((float(x[-1]) / max_x) > 0.6 or (float(y[-1]) / max_y) > 0.6):
                                 plt.annotate(gene, xy=(x[-1], y[-1]), xytext=(x[-1], y[-1]),
                                              bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5))
-                            # plt.annotate(gene, xy = (x[-1], y[-1]), xytext = (-(x[-1] * 0.01), y[-1] * 0.1), textcoords = 'offset points', ha = 'right', va = 'bottom',
-                            #	bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5)), arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
+                                # plt.annotate(gene, xy = (x[-1], y[-1]), xytext = (-(x[-1] * 0.01), y[-1] * 0.1), textcoords = 'offset points', ha = 'right', va = 'bottom',
+                                #	bbox = dict(boxstyle = 'round,pad=0.5', fc = 'yellow', alpha = 0.5)), arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'))
         plot_title = "tester"
         plt.title(plot_title)
         plt.ylabel('r')
         plt.xlabel('k')
         plt.savefig(home_path + '/' + plot_title + '.png')
         plt.clf()
-    # print project
+        # print project
 
 
 def trans_plot(trans_dir):

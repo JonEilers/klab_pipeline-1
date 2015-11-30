@@ -6,8 +6,8 @@ setup(name='kaboodle',
       author='Connor McCoy <cmccoy@fhcrc.org>',
       packages=find_packages(),
       entry_points={'console_scripts':
-          ['kaboodle-search-recruit = kaboodle.scripts.recruit:main',
-           'kaboodle-recruit-nest = kaboodle.scripts.recruit_nest:main',
-           'kaboodle-search-analysis = kaboodle.scripts.analyze:main']},
+                        ['kaboodle-search-recruit = kaboodle.scripts.recruit:main',
+                         'kaboodle-recruit-nest = kaboodle.scripts.recruit_nest:main',
+                         'kaboodle-search-analysis = kaboodle.scripts.analyze:main']},
       install_requires=['biopython', 'nestly'],
       )

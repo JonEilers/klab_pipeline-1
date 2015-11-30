@@ -1,8 +1,10 @@
 from sklearn.datasets import load_iris
+
 iris = load_iris()
 print iris
 
 from sklearn import neighbors
+
 X, y = iris.data, iris.target
 knn = neighbors.KNeighborsClassifier(n_neighbors=1)
 knn.fit(X, y)

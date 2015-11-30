@@ -9,8 +9,8 @@ import operator
 
 from Bio import SeqIO
 
-class IterCounter(object):
 
+class IterCounter(object):
     def __init__(self, iterable):
         self.iterable = iterable
         self.count = 0
@@ -27,9 +27,11 @@ def highest_scoring(domain_table):
     """
     Gets a set of the lowest e-values by domain
     """
+
     def key(line):
         """Sort by independent E-value"""
         return float(line[12])
+
     def new_id(line):
         """
         Mirrors the ID in a .sto file from a row in a domain table:
@@ -37,6 +39,7 @@ def highest_scoring(domain_table):
             ID/start-end
         """
         return "{0}/{1}-{2}".format(line[0], line[17], line[18])
+
     lines = iter(domain_table)
     lines = (i.rstrip('\n') for i in lines if not i.startswith('#'))
     split_lines = (i.split() for i in lines)
@@ -59,7 +62,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('stockholm_file', type=argparse.FileType('r'))
     parser.add_argument('domain_table', type=argparse.FileType('r'),
-            help='Output of hmmsearch --domtblout')
+                        help='Output of hmmsearch --domtblout')
 
     parser.add_argument('output_file', type=argparse.FileType('w'))
     arguments = parser.parse_args()
@@ -79,5 +82,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

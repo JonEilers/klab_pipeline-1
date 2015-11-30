@@ -6,13 +6,16 @@ import argparse
 import itertools
 import os
 import re
+
 from Bio import AlignIO, Seq, SeqIO
+
 
 def compress_sequences(sequences, mask):
     for sequence in sequences:
         s = sequence[:]
         s.seq = Seq.Seq(''.join(itertools.compress(str(s.seq), mask)))
         yield s
+
 
 def get_nongap_frac(align, gap='-'):
     """
@@ -24,6 +27,7 @@ def get_nongap_frac(align, gap='-'):
     columns = [align[:, i] for i in xrange(length)]
     nongap = [sum(b not in gap for b in col) for col in columns]
     return [float(x) / nseqs for x in nongap]
+
 
 def int_list_of_file(handle):
     """
@@ -38,6 +42,7 @@ def int_list_of_file(handle):
     # Cast mask positions to integers
     return map(int, mask_text.split(','))
 
+
 def trans_bool(b):
     """
     Turn a boolean into a consensus annotation
@@ -47,16 +52,19 @@ def trans_bool(b):
     """
     return 'x' if b else '.'
 
+
 def rf_of_bool_list(bl):
     return "".join(map(trans_bool, bl))
+
 
 def write_gc_rf_sto(out_name, align, is_consensus):
     with open(out_name, "w") as handle:
         handle.write("# STOCKHOLM 1.0\n\n")
         for record in align:
-            handle.write(record.id + "  " + re.sub("\?","~",str(record.seq)) + "\n")
+            handle.write(record.id + "  " + re.sub("\?", "~", str(record.seq)) + "\n")
         handle.write("#=GC RF  " + rf_of_bool_list(is_consensus) + "\n")
         handle.write("//\n")
+
 
 def update_mask_positions(updated_consensus, mask_positions):
     """
@@ -69,10 +77,11 @@ def update_mask_positions(updated_consensus, mask_positions):
     assert all(i is not None for i in result)
     return result
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--consensus-threshold', type=float, default=0.5,
-            help='''Minimum proportion of non-gap bases to consider a consensus
+                        help='''Minimum proportion of non-gap bases to consider a consensus
             column (default: %(default)s''')
     parser.add_argument('fasta_name', help='fasta_file', type=argparse.FileType('r'))
     parser.add_argument('mask_file', help='Mask file', type=argparse.FileType('r'))
@@ -114,6 +123,7 @@ def main():
     if arguments.masked_out:
         m = [i in in_mask_positions for i in xrange(len(align[0]))]
         SeqIO.write(compress_sequences(align, m), arguments.masked_out, 'fasta')
+
 
 if __name__ == '__main__':
     main()

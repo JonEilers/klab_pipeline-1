@@ -10,7 +10,7 @@ jplace_path = testdata_path + 'ETSP/dmmd/dmmd_split/'
 # make sure pca directory exist
 parent_list = os.listdir(post_path)
 if parent_list.count('pca') == 0:
-	os.system('mkdir ' + post_path + 'pca')
+    os.system('mkdir ' + post_path + 'pca')
 
 # calculates pca values
 '''
@@ -36,19 +36,19 @@ for gene, infiles in gene_dictionary.iteritems():
 '''
 # collects the pca values
 pca_dir = os.walk(pca_path)
-output = open(post_path + 'PCA_roundup.csv','w')
+output = open(post_path + 'PCA_roundup.csv', 'w')
 output.write('gene,sample_id,domain,pca1,pca2,pca3,pca4,pca5\n')
 for root, dirs, files in pca_dir:
-	for file in files:
-		if file.find('.trans') != -1:
-			input = open(root + '/' + file, 'r')
-			for line in input:
-				splitLine = line.strip('\n').split(',')
-				placerun = splitLine.pop(0)
-				split_placerun = placerun.split('.')
-				gene = split_placerun[0]
-				sample_id = split_placerun[2]
-				domain = split_placerun[-1]
-				output.write(gene + ',' + sample_id + ',' + domain + ',' + ','.join(splitLine) + '\n')
-			input.close()
+    for file in files:
+        if file.find('.trans') != -1:
+            input = open(root + '/' + file, 'r')
+            for line in input:
+                splitLine = line.strip('\n').split(',')
+                placerun = splitLine.pop(0)
+                split_placerun = placerun.split('.')
+                gene = split_placerun[0]
+                sample_id = split_placerun[2]
+                domain = split_placerun[-1]
+                output.write(gene + ',' + sample_id + ',' + domain + ',' + ','.join(splitLine) + '\n')
+            input.close()
 output.close()

@@ -2,11 +2,15 @@
 """
 Convert the HMMER afa files to fasta, i.e. make gaps -, and take only the first part of the name without whitespace.
 """
-import sys, os, string
-from Bio import SeqIO, AlignIO
+import sys
+import os
+import string
+
+from Bio import SeqIO
 from Bio.Seq import Seq, SeqRecord
 
 seqtrans = string.maketrans(".", "-")
+
 
 def convert(records):
     """
@@ -15,11 +19,12 @@ def convert(records):
     """
     for record in records:
         yield SeqRecord(Seq(str(record.seq).translate(seqtrans)),
-                id=record.id.split(" ")[0],
-                description="")
+                        id=record.id.split(" ")[0],
+                        description="")
+
 
 for fname in sys.argv[1:]:
     (base, ext) = os.path.splitext(fname)
-    assert(ext == ".afa")
-    count = SeqIO.write(convert(SeqIO.parse(fname, "fasta")), base+".fasta",
-            "fasta")
+    assert (ext == ".afa")
+    count = SeqIO.write(convert(SeqIO.parse(fname, "fasta")), base + ".fasta",
+                        "fasta")

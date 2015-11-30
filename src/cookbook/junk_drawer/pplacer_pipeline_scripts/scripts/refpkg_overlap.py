@@ -11,9 +11,11 @@ import re
 import sys
 
 from Bio import SeqIO
+
 from taxtastic import refpkg
 
 RANGE_RE = re.compile(r'/\d+-\d+$')
+
 
 def strip_range(sequence_id):
     """
@@ -22,8 +24,10 @@ def strip_range(sequence_id):
     """
     return RANGE_RE.sub('', sequence_id)
 
+
 def stripext(f):
     return os.path.splitext(os.path.basename(f))[0]
+
 
 def sequence_contents(reference_packages):
     def inner(refpkg):
@@ -31,6 +35,7 @@ def sequence_contents(reference_packages):
             return frozenset(strip_range(s.id) for s in SeqIO.parse(fp, 'fasta'))
 
     return {stripext(r.path): inner(r) for r in reference_packages}
+
 
 def find_overlap(contents):
     result = {}
@@ -42,6 +47,7 @@ def find_overlap(contents):
 
     return result
 
+
 def write_results(multi_seq, output):
     rows = (list(k) + list(v)
             for k, v in multi_seq.items())
@@ -49,14 +55,15 @@ def write_results(multi_seq, output):
     writer.writerow(('refpkg1', 'refpkg2', 'overlap_size', 's1', 's2'))
     writer.writerows(rows)
 
+
 def main():
     parser = argparse.ArgumentParser(description="""Find sequences in multiple
     reference packages""")
     parser.add_argument('reference_packages', metavar='refpkg', nargs='+',
-            type=refpkg.Refpkg)
+                        type=refpkg.Refpkg)
     parser.add_argument('-o', '--output', default=sys.stdout,
-            help='Destination',
-            type=argparse.FileType('w'))
+                        help='Destination',
+                        type=argparse.FileType('w'))
 
     arguments = parser.parse_args()
 
@@ -65,6 +72,7 @@ def main():
     overlap = find_overlap(contents)
     with arguments.output:
         write_results(overlap, arguments.output)
+
 
 if __name__ == '__main__':
     main()

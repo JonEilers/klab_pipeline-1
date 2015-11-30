@@ -1,16 +1,14 @@
+import sys
+
 from sklearn.cluster import KMeans
 import pandas as pd
-import sys
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import adjusted_rand_score
 
 data_file = sys.argv[1]
 data = pd.DataFrame.from_csv(data_file, sep='\t', header=0, index_col=False)
 print data.head()
-data = data['cluster','lowest_classification','']
+data = data['cluster', 'lowest_classification', '']
 kmeans = KMeans()
 kmeans.fit(data.values)
-
 
 '''
 true_k = 2
@@ -31,7 +29,3 @@ for i in range(true_k):
         print ' %s' % terms[ind],
     print
 '''
-
-
-
-

@@ -10,6 +10,7 @@ import sys
 
 from Bio import SeqIO
 
+
 def load_taxids(taxonomy_db_path):
     command = "SELECT tax_id FROM nodes;"
     connection = sqlite3.connect(taxonomy_db_path)
@@ -23,7 +24,7 @@ def load_taxids(taxonomy_db_path):
 
 def check_taxids(taxids, sequences):
     ids = (sequence.id for sequence in sequences)
-    counter = collections.Counter({'UNKNOWN':0, 'INVALID':0, 'OK':0})
+    counter = collections.Counter({'UNKNOWN': 0, 'INVALID': 0, 'OK': 0})
     ok = 0
     invalid = 0
     unknown = 0
@@ -45,7 +46,7 @@ def check_taxids(taxids, sequences):
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--input-format', default='fasta',
-        help="""Input sequence format (default: %(default)s)""")
+                        help="""Input sequence format (default: %(default)s)""")
     parser.add_argument('taxonomy_db', help='sqlite taxonomy db')
     parser.add_argument('sequence_file', type=argparse.FileType('r'))
 
@@ -65,4 +66,3 @@ def main(argv=sys.argv[1:]):
 
 if __name__ == '__main__':
     main()
-

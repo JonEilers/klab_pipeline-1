@@ -1,7 +1,7 @@
 import sys
+
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
+
 
 # Built to use the standard output of countbot
 file = sys.argv[1]
@@ -22,7 +22,6 @@ sra_order = ['SRR064445', 'SRR064447', 'SRR064449', 'SRR064451']
 exclude_list = ['null_domain', 'root', 'metagenomes', 'environmental sample', 'fuzzy_archaea', 'fuzzy_viruses',
                 'fuzzy_null', 'fuzzy_unknown', 'fuzzy_bacteria', 'cellular_organisms', 'metagenomes', 'fuzzy_eukaryota',
                 'fuzzy_root', 'fuzzy_cellular_organisms', 'unclassified sequences', 'cellular organisms', 'Viruses']
-
 
 data = data[data['sra_id'].isin(sra_order)]
 data = data[~data['domain_name'].isin(exclude_list)]

@@ -12,6 +12,7 @@ from Bio import SeqIO
 
 dn = os.path.dirname(__file__)
 
+
 def main():
     with open('control.json') as fp:
         d = json.load(fp)
@@ -27,7 +28,7 @@ def main():
 
     # Run PCA
     pca_base = d['title'] + '_pca'
-    cmd = ['guppy', 'pca',  '--prefix', pca_base,
+    cmd = ['guppy', 'pca', '--prefix', pca_base,
            ':'.join((jplace, sample_map))]
     print ' '.join(cmd)
     subprocess.check_call(cmd)
@@ -35,6 +36,7 @@ def main():
     r_script = os.path.join(dn, 'pca_plot.R')
     cmd = ['Rscript', r_script, pca_base + '.trans', d['title']]
     subprocess.check_call(cmd)
+
 
 if __name__ == '__main__':
     main()

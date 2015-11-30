@@ -1,7 +1,7 @@
 import sys
+
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
+
 
 # Built to use the standard output of countbot
 file = sys.argv[1]
@@ -24,7 +24,6 @@ exclude_list = ['null_domain', 'root', 'metagenomes', 'environmental sample', 'f
                 'fuzzy_null', 'fuzzy_unknown', 'fuzzy_bacteria', 'cellular_organisms', 'metagenomes', 'fuzzy_eukaryota',
                 'fuzzy_root', 'fuzzy_cellular_organisms', 'unclassified sequences', 'cellular organisms', 'Viruses']
 
-
 data = data[data['sra_id'].isin(sra_order)]
 data = data[~data['domain_name'].isin(exclude_list)]
 
@@ -41,5 +40,5 @@ for domain in set(data.domain_name):
         # d = data_summed.pivot(index=group_name, columns='sra_id', values='taxa_count').dropna()
         # for including all and adding empty values for missing groups in samples
         d = domain_data_summed.pivot(index=group_name, columns='sra_id', values='count'
-                      ).fillna(0)
+                                     ).fillna(0)
         d.to_csv('.'.join([domain, group_name, out_file]))

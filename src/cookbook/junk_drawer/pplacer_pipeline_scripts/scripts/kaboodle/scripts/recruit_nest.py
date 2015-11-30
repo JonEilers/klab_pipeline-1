@@ -14,9 +14,10 @@ from Bio import SeqIO
 from kaboodle import hmmer
 from kaboodle.scripts import extant_file, joiner, stripext
 
+
 def build_nest(recruited_hmms, sequence_database_file,
-        run_dir='runs', base_dict=None,
-        file_name='recruit.fasta'):
+               run_dir='runs', base_dict=None,
+               file_name='recruit.fasta'):
     # Build the nest, by hand
     logging.info('Building nest under %s', run_dir)
     fetcher = hmmer.IndexedSequenceFetcher(sequence_database_file)
@@ -39,15 +40,16 @@ def build_nest(recruited_hmms, sequence_database_file,
         count = SeqIO.write(sequences, p(file_name), 'fasta')
         assert count > 0, 'No sequences written to {0}'.format(count)
 
+
 def main(args=sys.argv[1:]):
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--tree-method', choices=('fasttree', 'raxml'),
-        default='fasttree', help="""Method to save in control file for building
+                        default='fasttree', help="""Method to save in control file for building
         trees [Default: %(default)s]""")
 
     parser.add_argument('sequence_file', help="""Sequence file""",
-            type=extant_file)
+                        type=extant_file)
     parser.add_argument('--run-dir', help="""Prefix for output reference
             packges [default: %(default)s]""", default='runs')
 
@@ -59,7 +61,7 @@ def main(args=sys.argv[1:]):
     with open(arguments.hmm_map) as fp:
         hmm_map = json.load(fp)
 
-    with open(arguments.dom_tbl, 'r', buffering=8<<20) as fp:
+    with open(arguments.dom_tbl, 'r', buffering=8 << 20) as fp:
         results = hmmer.domtbl_parse(fp)
         best_hits = hmmer.choose_best_hit(results)[0]
     logging.info('%d best_hits', len(best_hits))
@@ -71,6 +73,6 @@ def main(args=sys.argv[1:]):
                base_dict={'sequence_file_analyzed': arguments.sequence_file,
                           'tree_method': arguments.tree_method})
 
+
 if __name__ == '__main__':
     main()
-

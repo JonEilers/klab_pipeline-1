@@ -1,4 +1,5 @@
 import sys
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -46,7 +47,8 @@ for domain in set(data_mean.domain_name):
         for year in years:
             year_ids = list(meta_data.loc[(meta_data.year == year)].sra_id)
             year_data = domain_data[domain_data['sra_id'].isin(year_ids)]
-            deseq_file = '../data/DESeq/ETSP_COG_SSU/output/meta/gene_by_domain/' + domain + '/DESeq2_' + str(int(year)) + '_oxic_vs_suboxic.res'
+            deseq_file = '../data/DESeq/ETSP_COG_SSU/output/meta/gene_by_domain/' + domain + '/DESeq2_' + str(
+                int(year)) + '_oxic_vs_suboxic.res'
             deseq_data = pd.DataFrame.from_csv(deseq_file, sep=',', header=0, index_col=False)
             column_nm = deseq_data.columns.tolist()
             column_nm[0] = 'gene'
@@ -55,7 +57,7 @@ for domain in set(data_mean.domain_name):
             year_data = pd.merge(year_data, deseq_data, how='left', on=['gene'])
             year_data = year_data.loc[year_data.padj <= 0.05]
             print year_data.head()
-            year_data.to_csv('_'.join([domain,str(year),'.csv']))
+            year_data.to_csv('_'.join([domain, str(year), '.csv']))
             year_data = pd.DataFrame(year_data.groupby(['sra_id']).mean()).reset_index()
             y = [int(meta_data.loc[meta_data.sra_id == n]['depth']) for n in
                  year_data.sra_id
@@ -79,8 +81,8 @@ for domain in set(data_mean.domain_name):
         # plt.plot(x, p(x), 'k-')
         t = str('y = %.6fx + s(%.6f)' % (z[0], z[1]))
         equ = ax.legend([], [], loc='lower center',
-            title=t, scatterpoints=1, fontsize=12
-        )
+                        title=t, scatterpoints=1, fontsize=12
+                        )
         l1 = plt.scatter([], [], s=100, c='black', marker='s')
         l2 = plt.scatter([], [], s=100, c='black', marker='o')
 
@@ -90,9 +92,9 @@ for domain in set(data_mean.domain_name):
                         scatterpoints=1, fontsize=12)
         ax.legend(legend_list, years, scatterpoints=1, loc='center right', title='Year', fontsize=12)
         plt.gca().add_artist(leg)
-        #plt.gca().add_artist(equ)
+        # plt.gca().add_artist(equ)
         plt.gca().invert_yaxis()
-        #plt.xlim([0,2])
+        # plt.xlim([0,2])
         plt.ylim([850, -100])
         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
             label.set_fontsize(16)

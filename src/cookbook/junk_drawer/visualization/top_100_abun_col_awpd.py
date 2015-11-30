@@ -1,13 +1,12 @@
 import sys
+import math
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import math
-
 
 file = sys.argv[1]
 awpd_file = sys.argv[2]
-data = pd.DataFrame.from_csv(file, sep='\t', header=0, index_col=False)
 awpd_data = pd.DataFrame.from_csv(awpd_file, sep=',', header=0, index_col=False)[
     ['cluster', 'sra_id', 'domain_name', 'awpd']]
 data = pd.DataFrame.from_csv(file, sep='\t', header=0, index_col=False)

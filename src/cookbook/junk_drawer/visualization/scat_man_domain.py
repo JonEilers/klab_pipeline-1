@@ -1,4 +1,5 @@
 import sys
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -65,11 +66,11 @@ for domain in set(data_mean.domain_name):
         x = domain_data.awpd
         z = np.polyfit(x, y, 1)
         p = np.poly1d(z)
-        #plt.plot(x, p(x), 'k-')
+        # plt.plot(x, p(x), 'k-')
         t = str('y = %.6fx + s(%.6f)' % (z[0], z[1]))
         equ = ax.legend([], [], loc='lower center',
-            title=t, scatterpoints=1, fontsize=12
-        )
+                        title=t, scatterpoints=1, fontsize=12
+                        )
         l1 = plt.scatter([], [], s=100, c='black', marker='s')
         l2 = plt.scatter([], [], s=100, c='black', marker='o')
 
@@ -79,9 +80,9 @@ for domain in set(data_mean.domain_name):
                         scatterpoints=1, fontsize=12)
         ax.legend(legend_list, years, scatterpoints=1, loc='center right', title='Year', fontsize=12)
         plt.gca().add_artist(leg)
-        #plt.gca().add_artist(equ)
+        # plt.gca().add_artist(equ)
         plt.gca().invert_yaxis()
-        #plt.xlim([0,2])
+        # plt.xlim([0,2])
         plt.ylim([850, -100])
         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
             label.set_fontsize(16)

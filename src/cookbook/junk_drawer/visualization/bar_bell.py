@@ -1,8 +1,10 @@
 import sys
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+
 
 # from ggplot import *
 
@@ -77,7 +79,7 @@ for year in list(set(meta_df.year)):
         # set color scheme
         colors = 'bgrcmykw'
 
-        for (r, w, l, d) in zip(rows, widths, labels, depths):  #zip_up_data:
+        for (r, w, l, d) in zip(rows, widths, labels, depths):  # zip_up_data:
             depth_index = depths_sorted.index(d)
             patch_handles.append(ax.barh(depth_index, w, align='center', left=left[depth_index],
                                          color=colors[int(row_counts[depth_index]) % len(colors)])

@@ -1,4 +1,5 @@
 import sys
+
 import pandas as pd
 
 count_file = sys.argv[1]
@@ -14,4 +15,3 @@ gene_list = list(set(gene_list))
 
 count_df = count_df[count_df['gene'].isin(gene_list)]
 count_df.to_csv(outfile)
-

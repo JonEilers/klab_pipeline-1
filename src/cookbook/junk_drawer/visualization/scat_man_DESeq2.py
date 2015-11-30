@@ -1,7 +1,8 @@
 import sys
+import os
+
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
 
 dir = sys.argv[1]
 # file = sys.argv[1]
@@ -9,7 +10,7 @@ file_list = [x for x in os.listdir(dir) if x.find('.res') != -1]
 for file in file_list:
     data = pd.DataFrame.from_csv(dir + '/' + file, sep=',', header=0)
     sig_df = data[data['padj'] <= 0.05]
-    sig_df.to_csv(dir.rstrip('/').rsplit('/',1)[1] + '_' + file.rsplit('.')[0] + '.meta.tsv', sep='\t')
+    sig_df.to_csv(dir.rstrip('/').rsplit('/', 1)[1] + '_' + file.rsplit('.')[0] + '.meta.tsv', sep='\t')
     color_dict = {True: 'r', False: 'b'}
     marker_dict = {True: 's', False: 'o'}
     fig, ax = plt.subplots()
@@ -42,5 +43,5 @@ for file in file_list:
     plt.ylabel('log2FoldChange', fontsize=16)
     plt.xlabel('baseMean', fontsize=16)
     plt.title(file.split('/')[-1].split('.')[0])
-    plt.savefig(dir.rstrip('/').rsplit('/',1)[1] + '_' + file.rsplit('.')[0] + '.meta.png')
+    plt.savefig(dir.rstrip('/').rsplit('/', 1)[1] + '_' + file.rsplit('.')[0] + '.meta.png')
     plt.clf()

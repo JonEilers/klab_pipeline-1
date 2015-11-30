@@ -1,13 +1,12 @@
 import sys
+import math
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import math
-
 
 file = sys.argv[1]
 awpd_file = sys.argv[2]
-data = pd.DataFrame.from_csv(file, sep='\t', header=0, index_col=False)
 awpd_data = pd.DataFrame.from_csv(awpd_file, sep=',', header=0, index_col=False)[
     ['cluster', 'sra_id', 'domain_name', 'awpd']]
 data = pd.DataFrame.from_csv(file, sep='\t', header=0, index_col=False)
@@ -29,8 +28,8 @@ for domain_name in set(data.domain_name):
     for sra_id in set(domain_data.sra_id):
         sra_data = domain_data.loc[(domain_data.sra_id == sra_id)].sort(['awpd'], ascending=[False]
                                                                         ).reset_index()[
-            ['cluster', 'sra_id', 'domain_name', 'count', 'awpd']
-        ][:100]
+                       ['cluster', 'sra_id', 'domain_name', 'count', 'awpd']
+                   ][:100]
         heatmap_data[sra_data.sra_id[0]] = sra_data.awpd
     heatmap_data.to_csv(domain_name + '_100_awpd.awpd_col.csv')
     heatmap_data.fillna(0, inplace=True)

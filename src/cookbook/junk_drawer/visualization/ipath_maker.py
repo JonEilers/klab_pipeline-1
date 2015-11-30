@@ -1,5 +1,5 @@
-import os
 import sys
+
 import pandas as pd
 
 count_file = sys.argv[1]
@@ -36,14 +36,14 @@ for padj_file in padj_file_list:  # todo: separate out oxic and suboxic genes
     suboxic_list.extend(list(set(suboxic_padj_df['gene'])))
 oxic_list = list(set(oxic_list))
 suboxic_list = list(set(suboxic_list))
-gene_dict = {'oxic':oxic_list, 'suboxic':suboxic_list}
+gene_dict = {'oxic': oxic_list, 'suboxic': suboxic_list}
 
 for zone in zones:
     gene_list = gene_dict[zone]
     zone_ids = list(meta_data.loc[(meta_data.zone == zone)].sra_id)
     count_data = data[data['gene'].isin(gene_list)]
-    zone_data = count_data[count_data['sra_id'].isin(zone_ids)][['gene','count']].groupby(['gene']).sum()
-    zone_data['count'] = zone_data['count']/100
+    zone_data = count_data[count_data['sra_id'].isin(zone_ids)][['gene', 'count']].groupby(['gene']).sum()
+    zone_data['count'] = zone_data['count'] / 100
     zone_data['count'] = 'W' + zone_data['count'].astype(str)
     color = colors[zones.index(zone)]
     zone_data['color_code'] = color

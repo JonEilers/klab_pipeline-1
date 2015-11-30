@@ -1,4 +1,5 @@
 import sys
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -52,7 +53,7 @@ for domain in set(data_mean.domain_name):
                  year_data.sra_id
                  ]
             x = year_data.awpd
-            t_test_dict[year] = year_data[['sra_id','awpd']]
+            t_test_dict[year] = year_data[['sra_id', 'awpd']]
             colors = ['r' for i in range(0, len(year_data))]
             sizes = [int(int(meta_data.loc[(meta_data.sra_id == a)].lib_size) / 10000) for a in year_data.sra_id]
             markers = [marker_list[zones.index(meta_data.zone.where(meta_data.sra_id == a, np.nan).max())] for a in
@@ -78,13 +79,13 @@ for domain in set(data_mean.domain_name):
             deseq_data = deseq_data[['gene', 'padj']]
             year_data = pd.merge(year_data, deseq_data, how='left', on=['gene'])
             year_data = year_data.loc[year_data.padj <= 0.05]
-            year_data.to_csv('_'.join([domain,str(year),'.csv']))
+            year_data.to_csv('_'.join([domain, str(year), '.csv']))
             year_data = pd.DataFrame(year_data.groupby(['sra_id']).mean()).reset_index()
             y = [int(meta_data.loc[meta_data.sra_id == n]['depth']) for n in
                  year_data.sra_id
                  ]
             x = year_data.awpd
-            t_test_dict[year] = pd.merge(t_test_dict[year],year_data[['sra_id','awpd']], how='left', on=['sra_id'])
+            t_test_dict[year] = pd.merge(t_test_dict[year], year_data[['sra_id', 'awpd']], how='left', on=['sra_id'])
 
             colors = ['b' for i in range(0, len(year_data))]
             sizes = [int(int(meta_data.loc[(meta_data.sra_id == a)].lib_size) / 10000) for a in year_data.sra_id]
@@ -96,7 +97,7 @@ for domain in set(data_mean.domain_name):
         legend_list.append(lo)
         #  Run a paired t-test of All vs Sig
 
-        for year,df in t_test_dict.iteritems():
+        for year, df in t_test_dict.iteritems():
             df = df.dropna()
             paired_sample = stats.ttest_rel(list(df.awpd_x), list(df.awpd_y))
             print "The " + str(year) + " t-statistic is %.3f and the p-value is %.3f." % paired_sample
@@ -107,11 +108,11 @@ for domain in set(data_mean.domain_name):
         x = domain_data.awpd
         z = np.polyfit(x, y, 1)
         p = np.poly1d(z)
-        #plt.plot(x, p(x), 'k-')
+        # plt.plot(x, p(x), 'k-')
         t = str('y = %.6fx + s(%.6f)' % (z[0], z[1]))
         equ = ax.legend([], [], loc='lower center',
-            title=t, scatterpoints=1, fontsize=12
-        )
+                        title=t, scatterpoints=1, fontsize=12
+                        )
         l1 = plt.scatter([], [], s=100, c='black', marker='s')
         l2 = plt.scatter([], [], s=100, c='black', marker='o')
 
@@ -122,9 +123,9 @@ for domain in set(data_mean.domain_name):
         ax.legend(legend_list, ['All COGs', 'Sig COGs'], scatterpoints=1, loc='center right',
                   title='Year', fontsize=12)
         plt.gca().add_artist(leg)
-        #plt.gca().add_artist(equ)
+        # plt.gca().add_artist(equ)
         plt.gca().invert_yaxis()
-        #plt.xlim([0,2])
+        # plt.xlim([0,2])
         plt.ylim([850, -100])
         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
             label.set_fontsize(16)

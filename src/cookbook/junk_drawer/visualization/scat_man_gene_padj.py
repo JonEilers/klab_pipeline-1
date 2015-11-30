@@ -1,4 +1,5 @@
 import sys
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,7 +51,7 @@ for year in years:
     deseq_data = deseq_data[['gene', 'padj']]
     year_data = pd.merge(year_data, deseq_data, how='left', on=['gene'])
     year_data = year_data.loc[year_data.padj <= 0.05]
-    year_data.to_csv('_'.join([str(year),'.csv']))
+    year_data.to_csv('_'.join([str(year), '.csv']))
 
     year_data = pd.DataFrame(year_data.groupby(['sra_id']).mean()).reset_index()
 
@@ -64,7 +65,7 @@ for year in years:
                year_data.sra_id]
     for _x, _y, _c, _m, _s in zip(x, y, colors, markers, sizes):
         ax.scatter(_x, _y, c=_c, s=_s, marker=_m)
-    #ax.scatter(x, y, c=colors, s=sizes, edgecolors='none')
+    # ax.scatter(x, y, c=colors, s=sizes, edgecolors='none')
     lo = ax.scatter([], [], c=colors, s=100)
     legend_list.append(lo)
 
@@ -74,10 +75,10 @@ y = [int(meta_data.loc[meta_data.sra_id == n]['depth']) for n in
 x = data_mean.awpd
 z = np.polyfit(x, y, 1)
 p = np.poly1d(z)
-#plt.plot(x, p(x), 'k-')
+# plt.plot(x, p(x), 'k-')
 t = str('y = %.6fx + s(%.6f)' % (z[0], z[1]))
 equ = ax.legend([], [], loc='lower center',
-    title=t, scatterpoints=1, fontsize=12)
+                title=t, scatterpoints=1, fontsize=12)
 
 l1 = plt.scatter([], [], s=100, edgecolors='none', c='black', marker='s')
 l2 = plt.scatter([], [], s=100, edgecolors='none', c='black', marker='o')
@@ -88,7 +89,7 @@ leg = ax.legend([l1, l2], zones, loc='center left', title='Zone',
                 scatterpoints=1, fontsize=12)
 ax.legend(legend_list, years, scatterpoints=1, loc='center right', title='Year', fontsize=12)
 plt.gca().add_artist(leg)
-#plt.gca().add_artist(equ)
+# plt.gca().add_artist(equ)
 plt.gca().invert_yaxis()
 plt.ylim([850, -100])
 for label in (ax.get_xticklabels() + ax.get_yticklabels()):

@@ -1,5 +1,3 @@
-import os
-
 Mpath = '/home/mclaugr4/bio/scripts_built/MBARI/'
 data_in = Mpath + 'data_in/'
 path = '/home/mclaugr4/bio/scripts_built/lineage/taxonomy-upa/data/'
@@ -44,7 +42,7 @@ for line in input:
         COG_id = split_line[1].split(' ')[1]
         func = ' '.join(split_line[1].split(' ')[2:-1])
         COG_func[COG_id] = func_cat, func
-    # output.write('\t'.join([COG_id,func_cat,func]) + '\n')
+        # output.write('\t'.join([COG_id,func_cat,func]) + '\n')
 # output.close()
 input.close()
 

@@ -1,4 +1,3 @@
-import sys
 import os
 from math import log as ln
 

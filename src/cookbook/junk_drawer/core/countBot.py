@@ -1,8 +1,6 @@
-import os
 import sys
-import operator
 import argparse
-from os.path import dirname, realpath, join
+from os.path import dirname, realpath
 
 
 # countBot.py

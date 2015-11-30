@@ -21,7 +21,6 @@ import urllib2
 from Bio import SeqIO
 
 
-
 # Define global variables
 ftp_url = "ftp://ftp.ncbi.nih.gov/refseq/release/"
 version_url = ftp_url + "release-notes/"

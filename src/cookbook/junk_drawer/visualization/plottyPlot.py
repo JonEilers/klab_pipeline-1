@@ -6,7 +6,6 @@ import matplotlib.cm as cm
 import numpy as np
 
 
-
 # Global path and directory list
 home_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -61,7 +60,7 @@ def rare_plot(rare_dir):
                 if max_x != None and max_y != None:
                     if len(x) != 0 and len(y) != 0:
                         if float(x[-1]) != 0 and float(y[-1]) != 0:
-                            if ((float(x[-1]) / max_x) > 0.6 or (float(y[-1]) / max_y) > 0.6):
+                            if (float(x[-1]) / max_x) > 0.6 or (float(y[-1]) / max_y) > 0.6:
                                 plt.annotate(gene, xy=(x[-1], y[-1]), xytext=(x[-1], y[-1]),
                                              bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5))
                                 # plt.annotate(gene, xy = (x[-1], y[-1]), xytext = (-(x[-1] * 0.01), y[-1] * 0.1), textcoords = 'offset points', ha = 'right', va = 'bottom',

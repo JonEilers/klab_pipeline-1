@@ -1,6 +1,7 @@
-from Bio import Phylo
 import os
 import sys
+
+from Bio import Phylo
 
 tree_dir = sys.argv[1]
 output_file = sys.argv[2]

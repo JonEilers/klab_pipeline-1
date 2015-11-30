@@ -9,6 +9,7 @@ import sys
 
 from Bio import SeqIO
 
+
 # import networkx
 from taxtastic import refpkg
 

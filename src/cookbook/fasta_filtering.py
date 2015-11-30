@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-from Bio import SeqIO
 import re
 import string
 import sys
 import os
+
+from Bio import SeqIO
 
 from klab.process.lineage import create_taxonomy_data_structures, get_lineage, get_name_from_taxa_id
 

@@ -112,10 +112,8 @@ def _generate_domain_stack_plots(sp1, sp2, level):
     gap = 1 - width
     xlim = [0 - gap - (width / 2), len(categories) - (width / 2)]  # leave gap on left edge, gap on right edge
 
-    level_title = level.replace('_', ' ').title() + ' Level'
     d.plot(ax=sp1, kind='bar', stacked=True, color=DOMAIN_COLORS, width=width, linewidth=0, legend=False, alpha=0.9)
     sp1.set_xticklabels(categories, rotation='horizontal')
-    sp1.set_title(level_title, fontsize=10)
     sp1.set_ylabel('Placements (thousands)', color='0.4')
     sp1.yaxis.set_major_formatter(FuncFormatter(_to_thousands))
     sp1.set_xlim(xlim)
@@ -124,7 +122,7 @@ def _generate_domain_stack_plots(sp1, sp2, level):
     d = d.div(d.sum(axis=1), axis=0)  # scale the data
     d.plot(ax=sp2, kind='bar', stacked=True, color=DOMAIN_COLORS, width=width, linewidth=0, legend=False, alpha=0.9)
     sp2.set_xticklabels(categories, rotation='horizontal')
-    sp2.set_title('Scaled ' + level_title, fontsize=10)
+    sp2.set_ylabel('Placements (scaled)', color='0.4')
     sp2.yaxis.set_major_formatter(FuncFormatter(_to_percent))
     sp2.set_xlim(xlim)
     sp2.xaxis.grid(False)
@@ -214,7 +212,7 @@ def _side_by_side_bar(subplot, df, x, y, colors, gap=None):
         gap = width = 1 / (bars + 1)
     else:  # this path needs work
         width = (1 - gap) / bars
-    width += 0.005  # leave slight space between bars
+    width += 0.008  # leave slight space between bars
     alpha = 0.6
     xticks = range(1, n + 1)
 
@@ -223,6 +221,7 @@ def _side_by_side_bar(subplot, df, x, y, colors, gap=None):
         subplot.bar(pos, df[y[i]], gap, color=colors[i], label=y[i], alpha=alpha, linewidth=0)
     subplot.set_xticks(xticks)
     subplot.set_xticklabels(categories)
+    subplot.xaxis.grid(False)
     subplot.tick_params(axis='x', labelsize=10)
     subplot.tick_params(axis='y', labelsize=8)
 
@@ -302,6 +301,8 @@ def create_figure_2(out_file=MBARI_ANALYSIS_DIR + 'figure_2.pdf'):
     _generate_domain_stack_plots(ax1, ax3, 'domain')
     _generate_domain_stack_plots(ax2, ax4, 'lowest_classification')
 
+    ax1.set_title("Domain Level", fontsize=10)
+    ax2.set_title("Lowest Classification Level", fontsize=10)
     # put legend in upper left subplot and set font size
     legend = ax1.legend(loc='upper right')
     plt.setp(legend.get_texts(), fontsize=10)
@@ -312,6 +313,7 @@ def create_figure_2(out_file=MBARI_ANALYSIS_DIR + 'figure_2.pdf'):
     plt.setp(ax2.get_yticklabels(), visible=False)
     ax2.set_ylabel('')
     plt.setp(ax4.get_yticklabels(), visible=False)
+    ax4.set_ylabel('')
     # fig.suptitle('2012 to 2014 Placement Changes')
     # plt.subplots_adjust(top=0.9)  # move subplots down to accomodate title (tight_layout doesn't consider it)
     # remove dead space

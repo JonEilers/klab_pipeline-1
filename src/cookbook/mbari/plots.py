@@ -151,11 +151,15 @@ def _get_values_and_weights(series):
 
 def _create_comparison_histogram(subplot, bins, series1, color1, series2, color2, xlabel, xlim=None, ylim=None):
     values, weights = _get_values_and_weights(series1)
-    subplot.hist(values, bins=bins, weights=weights, facecolor=color1, label='2012', alpha=0.5,
-                 linewidth=0.5, edgecolor='white')
+    n, b, p = subplot.hist(values, bins=bins, weights=weights, facecolor=color1, label='2012', alpha=0.5,
+                           linewidth=0.5, edgecolor='white')
+    print '2012 ' + series1.name
+    print '{:2.3f}%'.format((1 - n.sum()) * 100)
     values, weights = _get_values_and_weights(series2)
-    subplot.hist(values, bins=bins, weights=weights, facecolor=color2, label='2014', alpha=0.5,
-                 linewidth=0.5, edgecolor='white')
+    n, b, p = subplot.hist(values, bins=bins, weights=weights, facecolor=color2, label='2014', alpha=0.5,
+                           linewidth=0.5, edgecolor='white')
+    print '2014 ' + series2.name
+    print '{:2.2f}%'.format((1 - n.sum()) * 100)
 
     subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
     subplot.set_xlabel(xlabel, fontsize=10)
@@ -175,12 +179,12 @@ def _create_taxa_depth_histogram(a, df12, df14):
 
 def _create_edpl_histogram(a, df12, df14):
     min_lim = 0
-    max_lim = 1.2  # manual range (clips a long tail with few values)
+    max_lim = 2  # manual range (clips a long tail with few values)
     num_bins = 40
     bin_width = (max_lim - min_lim) / num_bins
     bins = np.arange(min_lim, max_lim + bin_width, bin_width)
     _create_comparison_histogram(a, bins=bins, series1=df12.edpl, color1=COLOR_2012, series2=df14.edpl,
-                                 color2=COLOR_2014, xlabel=r'EDPL', xlim=[min_lim, max_lim], ylim=[0, 0.45])
+                                 color2=COLOR_2014, xlabel=r'EDPL', xlim=[min_lim, max_lim], ylim=[0, 0.5])
 
 
 def _create_post_prob_histogram(a, df12, df14):
@@ -199,9 +203,9 @@ def create_edpl_post_prob_scatter(subplot, df, year, color, domain_filter, bins=
     subplot.scatter(d['post_prob', 'mean'], d['edpl', 'mean'], c=color, label=year, alpha=0.8)
     subplot.set_title(domain_filter.title())
     subplot.set_ylim(-0.025, 1.0)
-    subplot.set_xlabel('Posterior Probability')
+    subplot.set_xlabel('Posterior Probability (bins)')
     subplot.set_xlim(-0.01, 1.01)
-    subplot.set_ylabel('EDPL')
+    subplot.set_ylabel('EDPL (bins)')
 
 
 def _side_by_side_bar(subplot, df, x, y, colors, gap=None):
@@ -333,6 +337,7 @@ def create_figure_3(out_file=MBARI_ANALYSIS_DIR + 'figure_3.pdf'):
     fig, axes = plt.subplots(nrows=3, ncols=2)
 
     domain_filter = 'Bacteria'
+    print domain_filter
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
     axes[0, 0].set_title(domain_filter)
@@ -341,6 +346,7 @@ def create_figure_3(out_file=MBARI_ANALYSIS_DIR + 'figure_3.pdf'):
     _create_taxa_depth_histogram(axes[2, 0], d12, d14)
 
     domain_filter = 'Eukaryota'
+    print domain_filter
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
     axes[0, 1].set_title(domain_filter)

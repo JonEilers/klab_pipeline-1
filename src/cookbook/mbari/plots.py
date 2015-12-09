@@ -388,10 +388,10 @@ def create_figure_4(out_file=MBARI_ANALYSIS_DIR + 'figure_4.pdf'):
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
     l12, r12 = _calc_split(df12, divider_x, domain_filter)
     l14, r14 = _calc_split(df14, divider_x, domain_filter)
-    subplot.text(0.12, 0.81, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
-    subplot.text(0.65, 0.81, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
-    subplot.text(0.12, 0.68, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
-    subplot.text(0.65, 0.68, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.12, 0.83, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.65, 0.83, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.12, 0.70, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.65, 0.70, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
 
     subplot = axes[1]
     domain_filter = 'Eukaryota'
@@ -402,10 +402,10 @@ def create_figure_4(out_file=MBARI_ANALYSIS_DIR + 'figure_4.pdf'):
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
     l12, r12 = _calc_split(df12, divider_x, domain_filter)
     l14, r14 = _calc_split(df14, divider_x, domain_filter)
-    subplot.text(0.45, 0.81, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
-    subplot.text(0.85, 0.81, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
-    subplot.text(0.45, 0.68, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
-    subplot.text(0.85, 0.68, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.45, 0.83, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.85, 0.83, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.45, 0.70, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.85, 0.70, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
 
     # put legend in upper right subplot and set font size
     legend = axes[0].legend(loc='upper right', scatterpoints=3)

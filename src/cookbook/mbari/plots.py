@@ -249,11 +249,11 @@ def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
 
     d3 = read_df_from_file('/Users/ehervol/Projects/WWU/MBARI_data/mbari_ref_counts.tsv')
     subplot = axes[0]
-    subplot.set_title('Unique Reference Sequences by Domain')
-    _side_by_side_bar(subplot, d3, x=x, y=y, colors=c)
+    subplot.set_title('Increase in Unique References')
+    d3.plot('domain_name', ['change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
+    subplot.xaxis.grid(False)
+    subplot.set_xlabel('')
 
-    # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
-    # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
     # filter by domain and drop dups for 2012 and 2014 data
     d = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     d.drop_duplicates('classification', inplace=True)
@@ -266,10 +266,14 @@ def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
     # merge 2012 and 2014 data
     df = pd.merge(df12, df14, on='domain_name', how='outer', suffixes=('_12', '_14'))
     df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
+    df['change'] = df['2014'] / df['2012']
 
     subplot = axes[1]
-    subplot.set_title('Unique Placements by Domain')
-    _side_by_side_bar(subplot, df, x=x, y=y, colors=c)
+    subplot.set_title('Increase in Unique Placements')
+    df.plot('domain_name', ['change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
+    subplot.set_ylim([0, 3.5])  # same as plot above
+    subplot.xaxis.grid(False)
+    subplot.set_xlabel('')
 
     # normalize data
     d = pd.merge(d3, df, on='domain_name', how='outer', suffixes=('_ref', '_domain'))
@@ -277,11 +281,12 @@ def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
     d['2014'] = d['2014_domain'] / d['2014_ref']
 
     subplot = axes[2]
-    subplot.set_title('Normalized Placements by Domain')
+    subplot.set_title('Placement Efficiency')
     _side_by_side_bar(subplot, d, x=x, y=y, colors=c)
+    subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
+    legend = subplot.legend(loc='upper right')
 
-    # put legend in lower right subplot and set font size
-    legend = axes[0].legend(loc='upper right')
+    # set legend font size
     plt.setp(legend.get_texts(), fontsize=10)
     # hide x-tick labels for a couple subplots
     plt.setp(axes[0].get_xticklabels(), visible=False)

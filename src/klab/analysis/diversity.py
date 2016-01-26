@@ -2,6 +2,9 @@
 
 from __future__ import division
 
+import argparse
+import os
+
 import pandas as pd
 
 import numpy as np
@@ -65,12 +68,20 @@ def build_similarity_frame(node_dict, abundance):
 
 
 if __name__ == '__main__':
-    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures('../../data')
-    placements = create_placements('/Users/ehervol/Dropbox/shared_projects/seastar/data/bm_ssu_analysis')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-directory', help='directory with .jplace files', required=True)
+    parser.add_argument('-out_directory', help='output directory', required=True)
+    args = parser.parse_args()
+
+    # little hacky to use relative path from this file
+    data_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../data')
+
+    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures(data_dir)
+    placements = create_placements(args.directory)
     add_name_column(placements, CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN, name_dict, deleted_list)
 
     abundance = group_and_count(placements, [CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN])
-    write_df_to_file(abundance, '../../../test/abundance.tsv')
+    write_df_to_file(abundance, os.path.join(args.out_directory, 'abundance.tsv'))
 
     similarity = build_similarity_frame(node_dict, abundance)
-    write_df_to_file(similarity, '../../../test/similarity_matrix.tsv')
+    write_df_to_file(similarity, os.path.join(args.out_directory, 'similarity_matrix.tsv'))

@@ -242,7 +242,7 @@ def _calc_split(df, divider, domain_filter):
 
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
 def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
-    fig, axes = plt.subplots(nrows=3, ncols=1)
+    fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(6, 8))
     x = 'domain_name'
     y = ['2012', '2014']
     c = [COLOR_2012, COLOR_2014]
@@ -284,7 +284,7 @@ def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
     subplot.set_title('Placement Efficiency')
     _side_by_side_bar(subplot, d, x=x, y=y, colors=c)
     subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
-    legend = subplot.legend(loc='upper right')
+    legend = subplot.legend(loc='upper center')
 
     # set legend font size
     plt.setp(legend.get_texts(), fontsize=10)
@@ -301,6 +301,7 @@ def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
 
 # Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
 def create_figure_2(out_file=MBARI_ANALYSIS_DIR + 'figure_2.pdf'):
+    plt.figure(figsize=(4, 6))
     gs = gridspec.GridSpec(2, 2, width_ratios=[5, 3])  # change widths (5 bars on left, 3 on right)
     ax1 = plt.subplot(gs[0, 0])
     ax2 = plt.subplot(gs[0, 1])

@@ -1,8 +1,8 @@
 #  Author: C A Cobbold
 #  14 December 2010
 
-# This code computes the diversity of a community based on species similarity 
-# and abundance.  The diversity measure is plotted as function of the 
+# This code computes the diversity of a community based on species similarity
+# and abundance.  The diversity measure is plotted as function of the
 # parameter q which indicates the importance placed or rare (q=0) and abundance
 # species (q->infinity).  This code accompanices the manuscript:
 
@@ -72,6 +72,6 @@ colors = c(4,2,6)
 matplot(qq,Dqz, type="l", col = colors,
   xlab="Sensitivity Parameter q",
   ylab="Diversity DqZ(p)",
-  main="Seastar Bacterial Metagenome SSU Diversity",
+  main="Some Title Relating to Diversity"
 )
-legend("topright", legend=colnames(obs), fill=colors, bty="n") 
+legend("topright", legend=colnames(obs), fill=colors, bty="n")

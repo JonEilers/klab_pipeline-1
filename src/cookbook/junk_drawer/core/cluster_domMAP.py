@@ -1,6 +1,6 @@
 import os
 
-from qsub import Qsub
+from cookbook.junk_drawer.qsub import Qsub
 
 
 def slice_it(script_cmd_list, file_number):

@@ -12,12 +12,12 @@ if __name__ == '__main__':
     # only take confident placements
     p = placements[placements.placement_type == 'confident']
 
-    create_n_way_diversity_files(p, 'host_disease', os.path.join(seastar_dir, 'bm_ssu_disease_confident_'))
-    create_n_way_diversity_files(p, 'host', os.path.join(seastar_dir, 'bm_ssu_species_confident_'))
-    create_n_way_diversity_files(p, 'library_name', os.path.join(seastar_dir, 'bm_ssu_library_confident_'))
-    create_n_way_diversity_files(p, 'location', os.path.join(seastar_dir, 'bm_ssu_location_confident_'))
+    create_n_way_diversity_files(p, 'host_disease', os.path.join(seastar_dir, 'host_disease'))
+    # create_n_way_diversity_files(p, 'host', os.path.join(seastar_dir, 'bm_ssu_species_confident'))
+    # create_n_way_diversity_files(p, 'library_name', os.path.join(seastar_dir, 'bm_ssu_library_confident'))
+    # create_n_way_diversity_files(p, 'location', os.path.join(seastar_dir, 'bm_ssu_location_confident'))
 
-    p2 = p[p.host_disease == 'Asymptomatic']
-    create_n_way_diversity_files(p2, 'host', os.path.join(seastar_dir, 'bm_ssu_asymptomatic_species_confident_'))
-    p2 = p[p.host_disease == 'Symptomatic']
-    create_n_way_diversity_files(p2, 'host', os.path.join(seastar_dir, 'bm_ssu_symptomatic_species_confident_'))
+    # p2 = p[p.host_disease == 'Asymptomatic']
+    # create_n_way_diversity_files(p2, 'host', os.path.join(seastar_dir, 'bm_ssu_asymptomatic_species_confident'))
+    # p2 = p[p.host_disease == 'Symptomatic']
+    # create_n_way_diversity_files(p2, 'host', os.path.join(seastar_dir, 'bm_ssu_symptomatic_species_confident'))

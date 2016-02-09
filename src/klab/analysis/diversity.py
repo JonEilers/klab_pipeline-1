@@ -6,7 +6,6 @@ import argparse
 import os
 
 import pandas as pd
-
 import numpy as np
 
 from klab.process.derived_info import group_and_count
@@ -14,6 +13,7 @@ from klab.process.file_manager import write_df_to_file, create_placements, CLASS
 from klab.process.lineage import build_lineage_matrix, create_taxonomy_data_structures, add_name_column
 
 CLASSIFICATION_NAME_COLUMN = 'classification_name'
+NORMALIZE_COLUMN = 'normalize_factor'
 
 
 def _calculate_similarity(lineage_dict, a, b):
@@ -59,6 +59,42 @@ def _build_similarity_matrix(node_dict, abundance):
             sm[i][j] = sim
             sm[j][i] = sim
     return sm, taxa_id_list,
+
+
+def _normalize_data(compare_column, placements):
+    if NORMALIZE_COLUMN not in placements.columns:
+        return placements
+
+    # group the placements - assume ungrouped and has a 'normalize_factor' column
+    c = group_and_count(placements,
+                        [CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN, compare_column, NORMALIZE_COLUMN])
+    # calculate the normalized counts
+    c['norm_count'] = c[NORMALIZE_COLUMN] * c['count']
+    c.drop([NORMALIZE_COLUMN, 'count'], axis=1, inplace=True)
+    return c
+
+
+# filter and pivot the dataframe by compare_column, then calculate abundance and similarity
+def create_n_way_diversity_files(node_dict, placements, compare_column, path):
+    c = _normalize_data(compare_column, placements)
+
+    # group and sum up the counts
+    n = c.groupby([CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN, compare_column]).sum().reset_index()
+
+    # pivot and unstack to break out values by compare column
+    t = pd.pivot_table(n, index=[CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN, compare_column], aggfunc=[np.sum])
+    abundance = t.unstack()
+    abundance.fillna(0, inplace=True)
+
+    # clean up and flatten the multi-index
+    abundance.columns = abundance.columns.get_level_values(2)
+    abundance.reset_index(inplace=True)
+
+    write_df_to_file(abundance, path + 'abundance.tsv')
+
+    # make and save the similarity matrix
+    similarity = build_similarity_frame(node_dict, abundance)
+    write_df_to_file(similarity, path + 'similarity.tsv')
 
 
 def build_similarity_frame(node_dict, abundance):

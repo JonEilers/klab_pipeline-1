@@ -4,8 +4,6 @@ MBARI_2014_PACKAGE_DIR = '/home/kodnerr/share/refpkgs/refpkgs_2014-10-20/COG_ref
 # directory where big data files (jplace, etc) live
 MBARI_DATA_DIR = '/Users/ehervol/Projects/WWU/MBARI_data/'
 
-NCBI_DATA_DIR = '/Users/ehervol/Projects/WWU/klab_pipeline/src/data'
-
 MBARI_2012_BASE = MBARI_DATA_DIR + '2012_MBARI_cog_'
 MBARI_2014_BASE = MBARI_DATA_DIR + '2014_MBARI_cog_'
 

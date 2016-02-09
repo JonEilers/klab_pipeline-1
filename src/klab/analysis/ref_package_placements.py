@@ -32,9 +32,9 @@ def _get_tax_map_info(root):
     return df
 
 
-def get_ref_package_placements(root_directory, ncbi_directory, out_file=None):
+def get_ref_package_placements(root_directory, out_file=None):
     d2 = _get_tax_map_info(root_directory)
-    return create_lineage(ncbi_dir=ncbi_directory, placements=d2, out_file=out_file)
+    return create_lineage(placements=d2, out_file=out_file)
 
 
 if __name__ == '__main__':
@@ -44,5 +44,4 @@ if __name__ == '__main__':
     parser.add_argument('-out_file', help='output file', required=True)
     args = parser.parse_args()
 
-    get_ref_package_placements(root_directory=args.directory, ncbi_directory=args.ncbi_directory,
-                               out_file=args.out_file)
+    get_ref_package_placements(root_directory=args.directory, out_file=args.out_file)

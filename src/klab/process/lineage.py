@@ -101,15 +101,16 @@ def add_name_column(df, id_column, name_column, name_dict, deleted_list):
     return df
 
 
-def create_taxonomy_data_structures(dir):
-    return_code = subprocess.call(dir + "/get_ncbi_data.sh", shell=True)
+def create_taxonomy_data_structures():
+    ncbi_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../data'))
+    return_code = subprocess.call(os.path.join(ncbi_dir, 'get_ncbi_data.sh'), shell=True)
     if return_code != 0:
         raise Exception('Problem getting NCBI data.')
-    node_dict = _build_dict_from_file(os.path.join(dir, 'nodes.tsv'))
-    name_dict = _build_dict_from_file(os.path.join(dir, 'names.tsv'))
+    node_dict = _build_dict_from_file(os.path.join(ncbi_dir, 'nodes.tsv'))
+    name_dict = _build_dict_from_file(os.path.join(ncbi_dir, 'names.tsv'))
     name_dict[MISSING_ID] = NO_MATCH  # better to add here than make a special case in code
-    merged_dict = _build_dict_from_file(os.path.join(dir, 'merged.tsv'))
-    deleted_list = _build_deleted_list(os.path.join(dir, 'delnodes.tsv'))
+    merged_dict = _build_dict_from_file(os.path.join(ncbi_dir, 'merged.tsv'))
+    deleted_list = _build_deleted_list(os.path.join(ncbi_dir, 'delnodes.tsv'))
     return node_dict, name_dict, merged_dict, deleted_list
 
 
@@ -119,8 +120,8 @@ def _update_classification_ids(df, merged_dict):
     return df
 
 
-def create_lineage(ncbi_dir, placements, out_file=None):
-    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures(ncbi_dir)
+def create_lineage(placements, out_file=None):
+    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures()
     placements = _update_classification_ids(placements, merged_dict)
     lineage_frame = _build_lineage_frame(node_dict=node_dict, placements=placements)
     add_name_column(lineage_frame, 'domain_id', 'domain_name', name_dict, deleted_list)
@@ -136,14 +137,13 @@ def create_lineage(ncbi_dir, placements, out_file=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-ncbi_directory', help='directory with NCBI data files', required=True)
     parser.add_argument('-placement_file', help='sequence placement file', required=True)
     parser.add_argument('-out_file', help='output file', required=True)
     args = parser.parse_args()
 
     p = read_df_from_file(args.placement_file)
-    create_lineage(ncbi_dir=args.ncbi_directory, placements=p, out_file=args.out_file)
+    create_lineage(placements=p, out_file=args.out_file)
 
-    # -n '/placeholder/src/data' -p '/placeholder/test/data/test_placements.tsv' -o '/placeholder/test/data/test_placements_with_lineage.tsv'
-    # -n '/placeholder/src/data' -p '/shared_data/2014_placements.tsv' -o '/shared_data/2014_placements_with_lineage.tsv'
-    # -n '/placeholder/src/data' -p '/shared_data/2012_placements.tsv' -o '/shared_data/2012_placements_with_lineage.tsv'
+    # -p '/placeholder/test/data/test_placements.tsv' -o '/placeholder/test/data/test_placements_with_lineage.tsv'
+    # -p '/shared_data/2014_placements.tsv' -o '/shared_data/2014_placements_with_lineage.tsv'
+    # -p '/shared_data/2012_placements.tsv' -o '/shared_data/2012_placements_with_lineage.tsv'

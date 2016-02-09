@@ -45,13 +45,13 @@ def _filter_fasta_file(node_dict, name_dict, input_file, output_file, include, e
     print "Wrote %i matching sequences to %s" % (len(matching_sequences), output_file)
 
 
-def _split_fasta_file(ncbi_dir, input_file, output_dir, include_set, exclude_set):
+def _split_fasta_file(input_file, output_dir, include_set, exclude_set):
     if not os.path.isdir(ncbi_dir):
         raise ValueError(ncbi_dir + ' is not a directory.')
     if not os.path.isfile(input_file):
         raise ValueError(input_file + ' is not a file.')
 
-    nodes, names, merged, deleted = create_taxonomy_data_structures(ncbi_dir)
+    nodes, names, merged, deleted = create_taxonomy_data_structures()
 
     cluster = os.path.basename(input_file).split('.')[0]  # pull first part of filename (ex: 'COG0001')
     new_dir = os.path.join(output_dir, cluster)
@@ -77,4 +77,4 @@ if __name__ == '__main__':
     include_set = {2830, 2836, 3041, 2864, 3027}  # TODO ech 2015-06-29 - migrate these two items to file
     exclude_set = set()  # {2831}  # test value
 
-    _split_fasta_file(ncbi_dir, input_file, output_dir, include_set, exclude_set)
+    _split_fasta_file(input_file, output_dir, include_set, exclude_set)

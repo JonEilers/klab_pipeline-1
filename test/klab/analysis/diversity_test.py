@@ -82,7 +82,7 @@ class TestDiversity(unittest.TestCase):
     def test_build_similarity_frame(self):
         dat = [[2, 'two', 4], [6, 'six', 5], [9, 'nine', 2], [17, 'seventeen', 25]]
         abundance = pd.DataFrame(data=dat, columns=[CLASSIFICATION_COLUMN, CLASSIFICATION_NAME_COLUMN, 'count'])
-        sim = build_similarity_frame(node_dict, abundance)
+        sim = build_similarity_frame(abundance, node_dict)
 
         self.assertEquals(4, len(sim.index))
         self.assertEquals(['two', 'six', 'nine', 'seventeen'], list(sim.columns))

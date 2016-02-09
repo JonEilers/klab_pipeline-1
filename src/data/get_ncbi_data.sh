@@ -14,7 +14,7 @@ cd $DIR
 
 # if end file already exists, then don't need to do anything
 if [ -f names.tsv ]; then
-	echo "NCBI files already exist, skipping download."
+	# echo "NCBI files already exist, skipping download."
 	exit 0;
 fi
 

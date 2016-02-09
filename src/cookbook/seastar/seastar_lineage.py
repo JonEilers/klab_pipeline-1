@@ -15,7 +15,7 @@ def create_lineage_files(base):
     lineage_file = base + 'placements_with_lineage.tsv'
 
     p = create_placements(dir=jplace_dir)
-    l = create_lineage(ncbi_dir='/placeholder/src/data', placements=p)
+    l = create_lineage(placements=p)
     add_placement_type_column(l)
     write_df_to_file(l, lineage_file)
 

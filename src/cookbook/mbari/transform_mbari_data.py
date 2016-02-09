@@ -8,7 +8,7 @@ from klab.analysis.ref_package_placements import get_ref_package_placements
 from klab.process.derived_info import add_placement_type_column, group_and_count
 from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file
 from klab.process.lineage import create_lineage
-from cookbook.mbari import NCBI_DATA_DIR, MBARI_2012_BASE, MBARI_2014_BASE, MBARI_2012_EDPL_FILE, \
+from cookbook.mbari import MBARI_2012_BASE, MBARI_2014_BASE, MBARI_2012_EDPL_FILE, \
     MBARI_2014_EDPL_FILE, MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_MERGED_FILE, \
     MBARI_2012_REF_PKG_FILE, MBARI_2012_PACKAGE_DIR, MBARI_2014_PACKAGE_DIR, MBARI_2014_REF_PKG_FILE, MBARI_DATA_DIR
 
@@ -114,7 +114,7 @@ def create_mbari_lineage_files(base, edpl=None):
         p2 = _add_edpl_column(p, edpl)
     else:
         p2 = p
-    l = create_lineage(ncbi_dir=NCBI_DATA_DIR, placements=p2)
+    l = create_lineage(placements=p2)
     add_placement_type_column(l)
     _add_mbari_size_column(l)
     _add_mbari_location_column(l)
@@ -134,11 +134,9 @@ if __name__ == '__main__':
 
     # reference package placement counts
     if not os.path.isfile(MBARI_2012_REF_PKG_FILE):
-        get_ref_package_placements(root_directory=MBARI_2012_PACKAGE_DIR, ncbi_directory=NCBI_DATA_DIR,
-                                   out_file=MBARI_2012_REF_PKG_FILE)
+        get_ref_package_placements(root_directory=MBARI_2012_PACKAGE_DIR, out_file=MBARI_2012_REF_PKG_FILE)
     if not os.path.isfile(MBARI_2014_REF_PKG_FILE):
-        get_ref_package_placements(root_directory=MBARI_2014_PACKAGE_DIR, ncbi_directory=NCBI_DATA_DIR,
-                                   out_file=MBARI_2014_REF_PKG_FILE)
+        get_ref_package_placements(root_directory=MBARI_2014_PACKAGE_DIR, out_file=MBARI_2014_REF_PKG_FILE)
 
     # binned and merged ref package counts
     if not os.path.isfile(MBARI_DATA_DIR + 'mbari_ref_counts.tsv'):

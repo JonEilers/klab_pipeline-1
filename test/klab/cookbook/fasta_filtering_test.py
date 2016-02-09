@@ -19,13 +19,13 @@ class TestFastaFiltering(unittest.TestCase):
 
     def test_split_fasta_file(self):
         try:
-            _split_fasta_file('no_dir', None, None, None, None)
+            _split_fasta_file(None, None, None, None)
             self.fail('should have thrown ValueError')
         except ValueError, ve:
             self.assertEqual('no_dir is not a directory.', ve.message)
 
         try:
-            _split_fasta_file('.', 'no_file', None, None, None)
+            _split_fasta_file('no_file', None, None, None)
             self.fail('should have thrown ValueError')
         except ValueError, ve:
             self.assertEqual('no_file is not a file.', ve.message)

@@ -29,10 +29,9 @@ def _create_mbari_files_for_robin(base):
                             'placement_type'], base + 'classification_')
 
 
-def _create_lineage_and_count_files_for_robin(ncbi_dir, input_dir, output_dir):
+def _create_lineage_and_count_files_for_robin(input_dir, output_dir):
     p = create_placements(dir=input_dir)
-    l = create_lineage(ncbi_dir=ncbi_dir, placements=p,
-                       out_file=os.path.join(output_dir, 'placements_with_lineage.tsv'))
+    l = create_lineage(placements=p, out_file=os.path.join(output_dir, 'placements_with_lineage.tsv'))
     _create_count_files(l, ['domain_name', 'placement_type'], os.path.join(output_dir, 'domain_'))
     _create_count_files(l, ['domain_name', 'division_name', 'placement_type'], os.path.join(output_dir, 'division_'))
     _create_count_files(l, ['domain_name', 'division_name', 'lowest_classification_name', 'placement_type'],
@@ -41,10 +40,8 @@ def _create_lineage_and_count_files_for_robin(ncbi_dir, input_dir, output_dir):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-ncbi_directory', help='directory with NCBI data files', required=True)
     parser.add_argument('-placement_directory', help='directory with sequence placement files', required=True)
     parser.add_argument('-out_directory', help='output directory', required=True)
     args = parser.parse_args()
 
-    _create_lineage_and_count_files_for_robin(ncbi_dir=args.ncbi_directory, input_dir=args.placement_directory,
-                                              output_dir=args.out_directory)
+    _create_lineage_and_count_files_for_robin(input_dir=args.placement_directory, output_dir=args.out_directory)

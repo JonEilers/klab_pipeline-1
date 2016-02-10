@@ -6,7 +6,7 @@ import pandas as pd
 from klab.analysis.edpl import get_edpl
 from klab.analysis.ref_package_placements import get_ref_package_placements
 from klab.process.derived_info import add_placement_type_column, group_and_count
-from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file
+from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file, CLASSIFICATION_COLUMN
 from klab.process.lineage import create_lineage
 from cookbook.mbari import MBARI_2012_BASE, MBARI_2014_BASE, MBARI_2012_EDPL_FILE, \
     MBARI_2014_EDPL_FILE, MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_MERGED_FILE, \
@@ -90,11 +90,11 @@ def _merge_mbari_domain_data(file_12, file_14, result):
 
 def _merge_reference_package_data(file_12, file_14, result):
     d = read_df_from_file(file_12)
-    d2 = d.drop_duplicates('classification')
+    d2 = d.drop_duplicates(CLASSIFICATION_COLUMN)
     d12 = group_and_count(d2, ['domain_name'])
 
     d = read_df_from_file(file_14)
-    d2 = d.drop_duplicates('classification')
+    d2 = d.drop_duplicates(CLASSIFICATION_COLUMN)
     d14 = group_and_count(d2, ['domain_name'])
 
     df = pd.merge(d12, d14, on='domain_name', how='outer', suffixes=('_12', '_14'))

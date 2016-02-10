@@ -2,7 +2,7 @@
 import argparse
 import os
 
-from klab.analysis.diversity import CLASSIFICATION_NAME_COLUMN
+from klab.analysis.diversity import CLASSIFICATION_NAME_COLUMN, NORMALIZE_COLUMN
 from klab.process.file_manager import create_placements, write_df_to_file
 from klab.process.lineage import create_lineage
 
@@ -57,6 +57,9 @@ if __name__ == '__main__':
     _add_bb_location_column(p)
     _add_bb_date_columns(p)
     _add_bb_depth_column(p)
+
+    # TODO ech 2015-02-10 - diversity code expects this column - need to rewrite
+    p[NORMALIZE_COLUMN] = 1
 
     # placements_file = os.path.join(args.out_directory, 'placements.tsv')
     # write_df_to_file(p, placements_file)

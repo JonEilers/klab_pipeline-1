@@ -16,7 +16,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from matplotlib import gridspec
 
-from klab.process.file_manager import read_df_from_file, write_df_to_file
+from klab.process.file_manager import read_df_from_file, write_df_to_file, CLASSIFICATION_COLUMN
 from klab.process.derived_info import group_and_count
 from cookbook.mbari import MBARI_ANALYSIS_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
     MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE
@@ -256,11 +256,11 @@ def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
 
     # filter by domain and drop dups for 2012 and 2014 data
     d = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
-    d.drop_duplicates('classification', inplace=True)
+    d.drop_duplicates(CLASSIFICATION_COLUMN, inplace=True)
     df = d[d['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
     df12 = group_and_count(df, ['domain_name'])
     d = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
-    d.drop_duplicates('classification', inplace=True)
+    d.drop_duplicates(CLASSIFICATION_COLUMN, inplace=True)
     df = d[d['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
     df14 = group_and_count(df, ['domain_name'])
     # merge 2012 and 2014 data

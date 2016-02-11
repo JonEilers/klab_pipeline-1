@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument('-out_directory', help='output directory', required=True)
     args = parser.parse_args()
 
-    placements = read_df_from_file(args.placement_file)
+    placements = read_df_from_file(args.placement_file, low_memory=False)
 
     # filter by confident placements
     add_placement_type_column(placements)
@@ -20,6 +20,9 @@ if __name__ == '__main__':
 
     # filter out non-specific matches
     p = p[p['class_id'] != -1]
+
+    p = p[p['depth'] != 'UNKNOWN']
+    p = p[p['location'] != 'UNKNOWN']
     p = p[p[CLASSIFICATION_COLUMN] != 150487]  # this is just a poorly formed name that chokes R
 
     create_n_way_diversity_files(p, args.compare, args.out_directory)

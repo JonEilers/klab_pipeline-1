@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # Built by Eric Hervol, modified by Ryan McLaughlin
-import sys
+
 import argparse
 
 from klab.process.derived_info import group_and_count, FUZZY, CONFIDENT
 from klab.process.file_manager import create_placements, write_df_to_file
 from klab.process.lineage import create_lineage
-
-from pandas import DataFrame
 
 
 def create_lineage_files(jpath):
@@ -34,15 +32,16 @@ def do_the_do(jpath):
     create_and_write_count_files(lin, ['gene', 'domain_name', 'division_name', 'placement_type'],
                                  jpath + '_division_')
     create_and_write_count_files(lin, ['gene', 'domain_name', 'division_name', 'class_name',
-                                     'placement_type'], jpath + '_class_')
-    create_and_write_count_files(lin, ['gene', 'domain_name', 'division_name', 'class_name','lowest_classification_name',
-                                     'placement_type'], jpath + '_lowest_classification_')
+                                       'placement_type'], jpath + '_class_')
+    create_and_write_count_files(lin,
+                                 ['gene', 'domain_name', 'division_name', 'class_name', 'lowest_classification_name',
+                                  'placement_type'], jpath + '_lowest_classification_')
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser()
-	parser.add_argument('-j_dir', help='directory containing jplace files', required=True)
-	args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-j_dir', help='directory containing jplace files', required=True)
+    args = parser.parse_args()
 
-	jpath = args.j_dir
-	do_the_do(jpath)
+    jpath = args.j_dir
+    do_the_do(jpath)

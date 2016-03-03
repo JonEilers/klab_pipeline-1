@@ -46,8 +46,6 @@ def _filter_fasta_file(node_dict, name_dict, input_file, output_file, include, e
 
 
 def _split_fasta_file(input_file, output_dir, include_set, exclude_set):
-    if not os.path.isdir(ncbi_dir):
-        raise ValueError(ncbi_dir + ' is not a directory.')
     if not os.path.isfile(input_file):
         raise ValueError(input_file + ' is not a file.')
 
@@ -66,12 +64,10 @@ def _split_fasta_file(input_file, output_dir, include_set, exclude_set):
 
 
 if __name__ == '__main__':
-    # first argument is full path to directory where ncbi data files live
-    # second argument is full path to fasta file you want to split
-    # third argument is output directory
-    ncbi_dir = sys.argv[1]
-    input_file = sys.argv[2]
-    output_dir = sys.argv[3]
+    # first argument is full path to fasta file you want to split
+    # second argument is output directory
+    input_file = sys.argv[1]
+    output_dir = sys.argv[2]
 
     # TODO - fourth argument is file that contains tax_id, include/exclude, optional_name
     include_set = {2830, 2836, 3041, 2864, 3027}  # TODO ech 2015-06-29 - migrate these two items to file

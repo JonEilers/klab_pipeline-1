@@ -8,9 +8,9 @@ import numpy as np
 file = sys.argv[1]
 awpd_file = sys.argv[2]
 awpd_data = pd.DataFrame.from_csv(awpd_file, sep=',', header=0, index_col=False)[
-    ['cluster', 'sra_id', 'domain_name', 'awpd']]
+    ['gene', 'sra_id', 'domain_name', 'awpd']]
 data = pd.DataFrame.from_csv(file, sep='\t', header=0, index_col=False)
-data = pd.merge(data, awpd_data, how='left', on=['cluster', 'sra_id', 'domain_name'])
+data = pd.merge(data, awpd_data, how='left', on=['gene', 'sra_id', 'domain_name'])
 sra2name = {'SRR304684': '2008_15m', 'SRR064444': '2008_50m', 'SRR304656': '2008_65m', 'SRR064446': '2008_85m',
             'SRR064448': '2008_110m', 'SRR064450': '2008_200m', 'SRR304668': '2008_500m', 'SRR304683': '2008_800m',
             'SRR304671': '2009_35m', 'SRR304672': '2009_50m', 'SRR070081': '2009_70m', 'SRR304673': '2009_110m',
@@ -28,7 +28,7 @@ for domain_name in set(data.domain_name):
     for sra_id in set(domain_data.sra_id):
         sra_data = domain_data.loc[(domain_data.sra_id == sra_id)].sort(['awpd'], ascending=[False]
                                                                         ).reset_index()[
-                       ['cluster', 'sra_id', 'domain_name', 'count', 'awpd']
+                       ['gene', 'sra_id', 'domain_name', 'count', 'awpd']
                    ][:100]
         heatmap_data[sra_data.sra_id[0]] = sra_data.awpd
     heatmap_data.to_csv(domain_name + '_100_awpd.awpd_col.csv')

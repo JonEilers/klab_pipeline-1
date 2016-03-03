@@ -5,7 +5,7 @@ import pandas as pd
 
 #  magic numbers
 source = 'sra_id'
-target = 'cluster'
+target = 'gene'
 
 data_file = sys.argv[1]
 data_df = pd.DataFrame.from_csv(data_file, sep='\t', header=0, index_col=False)

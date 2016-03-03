@@ -7,9 +7,9 @@ import numpy as np
 file = sys.argv[1]
 awpd_file = sys.argv[2]
 awpd_data = pd.DataFrame.from_csv(awpd_file, sep=',', header=0, index_col=False)[
-    ['cluster', 'sra_id', 'domain_name', 'awpd']]
+    ['gene', 'sra_id', 'domain_name', 'awpd']]
 data = pd.DataFrame.from_csv(file, sep='\t', header=0, index_col=False)
-data = pd.merge(data, awpd_data, how='left', on=['cluster', 'sra_id', 'domain_name'])
+data = pd.merge(data, awpd_data, how='left', on=['gene', 'sra_id', 'domain_name'])
 sra2name = {'SRR304684': '2008_15m', 'SRR064444': '2008_50m', 'SRR304656': '2008_65m', 'SRR064446': '2008_85m',
             'SRR064448': '2008_110m', 'SRR064450': '2008_200m', 'SRR304668': '2008_500m', 'SRR304683': '2008_800m',
             'SRR304671': '2009_35m', 'SRR304672': '2009_50m', 'SRR070081': '2009_70m', 'SRR304673': '2009_110m',
@@ -21,18 +21,18 @@ sra_order = ['SRR304684', 'SRR064444', 'SRR304656', 'SRR064446', 'SRR064448', 'S
 for domain_name in set(data.domain_name):
     domain_data = data.loc[(data.domain_name == domain_name)]
     domain_data = domain_data[domain_data['sra_id'].isin(sra2name.keys())]
-    g = domain_data[['cluster', 'sra_id']]
+    g = domain_data[['gene', 'sra_id']]
     lib_count = g.sra_id.groupby(g.cluster).nunique().reset_index()
-    lib_count.columns = ['cluster', 'lib_count']
+    lib_count.columns = ['gene', 'lib_count']
 
     # Heatmaps
     heatmap_data = pd.DataFrame(columns=set(domain_data.sra_id))
     for sra_id in set(domain_data.sra_id):
         sra_data = domain_data.loc[(domain_data.sra_id == sra_id)].sort(['awpd'], ascending=[False]
                                                                         ).reset_index()[
-            ['cluster', 'sra_id', 'domain_name', 'count', 'awpd']
+            ['gene', 'sra_id', 'domain_name', 'count', 'awpd']
         ]
-        sra_data = pd.merge(sra_data, lib_count, how='left', on='cluster')[:100]
+        sra_data = pd.merge(sra_data, lib_count, how='left', on='gene')[:100]
         # sra_data = sra_data.sort(['awpd'], ascending=[False]).reset_index()
         heatmap_data[sra_data.sra_id[0]] = sra_data.lib_count
     heatmap_data.to_csv(domain_name + '.awpd.100.csv')

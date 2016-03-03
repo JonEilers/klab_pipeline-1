@@ -24,7 +24,7 @@ def _get_tax_map_info(root):
         file_name = os.path.basename(f)
         cluster = file_name.split('.')[0]  # name of cluster is first part of file name
         d = read_df_from_file(f)
-        d['cluster'] = pd.Series(cluster, index=d.index)  # add cluster column
+        d['gene'] = pd.Series(cluster, index=d.index)  # add cluster column
         df = df.append(d)
 
     df.drop('seqname', axis=1, inplace=True)  # drop uneeded column

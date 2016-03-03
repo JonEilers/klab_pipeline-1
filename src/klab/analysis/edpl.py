@@ -34,7 +34,7 @@ def _calculate_edpl(root):
                 row.extend(edpl.split())
                 data.append(row)
 
-    return pd.DataFrame(data=data, columns=['cluster', 'fragment_id', 'edpl'])
+    return pd.DataFrame(data=data, columns=['gene', 'fragment_id', 'edpl'])
 
 
 def get_edpl(root_directory, out_file=None):

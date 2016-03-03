@@ -18,19 +18,19 @@ for domain_name in set(data.domain_name):
     print domain_name
     domain_data = data.loc[(data.domain_name == domain_name)]
     domain_data = domain_data[domain_data['sra_id'].isin(sra2name.keys())]
-    g = domain_data[['cluster', 'sra_id']]
+    g = domain_data[['gene', 'sra_id']]
     lib_count = g.sra_id.groupby(g.cluster).nunique().reset_index()
-    lib_count.columns = ['cluster', 'lib_count']
+    lib_count.columns = ['gene', 'lib_count']
 
     # Heatmaps
     heatmap_data = pd.DataFrame(columns=set(domain_data.sra_id))
     for sra_id in set(domain_data.sra_id):
         sra_data = domain_data.loc[(domain_data.sra_id == sra_id)].sort(['count'], ascending=[False]
                                                                         ).reset_index()[
-            ['cluster', 'sra_id', 'domain_name', 'count']
+            ['gene', 'sra_id', 'domain_name', 'count']
         ]
         print sra_data.head()
-        sra_data = pd.merge(sra_data, lib_count, how='left', on='cluster')[:100]
+        sra_data = pd.merge(sra_data, lib_count, how='left', on='gene')[:100]
         print sra_data.head()
         heatmap_data[sra_data.sra_id[0]] = sra_data.lib_count
         print heatmap_data.head()

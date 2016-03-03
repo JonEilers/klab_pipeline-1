@@ -22,10 +22,10 @@ def _create_count_files(lineage, grouping, path):
 
 def _create_mbari_files_for_robin(base):
     l = create_mbari_lineage_files(base)
-    _create_count_files(l, ['cluster', 'domain_name', 'size', 'location', 'placement_type'], base + 'domain_')
-    _create_count_files(l, ['cluster', 'domain_name', 'division_name', 'size', 'location', 'placement_type'],
+    _create_count_files(l, ['gene', 'domain_name', 'size', 'location', 'placement_type'], base + 'domain_')
+    _create_count_files(l, ['gene', 'domain_name', 'division_name', 'size', 'location', 'placement_type'],
                         base + 'division_')
-    _create_count_files(l, ['cluster', 'domain_name', 'division_name', 'lowest_classification_name', 'size', 'location',
+    _create_count_files(l, ['gene', 'domain_name', 'division_name', 'lowest_classification_name', 'size', 'location',
                             'placement_type'], base + 'classification_')
 
 

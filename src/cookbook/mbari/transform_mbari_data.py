@@ -37,7 +37,7 @@ def _add_mbari_location_column(df):
 
 
 def _add_edpl_column(df, edpl_df):
-    return pd.merge(df, edpl_df, on=['fragment_id', 'cluster'], how='outer')
+    return pd.merge(df, edpl_df, on=['fragment_id', 'gene'], how='outer')
 
 
 def _merge_mbari_data(file_12, file_14, result):

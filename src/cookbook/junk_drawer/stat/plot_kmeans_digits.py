@@ -6,7 +6,7 @@ import pandas as pd
 data_file = sys.argv[1]
 data = pd.DataFrame.from_csv(data_file, sep='\t', header=0, index_col=False)
 print data.head()
-data = data['cluster', 'lowest_classification', '']
+data = data['gene', 'lowest_classification', '']
 kmeans = KMeans()
 kmeans.fit(data.values)
 

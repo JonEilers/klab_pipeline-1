@@ -19,7 +19,7 @@ for domain_name in set(data.domain_name):
     domain_data = data.loc[(data.domain_name == domain_name)]
     domain_data = domain_data[domain_data['sra_id'].isin(sra2name.keys())]
     g = domain_data[['gene', 'sra_id']]
-    lib_count = g.sra_id.groupby(g.cluster).nunique().reset_index()
+    lib_count = g.sra_id.groupby(g.gene).nunique().reset_index()
     lib_count.columns = ['gene', 'lib_count']
 
     # Heatmaps

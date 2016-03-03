@@ -24,7 +24,7 @@ def create_bb_diversity_files(placement_file, compare, out_directory):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-placement_file', help='placement file with lineage information', required=True)
-    parser.add_argument('-compare', help='comparison column name', required=True)
+    parser.add_argument('-compare', help='comparison column name (depth, location, year, date)', required=True)
     parser.add_argument('-out_directory', help='output directory', required=True)
     args = parser.parse_args()
 

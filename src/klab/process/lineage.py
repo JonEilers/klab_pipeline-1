@@ -7,6 +7,8 @@ import subprocess
 import pandas as pd
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file, CLASSIFICATION_COLUMN
+from klab.process.derived_info import add_placement_type_column
+
 
 ROOT_ID = 1
 CELLULAR_ORGANISMS_ID = 131567
@@ -130,6 +132,7 @@ def create_lineage(placements, out_file=None):
     add_name_column(lineage_frame, CLASSIFICATION_COLUMN, 'lowest_classification_name', name_dict, deleted_list)
 
     df = pd.merge(left=placements, right=lineage_frame, on=CLASSIFICATION_COLUMN, how='left')
+    add_placement_type_column(df)
     if out_file:
         write_df_to_file(df, out_file)
     return df

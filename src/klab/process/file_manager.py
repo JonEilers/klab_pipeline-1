@@ -67,18 +67,18 @@ def write_df_to_file(df, file_name, write_index=False):
 
 
 def _build_data_frame_from_jplace_files(root):
-    column_names = ['fragment_id', 'cluster']
+    column_names = ['fragment_id', 'gene']
     files = get_files(root)
     if not files:
         raise Exception('No jplace files were found.')
 
-    # TODO ech 2015-01-24 - create cluster/tree table (maybe)
+    # TODO ech 2015-01-24 - create gene/tree table (maybe)
     data = []
     for path in files:
         contents = _get_json_contents(path)
         if contents:
             file_name = os.path.basename(path)
-            cluster = file_name.split('.')[0]  # name of cluster is first part of file name
+            gene = file_name.split('.')[0]  # name of gene is first part of file name
             # TODO ech 2015-01-26 - too 'clever', and assumes all fields are same in all files
             if len(column_names) == 2:
                 column_names.extend(contents['fields'])
@@ -87,7 +87,7 @@ def _build_data_frame_from_jplace_files(root):
                 fragments = []
                 for fragment in item['nm']:
                     fragment_id = fragment[0]
-                    fragments.append([fragment_id, cluster])
+                    fragments.append([fragment_id, gene])
 
                 matches = []
                 for p in item['p'][:2]:  # just take the first two elements
@@ -123,7 +123,7 @@ def _prune_unwanted_rows(df):
 # TODO ech 2015-10-28 - don't actually see these in the 2012 data anymore
 # TODO ech 2015-02-14 - will need to deal with dups across clusters (KOGs & TIGRs, etc)
 def _fix_dup_problem_with_hack(df):
-    # data_frame.sort(columns=['fragment_id', 'cluster', CLASSIFICATION_COLUMN, PLACEMENT_COLUMN],
+    # data_frame.sort(columns=['fragment_id', 'gene', CLASSIFICATION_COLUMN, PLACEMENT_COLUMN],
     # ascending=[True, True, True, False], inplace=True)
     # TODO ech 2015-02-13 - can probably use 'drop_duplicates' here
     grouped = df.groupby(['fragment_id'])

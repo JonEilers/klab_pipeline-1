@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # Built by Eric Hervol, modified by Ryan McLaughlin
 import sys
+import argparse
+
 from klab.process.derived_info import group_and_count, FUZZY, CONFIDENT
 from klab.process.file_manager import create_placements, write_df_to_file
 from klab.process.lineage import create_lineage
+
 from pandas import DataFrame
 
 
@@ -37,5 +40,9 @@ def do_the_do(jpath):
 
 
 if __name__ == '__main__':
-	jpath = '/home/ryan/Dropbox/PycharmProjects/klab_pipeline/src/demo/jplace'
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-j_dir', help='directory containing jplace files', required=True)
+	args = parser.parse_args()
+
+	jpath = args.j_dir
 	do_the_do(jpath)

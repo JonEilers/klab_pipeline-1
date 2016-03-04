@@ -76,7 +76,7 @@ def _build_data_frame_from_jplace_files(root):
     data = []
     for path in files:
         contents = _get_json_contents(path)
-        if contents:
+        if contents and contents['placements'] != []: # Ryan add and ... to deal with empty jplace files 03/04/2016
             file_name = os.path.basename(path)
             gene = file_name.split('.')[0]  # name of gene is first part of file name
             # TODO ech 2015-01-26 - too 'clever', and assumes all fields are same in all files

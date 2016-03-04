@@ -67,7 +67,7 @@ def write_df_to_file(df, file_name, write_index=False):
 
 
 def _build_data_frame_from_jplace_files(root):
-    column_names = ['fragment_id', 'gene']
+    column_names = ['fragment_id', 'gene', 'sample']
     files = get_files(root)
     if not files:
         raise Exception('No jplace files were found.')
@@ -80,14 +80,15 @@ def _build_data_frame_from_jplace_files(root):
             file_name = os.path.basename(path)
             gene = file_name.split('.')[0]  # name of gene is first part of file name
             # TODO ech 2015-01-26 - too 'clever', and assumes all fields are same in all files
-            if len(column_names) == 2:
+            if len(column_names) == 3:
                 column_names.extend(contents['fields'])
             items = contents['placements']
             for item in items:
                 fragments = []
                 for fragment in item['nm']:
                     fragment_id = fragment[0]
-                    fragments.append([fragment_id, gene])
+                    sample = fragment_id.split('_')[0] # Assumes that underscores are used and first thing is sample name
+                    fragments.append([fragment_id, gene, sample])
 
                 matches = []
                 for p in item['p'][:2]:  # just take the first two elements

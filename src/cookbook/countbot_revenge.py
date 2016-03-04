@@ -28,14 +28,16 @@ def create_and_write_count_files(lineage, grouping, path):
 
 def do_the_do(jpath):
     lin, lineage_file = create_lineage_files(jpath)
-    create_and_write_count_files(lin, ['gene', 'domain_name', 'placement_type'], jpath + '_domain_')
-    create_and_write_count_files(lin, ['gene', 'domain_name', 'division_name', 'placement_type'],
-                                 jpath + '_division_')
-    create_and_write_count_files(lin, ['gene', 'domain_name', 'division_name', 'class_name',
+    create_and_write_count_files(lin, ['gene', 'sample', 'domain_name', 'placement_type'],
+                                     jpath + '_domain_')
+    create_and_write_count_files(lin, ['gene', 'sample', 'domain_name', 'division_name', 
+                                    'placement_type'], jpath + '_division_')
+    create_and_write_count_files(lin, ['gene', 'sample', 'domain_name', 'division_name', 'class_name',
                                        'placement_type'], jpath + '_class_')
     create_and_write_count_files(lin,
-                                 ['gene', 'domain_name', 'division_name', 'class_name', 'lowest_classification_name',
-                                  'placement_type'], jpath + '_lowest_classification_')
+                                 ['gene', 'sample', 'domain_name', 'division_name', 'class_name',
+                                 'lowest_classification_name', 'placement_type'], 
+                                 jpath + '_lowest_classification_')
 
 
 if __name__ == '__main__':

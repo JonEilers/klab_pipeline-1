@@ -76,7 +76,7 @@ def _build_data_frame_from_jplace_files(root):
     data = []
     for path in files:
         contents = _get_json_contents(path)
-        if contents and contents['placements'] != []: # Ryan add and ... to deal with empty jplace files 03/04/2016
+        if contents and contents['placements'] != []:  # Ryan add and ... to deal with empty jplace files 03/04/2016
             file_name = os.path.basename(path)
             gene = file_name.split('.')[0]  # name of gene is first part of file name
             # TODO ech 2015-01-26 - too 'clever', and assumes all fields are same in all files
@@ -87,7 +87,8 @@ def _build_data_frame_from_jplace_files(root):
                 fragments = []
                 for fragment in item['nm']:
                     fragment_id = fragment[0]
-                    sample = fragment_id.split('_')[0] # Assumes that underscores are used and first thing is sample name
+                    # assumes that underscores are used and first thing is sample name
+                    sample = fragment_id.split('_')[0]
                     fragments.append([fragment_id, gene, sample])
 
                 matches = []
@@ -112,7 +113,8 @@ def _prune_unwanted_rows(df):
 
     single_placements = df[PLACEMENT_COLUMN] == 1
     best_placements = df.fragment_id == df.nfid
-    df.loc[single_placements, [NEXT_BEST_PLACEMENT_COLUMN]] = 0  # clear next best posterior probability for single placements
+    df.loc[single_placements, [
+        NEXT_BEST_PLACEMENT_COLUMN]] = 0  # clear next best posterior probability for single placements
 
     good_stuff = df[single_placements | best_placements]
     r = good_stuff.ix[:, :-1]  # drop next_fragment_id column

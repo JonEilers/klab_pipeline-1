@@ -25,12 +25,12 @@ def _calculate_edpl(root):
     for f in file_list:
         print ('processing %s...' % f)
         file_name = os.path.basename(f)
-        cluster = file_name.split('.')[0]  # name of cluster is first part of file name
+        gene = file_name.split('.')[0]  # name of gene is first part of file name
         # call "guppy edpl --pp" to calculate edpl
         edpl_out = subprocess.check_output(['guppy', 'edpl', '--pp', f], stderr=subprocess.STDOUT)
         for edpl in edpl_out.split('\n'):
             if edpl:
-                row = [cluster]
+                row = [gene]
                 row.extend(edpl.split())
                 data.append(row)
 

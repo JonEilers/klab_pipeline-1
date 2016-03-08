@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import os, sys
+import os
+import sys
 
 jplace_path = sys.argv[1]
 jplace_split_out_path = sys.argv[2]

@@ -1,6 +1,6 @@
 import os
-
-from cookbook.junk_drawer.qsub import Qsub
+import sys
+from cookbook.junk_drawer.HTC import HTC
 
 
 def slice_it(script_cmd_list, file_number):
@@ -14,37 +14,35 @@ def slice_it(script_cmd_list, file_number):
 
 
 homepath = os.path.dirname(os.path.realpath(__file__))
-working_dir = homepath + '/data/ETSP_COG_SSU/'
-qsub_file_path = working_dir + 'qsub_batch/'
-jplace_dir = working_dir + 'jplace_split/'
+working_dir = sys.argv[1]
+HTC_file_path = os.path.join(working_dir, 'HTC_batch')
+jplace_dir = os.path.join(working_dir, 'jplace_files')
 dir_out = working_dir
-conf_file = working_dir + 'lineage_2.0/COG_SSU_placements_with_lineage.tsv'
-unkn_file = ''
+conf_file = os.path.join(working_dir, 'COG_SSU_placements_with_lineage.tsv')
 
-# Create qsub file directory
+# Create HTC file directory
 supplementary_file_list = os.listdir(working_dir)
-if supplementary_file_list.count('qsub_batch') == 0:
-    os.system('mkdir ' + working_dir + 'qsub_batch')
-# Create SBE QSUB BATCH scripts from the jplace file list
+if supplementary_file_list.count('HTC_batch') == 0:
+    os.system('mkdir ' + working_dir + 'HTC_batch')
+# Create SBE HTC BATCH scripts from the jplace file list
 jplace_file_list = [root + jfile for root, dirs, jfiles in os.walk(jplace_dir)
                     for jfile in jfiles if jfile.split('.')[-1].find('jplace') != -1]
-# and root == jplace_dir]
 script_cmd_list = []
 file_number = 200
 for jfile in jplace_file_list:
-    script_cmd = ' '.join(['python', homepath + '/domMAP.py', '--file', jfile,
+    script_cmd = ' '.join(['domMAP.py', '--file', jfile,
                            '--dir-out', dir_out, '--lineage', conf_file
                            ])
     script_cmd_list.append(script_cmd)
-# break the script commands into [file_number] of qsub scripts
+# break the script commands into [file_number] of HTC scripts
 sub_lists = slice_it(script_cmd_list, file_number)
 for script_cmd_list in sub_lists:
-    file_name = 'qsub_' + str(sub_lists.index(script_cmd_list))
-    qsub_file = Qsub(qsub_file_path, script_cmd_list, file_name)
-    print qsub_file.Batch_builder()
+    file_name = 'HTC_' + str(sub_lists.index(script_cmd_list))
+    with open(file_name, 'w') as o:
+        o.write('\n'.join(script_cmd_list))
 
-qsub_file_list = os.listdir(qsub_file_path)
-for qsub_file in qsub_file_list:
-    if qsub_file.find('.sh') != -1:
-        os.system('qsub ' + qsub_file_path + qsub_file)
-        print qsub_file, 'has been sent to the cluster...'
+HTC_file_list = os.listdir(HTC_file_path)
+for HTC_file in HTC_file_list:
+    if HTC_file.find('.sh') != -1:
+        proc = Popen(' '.join(['condor_run', path.join(HTC_file_path, HTC_file)]), shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+        print HTC_file, 'has been sent to the cluster...'

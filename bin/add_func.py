@@ -1,1 +1,1 @@
-../src/cookbook/add_func.py
+../src/cookbook/annotate/add_func.py

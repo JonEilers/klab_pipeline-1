@@ -1,1 +1,1 @@
-../src/cookbook/countbot_revenge.py
+../src/cookbook/annotate/countbot_revenge.py

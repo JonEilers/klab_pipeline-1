@@ -1,1 +1,1 @@
-../src/cookbook/guppy_quick_split.py
+../src/cookbook/annotate/guppy_quick_split.py

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import argparse
 import os
 
@@ -60,9 +61,6 @@ if __name__ == '__main__':
 
     # TODO ech 2015-02-10 - diversity code expects this column - need to rewrite
     p[NORMALIZE_COLUMN] = 1
-
-    # placements_file = os.path.join(args.out_directory, 'placements.tsv')
-    # write_df_to_file(p, placements_file)
 
     l = create_lineage(placements=p)
     l.rename(columns={'lowest_classification_name': CLASSIFICATION_NAME_COLUMN}, inplace=True)

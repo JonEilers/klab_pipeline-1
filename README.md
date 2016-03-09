@@ -4,7 +4,6 @@ Combination of the good parts of DAP and package_compare.
 ## bin
 Shell scripts which are convenience wrappers around python scripts for common tasks.
 
-
 ## python packages
  * **klab.process**
     - jplace files -> pandas data frames

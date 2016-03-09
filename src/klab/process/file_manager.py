@@ -67,7 +67,7 @@ def write_df_to_file(df, file_name, write_index=False):
 
 
 def _build_data_frame_from_jplace_files(root):
-    column_names = ['fragment_id', 'gene']
+    column_names = ['fragment_id', 'gene', 'sample']
     files = get_files(root)
     if not files:
         raise Exception('No jplace files were found.')
@@ -76,18 +76,20 @@ def _build_data_frame_from_jplace_files(root):
     data = []
     for path in files:
         contents = _get_json_contents(path)
-        if contents:
+        if contents and contents['placements'] != []:  # Ryan add and ... to deal with empty jplace files 03/04/2016
             file_name = os.path.basename(path)
             gene = file_name.split('.')[0]  # name of gene is first part of file name
             # TODO ech 2015-01-26 - too 'clever', and assumes all fields are same in all files
-            if len(column_names) == 2:
+            if len(column_names) == 3:
                 column_names.extend(contents['fields'])
             items = contents['placements']
             for item in items:
                 fragments = []
                 for fragment in item['nm']:
                     fragment_id = fragment[0]
-                    fragments.append([fragment_id, gene])
+                    # assumes that underscores are used and first thing is sample name
+                    sample = fragment_id.split('_')[0]
+                    fragments.append([fragment_id, gene, sample])
 
                 matches = []
                 for p in item['p'][:2]:  # just take the first two elements
@@ -111,7 +113,8 @@ def _prune_unwanted_rows(df):
 
     single_placements = df[PLACEMENT_COLUMN] == 1
     best_placements = df.fragment_id == df.nfid
-    df.loc[single_placements, [NEXT_BEST_PLACEMENT_COLUMN]] = 0  # clear next best posterior probability for single placements
+    df.loc[single_placements, [
+        NEXT_BEST_PLACEMENT_COLUMN]] = 0  # clear next best posterior probability for single placements
 
     good_stuff = df[single_placements | best_placements]
     r = good_stuff.ix[:, :-1]  # drop next_fragment_id column

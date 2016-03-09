@@ -5,7 +5,6 @@ import os
 import sys
 import json
 
-HOMEPATH = os.path.dirname(os.path.realpath(__file__))
 # List of commands from user
 COMMANDS = sys.argv
 

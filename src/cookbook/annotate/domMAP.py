@@ -6,6 +6,7 @@
 import os
 import sys
 import json
+from subprocess import call
 
 # List of commands from user
 COMMANDS = sys.argv
@@ -38,8 +39,8 @@ for file in input_file_list:
 dmmd_dir = COMMANDS[COMMANDS.index('--dir-out') + 1]
 parent_list = os.listdir(dmmd_dir)
 if parent_list.count('dmmd') == 0:
-    os.system('mkdir ' + dmmd_dir + '/dmmd')
-dmmd_dir = dmmd_dir + 'dmmd/'
+    call(['mkdir', os.path.join(dmmd_dir, 'dmmd')])
+dmmd_dir = os.path.join(dmmd_dir, 'dmmd')
 
 # jplace file being run
 file = COMMANDS[COMMANDS.index('--file') + 1]
@@ -75,7 +76,7 @@ for jfile in jplace_file_list:
 
     # resave the .jplace with the domain annotations on the confident placements
     # the files will not replace the originals but rather be named the same + .dmmd
-    outjfile = dmmd_dir + jfile.split('/')[-1].rsplit('.', 1)[0] + '.dmmd.jplace'
+    outjfile = os.path.join(dmmd_dir, jfile.split('/')[-1].rsplit('.', 1)[0] + '.dmmd.jplace')
     with open(outjfile, 'w') as outfile:
         json.dump(data, outfile, sort_keys=True, indent=1)
     print jfile, 'now has domains mapped to confident placements...'
@@ -83,7 +84,7 @@ for jfile in jplace_file_list:
 # find all the .jplace files in the directory
 # dmmd_file_list = [root + dmmdfile for root, dirs, dmmdfile in os.walk(dmmd_dir) for dmmdfile in dmmdfile if dmmdfile.split('.')[-2].find('dmmd') != -1]
 # just one jfile
-dmmd_file = dmmd_dir + jfile.split('/')[-1].rsplit('.', 1)[0] + '.dmmd.jplace'
+dmmd_file = os.path.join(dmmd_dir, jfile.split('/')[-1].rsplit('.', 1)[0] + '.dmmd.jplace')
 dmmd_file_list = [dmmd_file]
 
 ### split the new .jplace files by their domain
@@ -117,20 +118,19 @@ print domain_list
 dmmd_parent_dir = dmmd_dir  # '/'.join(dmmd_dir.split('/'))
 parent_list = os.listdir(dmmd_parent_dir)
 if parent_list.count('dmmd_split') == 0:
-    os.system('mkdir ' + dmmd_parent_dir + '/dmmd_split')
-dmmd_split_path = dmmd_parent_dir + '/dmmd_split/'
+    call(['mkdir', os.path.join(dmmd_parent_dir, 'dmmd_split')])
+dmmd_split_path = os.path.join(dmmd_parent_dir, 'dmmd_split')
 
 for domain in domain_list:
     split_path_list = os.listdir(dmmd_split_path)
     if domain not in split_path_list:
-        os.system('mkdir ' + dmmd_split_path + domain)
+        call(['mkdir', os.path.join(dmmd_split_path, domain)])
 
     for dmmdfile in dmmd_file_list:
-        guppy_cmd = '/home/mclaugr4/software/bin/guppy filter -Ir ' + domain
+        guppy_cmd = ['/home/mclaugr4/software/bin/guppy', 'filter', '-Ir', domain]
         for dom in domain_list:
             if dom != domain:
-                guppy_cmd = guppy_cmd + ' -Er ' + dom
-        guppy_cmd = guppy_cmd + ' ' + dmmdfile + ' -o ' + dmmd_split_path + domain + '/' + \
-                    dmmdfile.split('/')[-1].rsplit('.', 2)[0] + '.' + domain + '.jplace'
+                guppy_cmd.extend(['-Er', dom])
+        guppy_cmd.extend([dmmdfile, '-o', os.path.join(dmmd_split_path, domain, dmmdfile.split('/')[-1].rsplit('.', 2)[0] + '.' + domain + '.jplace')])
         print guppy_cmd
-        os.system(guppy_cmd)
+        call(guppy_cmd)

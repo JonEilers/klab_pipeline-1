@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # This script is the first attempt to map domain onto each confident placement in a jplace file.
 # The hope is to be able to then split the jplace file by domain to allow for directed analysis
 

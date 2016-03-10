@@ -14,9 +14,9 @@ def slice_it(script_cmd_list, file_number):
     return (sub_lists)
 
 
-working_dir = sys.argv[1]
-jplace_dir = sys.argv[2]
-conf_file = sys.argv[3]
+working_dir = path.abspath(sys.argv[1])
+jplace_dir = path.abspath(sys.argv[2])
+conf_file = path.abspath(sys.argv[3])
 
 HTC_file_path = path.join(working_dir, 'HTC_batch')
 dir_out = working_dir
@@ -27,7 +27,7 @@ if supplementary_file_list.count('HTC_batch') == 0:
     call(['mkdir', path.join(working_dir, 'HTC_batch')])
 batch_dir = path.join(working_dir, 'HTC_batch')
 # Create SBE HTC BATCH scripts from the jplace file list
-jplace_file_list = [path.join(root, jfile) for root, dirs, jfiles in walk(jplace_dir)
+jplace_file_list = [path.join(path.abspath(root), jfile) for root, dirs, jfiles in walk(jplace_dir)
                     for jfile in jfiles if jfile.split('.')[-1].find('jplace') != -1]
 script_cmd_list = []
 file_number = 200

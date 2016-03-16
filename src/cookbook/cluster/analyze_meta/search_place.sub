@@ -1,0 +1,9 @@
+# Unix submit description file
+# runs the nested sh on recruited reads
+getenv = True
+executable = search_place.sh
+machine_count = 1
+output = search_place.out
+error = search_place.err
+log = search_place.log
+queue

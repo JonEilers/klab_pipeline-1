@@ -1,0 +1,4 @@
+I changed the kaboodle scripts in bio/wwubio/lib/python2.7/site-packages/kaboodle-0.1.0-py2.7.egg/kaboodle/ to try to fix the pipeline.
+They are the ones that should be copied over.
+
+machines file is for mpirun and contains a list of all the compute-0-# nodes

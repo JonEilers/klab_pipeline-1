@@ -1,0 +1,53 @@
+#!/bin/sh
+##**************************************************************
+##
+# YOU MUST CHANGE THIS TO THE PREFIX DIR OF OPENMPI
+MPDIR=/opt/openmpi
+
+if `uname -m | grep "64" 1>/dev/null 2>&1` 
+then 
+    MPDIR=/opt/openmpi
+fi
+
+PATH=$MPDIR/bin:.:$PATH
+export PATH
+
+# This is a script to run openmpi jobs under the Condor parallel universe
+# openmpi assumes that a full openmpi is pre-installed on all execute 
+# machines
+# A sample submit file might look like...
+#
+
+_CONDOR_PROCNO=$_CONDOR_PROCNO
+_CONDOR_NPROCS=$_CONDOR_NPROCS
+
+CONDOR_SSH=`condor_config_val libexec`
+CONDOR_SSH=$CONDOR_SSH/condor_ssh
+
+SSHD_SH=`condor_config_val libexec`
+SSHD_SH=$SSHD_SH/sshd.sh
+
+. $SSHD_SH $_CONDOR_PROCNO $_CONDOR_NPROCS 
+
+# If not the head node, just sleep forever, to let the
+# sshds run
+if [ $_CONDOR_PROCNO -ne 0 ]
+then
+		wait
+		sshd_cleanup
+		exit 0
+fi
+
+# creates nest for metagenome analysis
+# Set database, directory containing HMMs
+# Set the path to the refpks
+REFPKG_DIR = ""
+# Set the path your metagenome
+FASTA_FILE_PATH = ""
+
+python /share/research-groups/kodner/cluster_pipeline/kaboodle-0.1.0-py2.7.egg/kaboodle/scripts/analyze.py $FASTA_FILE_PATH $REFPKG_DIR -f
+
+sshd_cleanup
+
+exit $?
+

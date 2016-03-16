@@ -1,0 +1,10 @@
+# Unix submit description file
+# creates nest for metagenome analysis
+universe = parallel
+getenv = True
+executable = make_nest_HTC.sh
+machine_count = 10
+output = make_nest_HTC.out
+error = make_nest_HTC.err
+log = make_nest_HTC.log
+queue

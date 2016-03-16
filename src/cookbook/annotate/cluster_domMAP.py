@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from os import walk, listdir, path
+from os import walk, listdir, path, environ
 import sys
 from subprocess import call, Popen
 
@@ -39,13 +39,14 @@ for jfile in jplace_file_list:
 # break the script commands into [file_number] of HTC scripts
 sub_lists = slice_it(script_cmd_list, file_number)
 for script_cmd_list in sub_lists:
-    file_name = path.join(batch_dir, 'HTC_' + str(sub_lists.index(script_cmd_list)))
+    file_name = path.join(batch_dir, ''.join(['HTC_', str(sub_lists.index(script_cmd_list)), '.sh']))
     with open(file_name, 'w') as o:
         o.write('\n'.join(script_cmd_list))
-'''
+
+my_env = environ.copy()
 HTC_file_list = listdir(HTC_file_path)
+perms = Popen(' '.join(['chmod', '-R', '777', HTC_file_path]), shell=True)
 for HTC_file in HTC_file_list:
     if HTC_file.find('.sh') != -1:
-        proc = Popen(' '.join(['condor_run', path.join(HTC_file_path, HTC_file)]), shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+        proc = Popen(' '.join(['condor_run', path.join(HTC_file_path, HTC_file)]), shell=True, env=my_env, stdin=None, stdout=None, stderr=None, close_fds=True)
         print HTC_file, 'has been sent to the cluster...'
-'''

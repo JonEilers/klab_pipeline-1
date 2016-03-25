@@ -1,1 +1,1 @@
-../src/cookbook/annotate/ipath_maker.py
+../src/cookbook/stat/ipath_maker.py

@@ -61,3 +61,6 @@ src/data/ncbi_readme.txt
 
 # demo data
 src/demo
+
+# Pycharm
+.idea

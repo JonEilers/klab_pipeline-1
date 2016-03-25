@@ -2,7 +2,7 @@
 # Built by Eric Hervol, modified by Ryan McLaughlin
 
 import argparse
-
+import pandas as pd
 from klab.process.derived_info import group_and_count, FUZZY, CONFIDENT
 from klab.process.file_manager import create_placements, write_df_to_file
 from klab.process.lineage import create_lineage
@@ -28,15 +28,17 @@ def create_and_write_count_files(lineage, grouping, path):
 
 def do_the_do(jpath):
     lin, lineage_file = create_lineage_files(jpath)
+    #lin = pd.read_csv('/media/ryan/PI/WDFW_data/recirc/phylosift/phylosift_jplace_placements_with_lineage_rerep.tsv',
+    #                  header=0, sep='\t', dtype=object)
     create_and_write_count_files(lin, ['gene', 'sample', 'domain_name', 'placement_type'],
-                                     jpath + '_domain_')
-    create_and_write_count_files(lin, ['gene', 'sample', 'domain_name', 'division_name', 
-                                    'placement_type'], jpath + '_division_')
+                                 jpath + '_domain_')
+    create_and_write_count_files(lin, ['gene', 'sample', 'domain_name', 'division_name',
+                                       'placement_type'], jpath + '_division_')
     create_and_write_count_files(lin, ['gene', 'sample', 'domain_name', 'division_name', 'class_name',
                                        'placement_type'], jpath + '_class_')
     create_and_write_count_files(lin,
                                  ['gene', 'sample', 'domain_name', 'division_name', 'class_name',
-                                 'lowest_classification_name', 'placement_type'], 
+                                  'lowest_classification_name', 'placement_type'],
                                  jpath + '_lowest_classification_')
 
 

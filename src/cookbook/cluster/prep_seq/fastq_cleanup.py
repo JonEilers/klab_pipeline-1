@@ -74,7 +74,7 @@ def run_fastq_filter(fastq, save_path):
 def run_derep(fastq, save_path):
     fasta_derep = path.join(save_path, '.'.join([fastq.rsplit('/', 1)[1], 'derep', 'fasta']))
     derep = subprocess.Popen(
-        ' '.join(['vsearch', '--derep_fulllength', fastq, '--sizeout', '--relabel_sha1','--minuniquesize 2', '--output', fasta_derep]), shell=True)
+        ' '.join(['vsearch', '--derep_fulllength', fastq, '--sizeout', '--minuniquesize 2', '--output', fasta_derep]), shell=True)
     derep.wait()
     if derep.returncode != 0:
         sys.exit()

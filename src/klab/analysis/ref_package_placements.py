@@ -40,7 +40,6 @@ def get_ref_package_placements(root_directory, out_file=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-directory', help='reference package directory', required=True)
-    parser.add_argument('-ncbi_directory', help='NCBI data directory', required=True)
     parser.add_argument('-out_file', help='output file', required=True)
     args = parser.parse_args()
 

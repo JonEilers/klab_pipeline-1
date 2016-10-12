@@ -3,14 +3,16 @@ import os
 
 import pandas as pd
 
+from cookbook.mbari import MBARI_2012_BASE, MBARI_2014_BASE, MBARI_2012_EDPL_FILE, \
+    MBARI_2014_EDPL_FILE, MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_MERGED_FILE, \
+    MBARI_2012_REF_PKG_FILE, MBARI_2012_PACKAGE_DIR, MBARI_2014_PACKAGE_DIR, MBARI_2014_REF_PKG_FILE, MBARI_DATA_DIR, \
+    MBARI_2016_EDPL_FILE, MBARI_2016_BASE, MBARI_2016_REF_PKG_FILE, MBARI_2016_PACKAGE_DIR, MBARI_2016_LINEAGE_FILE, \
+    MBARI_14_16_MERGED_FILE
 from klab.analysis.edpl import get_edpl
 from klab.analysis.ref_package_placements import get_ref_package_placements
 from klab.process.derived_info import add_placement_type_column, group_and_count
 from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file, CLASSIFICATION_COLUMN
 from klab.process.lineage import create_lineage
-from cookbook.mbari import MBARI_2012_BASE, MBARI_2014_BASE, MBARI_2012_EDPL_FILE, \
-    MBARI_2014_EDPL_FILE, MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_MERGED_FILE, \
-    MBARI_2012_REF_PKG_FILE, MBARI_2012_PACKAGE_DIR, MBARI_2014_PACKAGE_DIR, MBARI_2014_REF_PKG_FILE, MBARI_DATA_DIR
 
 TOP_LEVEL = 'top level'  # start with a lower case letter to sort after domains when graphing
 
@@ -126,17 +128,21 @@ def create_mbari_lineage_files(base, edpl=None):
 # do all the mbari data massage, skipping steps if results already exist
 ########################################################################
 if __name__ == '__main__':
-    # edpl calculations
-    if not os.path.isfile(MBARI_2012_EDPL_FILE):
-        get_edpl(root_directory=MBARI_2012_BASE + 'analysis', out_file=MBARI_2012_EDPL_FILE)
-    if not os.path.isfile(MBARI_2014_EDPL_FILE):
-        get_edpl(root_directory=MBARI_2014_BASE + 'analysis', out_file=MBARI_2014_EDPL_FILE)
-
     # reference package placement counts
     if not os.path.isfile(MBARI_2012_REF_PKG_FILE):
         get_ref_package_placements(root_directory=MBARI_2012_PACKAGE_DIR, out_file=MBARI_2012_REF_PKG_FILE)
     if not os.path.isfile(MBARI_2014_REF_PKG_FILE):
         get_ref_package_placements(root_directory=MBARI_2014_PACKAGE_DIR, out_file=MBARI_2014_REF_PKG_FILE)
+    if not os.path.isfile(MBARI_2016_REF_PKG_FILE):
+        get_ref_package_placements(root_directory=MBARI_2016_PACKAGE_DIR, out_file=MBARI_2016_REF_PKG_FILE)
+
+    # edpl calculations
+    if not os.path.isfile(MBARI_2012_EDPL_FILE):
+        get_edpl(root_directory=MBARI_2012_BASE + 'analysis', out_file=MBARI_2012_EDPL_FILE)
+    if not os.path.isfile(MBARI_2014_EDPL_FILE):
+        get_edpl(root_directory=MBARI_2014_BASE + 'analysis', out_file=MBARI_2014_EDPL_FILE)
+    if not os.path.isfile(MBARI_2016_EDPL_FILE):
+        get_edpl(root_directory=MBARI_2016_BASE + 'analysis', out_file=MBARI_2016_EDPL_FILE)
 
     # binned and merged ref package counts
     if not os.path.isfile(MBARI_DATA_DIR + 'mbari_ref_counts.tsv'):
@@ -148,6 +154,8 @@ if __name__ == '__main__':
         create_mbari_lineage_files(base=MBARI_2012_BASE, edpl=MBARI_2012_EDPL_FILE)
     if not os.path.isfile(MBARI_2014_LINEAGE_FILE):
         create_mbari_lineage_files(base=MBARI_2014_BASE, edpl=MBARI_2014_EDPL_FILE)
+    if not os.path.isfile(MBARI_2016_LINEAGE_FILE):
+        create_mbari_lineage_files(base=MBARI_2016_BASE, edpl=MBARI_2016_EDPL_FILE)
 
     # # merge lineage files
     # if not os.path.isfile(MBARI_12_14_MERGED_FILE):
@@ -158,3 +166,6 @@ if __name__ == '__main__':
     if not os.path.isfile(MBARI_12_14_MERGED_FILE):
         _merge_mbari_domain_data(file_12=MBARI_2012_LINEAGE_FILE, file_14=MBARI_2014_LINEAGE_FILE,
                                  result=MBARI_12_14_MERGED_FILE)
+    if not os.path.isfile(MBARI_14_16_MERGED_FILE):
+        _merge_mbari_domain_data(file_12=MBARI_2014_LINEAGE_FILE, file_14=MBARI_2016_LINEAGE_FILE,
+                                 result=MBARI_14_16_MERGED_FILE)

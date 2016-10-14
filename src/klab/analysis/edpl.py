@@ -28,14 +28,18 @@ def _calculate_edpl(root):
         print('processing %s...' % f)
         file_name = os.path.basename(f)
         gene = file_name.split('.')[0]  # name of gene is first part of file name
-        # call "guppy edpl --pp" to calculate edpl
-        edpl_out = subprocess.check_output(['guppy', 'edpl', '--pp', f], stderr=subprocess.STDOUT,
-                                           universal_newlines=True)
-        for edpl in edpl_out.split('\n'):
-            if edpl:
-                row = [gene]
-                row.extend(edpl.split())
-                data.append(row)
+        try:
+            # call "guppy edpl --pp" to calculate edpl
+            edpl_out = subprocess.check_output(['guppy', 'edpl', '--pp', f], stderr=subprocess.STDOUT,
+                                               universal_newlines=True)
+            for edpl in edpl_out.split('\n'):
+                if edpl:
+                    row = [gene]
+                    row.extend(edpl.split())
+                    data.append(row)
+        except subprocess.CalledProcessError as e:
+            print(e.returncode)
+            print(e.output)
 
     return pd.DataFrame(data=data, columns=['gene', 'fragment_id', 'edpl'])
 

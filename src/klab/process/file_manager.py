@@ -6,6 +6,7 @@ import argparse
 import os
 
 import pandas as pd
+from future.utils import bytes_to_native_str
 
 try:
     import simplejson as json
@@ -15,6 +16,7 @@ except ImportError:
 CLASSIFICATION_COLUMN = 'classification'
 PLACEMENT_COLUMN = 'post_prob'
 NEXT_BEST_PLACEMENT_COLUMN = 'next_best_pp'
+TAB_CHAR = bytes_to_native_str(b'\t')  # 2.7/3.5 compatible
 
 
 def get_files(root_directory, extension='.jplace'):
@@ -58,7 +60,7 @@ def read_df_from_file(file_name, low_memory=True):
 def write_df_to_file(df, file_name, write_index=False):
     ext = os.path.splitext(file_name)[1].lower()
     if ext == '.tsv':
-        df.to_csv(file_name, index=write_index, sep='\t')
+        df.to_csv(file_name, index=write_index, sep=TAB_CHAR)
     elif ext == '.csv':
         df.to_csv(file_name, index=write_index)
     elif ext in ('.h5', '.hdf5'):

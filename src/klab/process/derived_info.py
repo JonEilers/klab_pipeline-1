@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import division
+from __future__ import division, unicode_literals
 
 import pandas as pd
 
@@ -21,8 +21,9 @@ def standardize_column_headers(df):
 
 def add_placement_type_column(df, best_column=PLACEMENT_COLUMN, next_best_column=NEXT_BEST_PLACEMENT_COLUMN,
                               ci=CONFIDENCE_INTERVAL):
-    df['placement_type'] = FUZZY
-    df.loc[abs(df[best_column] - df[next_best_column]) >= ci, ['placement_type']] = CONFIDENT
+    if best_column in df and next_best_column in df:
+        df['placement_type'] = FUZZY
+        df.loc[abs(df[best_column] - df[next_best_column]) >= ci, ['placement_type']] = CONFIDENT
     return df
 
 

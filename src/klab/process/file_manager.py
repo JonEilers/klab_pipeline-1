@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
-import os
+from __future__ import unicode_literals
+
 import argparse
+import os
 
 import pandas as pd
 
@@ -31,7 +33,7 @@ def _get_json_contents(file_name):
     try:
         json_data = json.load(f)
     except Exception as e:
-        print 'json error with file %s - skipping\n%s' % (f.name, e.message)
+        print('json error with file %s - skipping\n%s' % (f.name, e.message))
     finally:
         f.close()
     return json_data

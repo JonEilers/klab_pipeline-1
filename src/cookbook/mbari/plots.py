@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-from __future__ import division
+from __future__ import division, unicode_literals
 
 import os
 
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
-import matplotlib as mpl
 
 mpl.use('Agg')  # Must be before importing matplotlib.pyplot or pylab
 
@@ -18,8 +18,8 @@ from matplotlib import gridspec
 
 from klab.process.file_manager import read_df_from_file, write_df_to_file, CLASSIFICATION_COLUMN
 from klab.process.derived_info import group_and_count
-from cookbook.mbari import MBARI_ANALYSIS_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
-    MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE
+from cookbook.mbari import MBARI_RESULTS_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
+    MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_REF_COUNTS_FILE
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Lost Placements']
 DOMAIN_COLORS = ['0.7', 'y', 'g', 'b', 'k']  # number is grey scale
@@ -69,7 +69,7 @@ def _massage_data(df, level='domain'):
 
 def _get_n_colors_in_hex(n=5):
     import colorsys
-    hsv_tuples = [(c * 1.0 / n, 0.5, 0.5) for c in xrange(n)]
+    hsv_tuples = [(c * 1.0 / n, 0.5, 0.5) for c in range(n)]
     hex_out = []
     for rgb in hsv_tuples:
         rgb = map(lambda x: int(x * 255), colorsys.hsv_to_rgb(*rgb))
@@ -92,7 +92,7 @@ def _generate_euk_spectrum_set_of_graphs(level):
     colors = _get_n_colors_in_hex(num_rows)
     colors.insert(0, '#bfbfbf')  # start with grey color for 'same' category
 
-    data_file = MBARI_ANALYSIS_DIR + level + '_placements.csv'
+    data_file = MBARI_RESULTS_DIR + level + '_placements.csv'
     write_df_to_file(d2, data_file)
     # title = 'Eukaryota ' + level.title() + ' 2012 to 2014 Placements'
     # plot_file = MBARI_ANALYSIS_DIR + level + '_placements_bar.pdf'
@@ -153,13 +153,13 @@ def _create_comparison_histogram(subplot, bins, series1, color1, series2, color2
     values, weights = _get_values_and_weights(series1)
     n, b, p = subplot.hist(values, bins=bins, weights=weights, facecolor=color1, label='2012', alpha=0.5,
                            linewidth=0.5, edgecolor='white')
-    print '2012 ' + series1.name
-    print '{:2.3f}%'.format((1 - n.sum()) * 100)
+    print('2012 ' + series1.name)
+    print('{:2.3f}%'.format((1 - n.sum()) * 100))
     values, weights = _get_values_and_weights(series2)
     n, b, p = subplot.hist(values, bins=bins, weights=weights, facecolor=color2, label='2014', alpha=0.5,
                            linewidth=0.5, edgecolor='white')
-    print '2014 ' + series2.name
-    print '{:2.2f}%'.format((1 - n.sum()) * 100)
+    print('2014 ' + series2.name)
+    print('{:2.2f}%'.format((1 - n.sum()) * 100))
 
     subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
     subplot.set_xlabel(xlabel, fontsize=10)
@@ -241,13 +241,13 @@ def _calc_split(df, divider, domain_filter):
 
 
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
-def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
+def create_figure_1(out_file=MBARI_RESULTS_DIR + 'figure_1.pdf'):
     fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(6, 8))
     x = 'domain_name'
     y = ['2012', '2014']
     c = [COLOR_2012, COLOR_2014]
 
-    d3 = read_df_from_file('/Users/ehervol/Projects/WWU/MBARI_data/mbari_ref_counts.tsv')
+    d3 = read_df_from_file(MBARI_12_14_REF_COUNTS_FILE)
     subplot = axes[0]
     subplot.set_title('Increase in Unique References')
     d3.plot('domain_name', ['change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
@@ -300,8 +300,8 @@ def create_figure_1(out_file=MBARI_ANALYSIS_DIR + 'figure_1.pdf'):
 
 
 # Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
-def create_figure_2(out_file=MBARI_ANALYSIS_DIR + 'figure_2.pdf'):
-    plt.figure(figsize=(4, 6))
+def create_figure_2(out_file=MBARI_RESULTS_DIR + 'figure_2.pdf'):
+    # plt.figure(figsize=(4, 6))
     gs = gridspec.GridSpec(2, 2, width_ratios=[5, 3])  # change widths (5 bars on left, 3 on right)
     ax1 = plt.subplot(gs[0, 0])
     ax2 = plt.subplot(gs[0, 1])
@@ -335,7 +335,7 @@ def create_figure_2(out_file=MBARI_ANALYSIS_DIR + 'figure_2.pdf'):
 
 
 # Figure 3 is six histograms: (post_prob, edpl, taxa_depth) x (euks, bacteria)
-def create_figure_3(out_file=MBARI_ANALYSIS_DIR + 'figure_3.pdf'):
+def create_figure_3(out_file=MBARI_RESULTS_DIR + 'figure_3.pdf'):
     # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
     # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
@@ -343,7 +343,7 @@ def create_figure_3(out_file=MBARI_ANALYSIS_DIR + 'figure_3.pdf'):
     fig, axes = plt.subplots(nrows=3, ncols=2)
 
     domain_filter = 'Bacteria'
-    print domain_filter
+    print(domain_filter)
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
     axes[0, 0].set_title(domain_filter)
@@ -352,7 +352,7 @@ def create_figure_3(out_file=MBARI_ANALYSIS_DIR + 'figure_3.pdf'):
     _create_taxa_depth_histogram(axes[2, 0], d12, d14)
 
     domain_filter = 'Eukaryota'
-    print domain_filter
+    print(domain_filter)
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
     axes[0, 1].set_title(domain_filter)
@@ -375,7 +375,7 @@ def create_figure_3(out_file=MBARI_ANALYSIS_DIR + 'figure_3.pdf'):
 
 
 # Figure 4 is two scatterplots: (edpl/post_prob) x (euks, bacteria)
-def create_figure_4(out_file=MBARI_ANALYSIS_DIR + 'figure_4.pdf'):
+def create_figure_4(out_file=MBARI_RESULTS_DIR + 'figure_4.pdf'):
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
     fig, axes = plt.subplots(nrows=2, ncols=1)

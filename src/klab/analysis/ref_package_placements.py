@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import unicode_literals
+
 import argparse
 import os
 
@@ -16,11 +18,11 @@ Reads the tax_map files from a reference package to get normalization counts for
 def _get_tax_map_info(root):
     file_list = get_files(root_directory=root, extension='tax_map.csv')
     file_list.sort()
-    print ('%d files to run...' % len(file_list))
+    print('%d files to run...' % len(file_list))
 
     df = pd.DataFrame()
     for f in file_list:
-        print ('processing %s...' % f)
+        print('processing %s...' % f)
         file_name = os.path.basename(f)
         cluster = file_name.split('.')[0]  # name of cluster is first part of file name
         d = read_df_from_file(f)

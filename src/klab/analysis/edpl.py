@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import unicode_literals
+
 import argparse
 import os
 import subprocess
@@ -19,15 +21,16 @@ def _calculate_edpl(root):
     file_list = get_files(root_directory=root, extension='.jplace')
     file_list.sort()
 
-    print ('%d files to run...' % len(file_list))
+    print('%d files to run...' % len(file_list))
 
     data = []
     for f in file_list:
-        print ('processing %s...' % f)
+        print('processing %s...' % f)
         file_name = os.path.basename(f)
         gene = file_name.split('.')[0]  # name of gene is first part of file name
         # call "guppy edpl --pp" to calculate edpl
-        edpl_out = subprocess.check_output(['guppy', 'edpl', '--pp', f], stderr=subprocess.STDOUT)
+        edpl_out = subprocess.check_output(['guppy', 'edpl', '--pp', f], stderr=subprocess.STDOUT,
+                                           universal_newlines=True)
         for edpl in edpl_out.split('\n'):
             if edpl:
                 row = [gene]

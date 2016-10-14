@@ -19,7 +19,7 @@ if [ -f names.tsv ]; then
 fi
 
 # download zipped file and extract the goodies
-wget ftp://$NCBI_SITE/$TAXONOMY_FILE
+curl ftp://$NCBI_SITE/$TAXONOMY_FILE -o $TAXONOMY_FILE
 tar -xzf $TAXONOMY_FILE nodes.dmp names.dmp merged.dmp delnodes.dmp readme.txt
 mv readme.txt ncbi_readme.txt
 rm -f $TAXONOMY_FILE

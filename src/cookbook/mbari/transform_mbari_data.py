@@ -68,12 +68,12 @@ def _merge_mbari_data(file_12, file_14, result):
     write_df_to_file(df, result)
 
 
-def _merge_mbari_domain_data(file_12, file_14, result):
-    df12 = read_df_from_file(file_12, low_memory=False)
-    df12 = df12[df12['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
-    df14 = read_df_from_file(file_14, low_memory=False)
-    df14 = df14[df14['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
-    df = pd.merge(df12, df14, on='fragment_id', how='outer', suffixes=('_12', '_14'))
+def _merge_mbari_domain_data(file_a, label_a, file_b, label_b, result):
+    df_a = read_df_from_file(file_a, low_memory=False)
+    df_a = df_a[df_a['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
+    df_b = read_df_from_file(file_b, low_memory=False)
+    df_b = df_b[df_b['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
+    df = pd.merge(df_a, df_b, on='fragment_id', how='outer', suffixes=('_' + label_a, '_' + label_b))
 
     # # drop rows with taxa id that were removed from NCBI
     # df = df[df.domain_name_12 != 'DELETED NODE']
@@ -93,20 +93,21 @@ def _merge_mbari_domain_data(file_12, file_14, result):
     write_df_to_file(df, result)
 
 
-# TODO ech 2016-10-14 - 12 and 14 are hardcoded, need to be parameters
-def _merge_reference_package_data(file_12, file_14, result):
-    d = read_df_from_file(file_12)
+def _merge_reference_package_data(file_a, label_a, file_b, label_b, result):
+    d = read_df_from_file(file_a)
     d2 = d.drop_duplicates(CLASSIFICATION_COLUMN)
-    d12 = group_and_count(d2, ['domain_name'])
+    df_a = group_and_count(d2, ['domain_name'])
+    year_a = '20' + label_a
 
-    d = read_df_from_file(file_14)
+    d = read_df_from_file(file_b)
     d2 = d.drop_duplicates(CLASSIFICATION_COLUMN)
-    d14 = group_and_count(d2, ['domain_name'])
+    df_b = group_and_count(d2, ['domain_name'])
+    year_b = '20' + label_b
 
-    df = pd.merge(d12, d14, on='domain_name', how='outer', suffixes=('_12', '_14'))
+    df = pd.merge(df_a, df_b, on='domain_name', how='outer', suffixes=('_' + label_a, '_' + label_b))
     df = df[df['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
-    df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
-    df['change'] = df['2014'] / df['2012']
+    df.rename(columns={'count_' + label_a: year_a, 'count_' + label_b: year_b}, inplace=True)
+    df['change'] = df[year_a] / df[year_b]
     write_df_to_file(df, result)
 
 
@@ -142,9 +143,11 @@ if __name__ == '__main__':
 
     # binned and merged ref package counts
     if not os.path.isfile(MBARI_12_14_REF_COUNTS_FILE):
-        _merge_reference_package_data(MBARI_2012_REF_PKG_FILE, MBARI_2014_REF_PKG_FILE, MBARI_12_14_REF_COUNTS_FILE)
+        _merge_reference_package_data(MBARI_2012_REF_PKG_FILE, '12', MBARI_2014_REF_PKG_FILE, '14',
+                                      MBARI_12_14_REF_COUNTS_FILE)
     if not os.path.isfile(MBARI_14_16_REF_COUNTS_FILE):
-        _merge_reference_package_data(MBARI_2014_REF_PKG_FILE, MBARI_2016_REF_PKG_FILE, MBARI_14_16_REF_COUNTS_FILE)
+        _merge_reference_package_data(MBARI_2014_REF_PKG_FILE, '14', MBARI_2016_REF_PKG_FILE, '16',
+                                      MBARI_14_16_REF_COUNTS_FILE)
 
     # edpl calculations
     if not os.path.isfile(MBARI_2012_EDPL_FILE):
@@ -169,8 +172,8 @@ if __name__ == '__main__':
 
     # merge domain lineage files
     if not os.path.isfile(MBARI_12_14_MERGED_FILE):
-        _merge_mbari_domain_data(file_12=MBARI_2012_LINEAGE_FILE, file_14=MBARI_2014_LINEAGE_FILE,
-                                 result=MBARI_12_14_MERGED_FILE)
+        _merge_mbari_domain_data(file_a=MBARI_2012_LINEAGE_FILE, label_a='12', file_b=MBARI_2014_LINEAGE_FILE,
+                                 label_b='14', result=MBARI_12_14_MERGED_FILE)
     if not os.path.isfile(MBARI_14_16_MERGED_FILE):
-        _merge_mbari_domain_data(file_12=MBARI_2014_LINEAGE_FILE, file_14=MBARI_2016_LINEAGE_FILE,
-                                 result=MBARI_14_16_MERGED_FILE)
+        _merge_mbari_domain_data(file_a=MBARI_2014_LINEAGE_FILE, label_a='14', file_b=MBARI_2016_LINEAGE_FILE,
+                                 label_b='16', result=MBARI_14_16_MERGED_FILE)

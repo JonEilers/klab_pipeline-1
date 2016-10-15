@@ -17,16 +17,16 @@ MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_mbari_cog_placements_with_linea
 MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_mbari_cog_placements_with_lineage.tsv'
 MBARI_2016_LINEAGE_FILE = MBARI_DATA_DIR + '2016_mbari_cog_placements_with_lineage.tsv'
 
-MBARI_12_14_MERGED_FILE = MBARI_DATA_DIR + '2012_2014_merged.tsv'
-MBARI_14_16_MERGED_FILE = MBARI_DATA_DIR + '2014_2016_merged.tsv'
+MBARI_12_14_MERGED_FILE = MBARI_DATA_DIR + '2012_2014_mbari_merged.tsv'
+MBARI_14_16_MERGED_FILE = MBARI_DATA_DIR + '2014_2016_mbari_merged.tsv'
 
 MBARI_2012_EDPL_FILE = MBARI_DATA_DIR + '2012_mbari_edpl.tsv'
 MBARI_2014_EDPL_FILE = MBARI_DATA_DIR + '2014_mbari_edpl.tsv'
 MBARI_2016_EDPL_FILE = MBARI_DATA_DIR + '2016_mbari_edpl.tsv'
 
-MBARI_2012_REF_PKG_FILE = MBARI_DATA_DIR + '2012_mbari_ref_pkg_placements.tsv'
-MBARI_2014_REF_PKG_FILE = MBARI_DATA_DIR + '2014_mbari_ref_pkg_placements.tsv'
-MBARI_2016_REF_PKG_FILE = MBARI_DATA_DIR + '2016_mbari_ref_pkg_placements.tsv'
+MBARI_2012_REF_PKG_FILE = MBARI_DATA_DIR + '2012_mbari_ref_pkg_counts.tsv'
+MBARI_2014_REF_PKG_FILE = MBARI_DATA_DIR + '2014_mbari_ref_pkg_counts.tsv'
+MBARI_2016_REF_PKG_FILE = MBARI_DATA_DIR + '2016_mbari_ref_pkg_counts.tsv'
 
 MBARI_12_14_REF_COUNTS_FILE = MBARI_DATA_DIR + '2012_2014_mbari_ref_counts.tsv'
 MBARI_14_16_REF_COUNTS_FILE = MBARI_DATA_DIR + '2014_2016_mbari_ref_counts.tsv'

@@ -18,8 +18,9 @@ from matplotlib import gridspec
 
 from klab.process.file_manager import read_df_from_file, CLASSIFICATION_COLUMN
 from klab.process.derived_info import group_and_count
-from cookbook.mbari import MBARI_RESULTS_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
-    MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_REF_COUNTS_FILE, COLOR_2016, MBARI_2016_LINEAGE_FILE
+from cookbook.mbari import MBARI_RESULTS_DIR, COLOR_2012, COLOR_2014, COLOR_2016, MBARI_2012_LINEAGE_FILE, \
+    MBARI_2014_LINEAGE_FILE, MBARI_2016_LINEAGE_FILE, MBARI_12_16_MERGED_FILE, MBARI_12_14_MERGED_FILE, \
+    MBARI_12_14_REF_COUNTS_FILE
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Lost Placements']
 DOMAIN_COLORS = ['0.7', 'y', 'g', 'b', 'k']  # number is grey scale
@@ -54,7 +55,7 @@ def _massage_data(df, label_a, label_b):
     c.rename(columns={'AAsame': 'Same', 'top level': 'Top Level', 'zNone': 'Lost'}, inplace=True)
 
     # clean up row names
-    c.ix[c[''] == 'zNone', ''] = 'New'
+    c.ix[c[''] == 'zNone', ''] = '20%s New' % label_b
     c.ix[c[''] == 'top level', ''] = 'Top Level'
     c.columns.name = ''
     c.set_index([''], inplace=True)  # set index to first column
@@ -62,7 +63,7 @@ def _massage_data(df, label_a, label_b):
     # make last column into last row
     a = c['Lost'].tolist()
     a.insert(0, 0.0)  # pad first value with a zero
-    c.loc['Lost'] = a
+    c.loc['20%s Lost' % label_b] = a
     c.drop('Lost', axis=1, inplace=True)
     return c
 
@@ -101,7 +102,32 @@ def _get_n_colors_in_hex(n=5):
 # _plot_data(data_file, plot_file, title, colors, True)
 
 
-def _generate_domain_stack_plots(sp1, sp2, level):
+def _generate_domain_stack_plot(sp1, level):
+    df14 = _get_and_clean_data(level, file_name=MBARI_12_14_MERGED_FILE, label_a='12', label_b='14')
+    d14 = _massage_data(df14, label_a='12', label_b='14')
+    d14.drop(d14.head(3).index, inplace=True)  # drop first three rows (Arch, Bact, Euk)
+    df16 = _get_and_clean_data(level, file_name=MBARI_12_16_MERGED_FILE, label_a='12', label_b='16')
+    d16 = _massage_data(df16, label_a='12', label_b='16')
+    d16.drop(d16.head(3).index, inplace=True)  # drop first three rows (Arch, Bact, Euk)
+    d = pd.concat([d14, d16])
+
+    d.drop('Same', axis=1, inplace=True)  # drop 'Same" column
+    colors = DOMAIN_COLORS[1:]
+
+    categories = d.index.tolist()  # index is list of categories
+    width = 0.92
+    gap = 1 - width
+    xlim = [0 - gap - (width / 2), len(categories) - (width / 2)]  # leave gap on left edge, gap on right edge
+
+    d.plot(ax=sp1, kind='bar', stacked=True, color=colors, width=width, linewidth=0, legend=False, alpha=0.9)
+    sp1.set_xticklabels(categories, rotation='horizontal')
+    sp1.set_ylabel('Placements (thousands)', color='0.4')
+    sp1.yaxis.set_major_formatter(FuncFormatter(_to_thousands))
+    sp1.set_xlim(xlim)
+    sp1.xaxis.grid(False)
+
+
+def _generate_domain_stack_and_scale_plots(sp1, sp2, level):
     df = _get_and_clean_data(level, file_name=MBARI_12_14_MERGED_FILE, label_a='12', label_b='14')
     d = _massage_data(df, label_a='12', label_b='14')
     if level != 'domain':
@@ -299,8 +325,22 @@ def create_figure_1(out_file=MBARI_RESULTS_DIR + 'figure_1.pdf'):
     plt.close()
 
 
-# Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
+# Figure 2 is one stacked bar chart: new and lost for 12->14 and 12->16
 def create_figure_2(out_file=MBARI_RESULTS_DIR + 'figure_2.pdf'):
+    fig, axes = plt.subplots(nrows=1, ncols=1)
+    _generate_domain_stack_plot(sp1=axes, level='domain')
+
+    legend = axes.legend(loc='upper left')
+    plt.setp(legend.get_texts(), fontsize=10)
+    # remove dead space
+    plt.tight_layout()
+    _ensure_directory_exists(out_file)
+    plt.savefig(out_file)
+    plt.close()
+
+
+# Figure 2 is four bar charts: (stacked, scaled) x (domain, lowest_classification)
+def create_figure_2_original(out_file=MBARI_RESULTS_DIR + 'figure_2.pdf'):
     # plt.figure(figsize=(4, 6))
     gs = gridspec.GridSpec(2, 2, width_ratios=[5, 3])  # change widths (5 bars on left, 3 on right)
     ax1 = plt.subplot(gs[0, 0])
@@ -308,8 +348,8 @@ def create_figure_2(out_file=MBARI_RESULTS_DIR + 'figure_2.pdf'):
     ax3 = plt.subplot(gs[1, 0])
     ax4 = plt.subplot(gs[1, 1])
 
-    _generate_domain_stack_plots(ax1, ax3, 'domain')
-    _generate_domain_stack_plots(ax2, ax4, 'lowest_classification')
+    _generate_domain_stack_and_scale_plots(ax1, ax3, 'domain')
+    _generate_domain_stack_and_scale_plots(ax2, ax4, 'lowest_classification')
 
     ax1.set_title("Domain Level", fontsize=10)
     ax2.set_title("Lowest Classification Level", fontsize=10)

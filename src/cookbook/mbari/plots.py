@@ -16,10 +16,10 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from matplotlib import gridspec
 
-from klab.process.file_manager import read_df_from_file, write_df_to_file, CLASSIFICATION_COLUMN
+from klab.process.file_manager import read_df_from_file, CLASSIFICATION_COLUMN
 from klab.process.derived_info import group_and_count
 from cookbook.mbari import MBARI_RESULTS_DIR, COLOR_2012, COLOR_2014, MBARI_12_14_MERGED_FILE, \
-    MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_REF_COUNTS_FILE
+    MBARI_2012_LINEAGE_FILE, MBARI_2014_LINEAGE_FILE, MBARI_12_14_REF_COUNTS_FILE, COLOR_2016, MBARI_2016_LINEAGE_FILE
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Lost Placements']
 DOMAIN_COLORS = ['0.7', 'y', 'g', 'b', 'k']  # number is grey scale
@@ -31,20 +31,20 @@ def _ensure_directory_exists(f):
         os.makedirs(d)
 
 
-def _get_and_clean_data(level):
-    d = read_df_from_file(MBARI_12_14_MERGED_FILE, low_memory=False)
+def _get_and_clean_data(level, file_name, label_a, label_b):
+    d = read_df_from_file(file_name=file_name, low_memory=False)
     d.fillna('None', inplace=True)
 
     # rename for nicer ordering of graphs
-    d.ix[d[level + '_name_12'] == d[level + '_name_14'], 'domain_name_14'] = 'AAsame'
-    d.ix[d['domain_name_12'] == 'None', 'domain_name_12'] = 'zNone'
-    d.ix[d['domain_name_14'] == 'None', 'domain_name_14'] = 'zNone'
+    d.ix[d[level + '_name_' + label_a] == d[level + '_name_' + label_b], 'domain_name_' + label_b] = 'AAsame'
+    d.ix[d['domain_name_' + label_a] == 'None', 'domain_name_' + label_a] = 'zNone'
+    d.ix[d['domain_name_' + label_b] == 'None', 'domain_name_' + label_b] = 'zNone'
     return d
 
 
-def _massage_data(df, level='domain'):
+def _massage_data(df, label_a, label_b):
     # group, reshape and replace missing values
-    b = pd.DataFrame(df.groupby([level + '_name_12', level + '_name_14']).size())
+    b = pd.DataFrame(df.groupby(['domain_name_' + label_a, 'domain_name_' + label_b]).size())
     c = b.unstack()
     c.fillna(0, inplace=True)  # replace NaN
 
@@ -78,32 +78,32 @@ def _get_n_colors_in_hex(n=5):
     return hex_out
 
 
-# uses spectrum of colors at a greater level of detail
-def _generate_euk_spectrum_set_of_graphs(level):
-    df = _get_and_clean_data(level)
-    t1 = 'Eukaryota'
-    t2 = 'Eukaryota'
-    a = df[df['domain_name_12'] == t1]
-    a = a[a['domain_name_14'] == t2]
-
-    d2 = _massage_data(a, level)
-
-    num_rows = len(d2.index)
-    colors = _get_n_colors_in_hex(num_rows)
-    colors.insert(0, '#bfbfbf')  # start with grey color for 'same' category
-
-    data_file = MBARI_RESULTS_DIR + level + '_placements.csv'
-    write_df_to_file(d2, data_file)
-    # title = 'Eukaryota ' + level.title() + ' 2012 to 2014 Placements'
-    # plot_file = MBARI_ANALYSIS_DIR + level + '_placements_bar.pdf'
-    # _plot_data(data_file, plot_file, title, colors)
-    # plot_file = MBARI_ANALYSIS_DIR + level + '_placements_scaled_bar.pdf'
-    # _plot_data(data_file, plot_file, title, colors, True)
+# # uses spectrum of colors at a greater level of detail
+# def _generate_euk_spectrum_set_of_graphs(level):
+#     df = _get_and_clean_data(level)
+#     t1 = 'Eukaryota'
+#     t2 = 'Eukaryota'
+#     a = df[df['domain_name_12'] == t1]
+#     a = a[a['domain_name_14'] == t2]
+#
+#     d2 = _massage_data(a, level)
+#
+#     num_rows = len(d2.index)
+#     colors = _get_n_colors_in_hex(num_rows)
+#     colors.insert(0, '#bfbfbf')  # start with grey color for 'same' category
+#
+#     data_file = MBARI_RESULTS_DIR + level + '_placements.csv'
+#     write_df_to_file(d2, data_file)
+# title = 'Eukaryota ' + level.title() + ' 2012 to 2014 Placements'
+# plot_file = MBARI_ANALYSIS_DIR + level + '_placements_bar.pdf'
+# _plot_data(data_file, plot_file, title, colors)
+# plot_file = MBARI_ANALYSIS_DIR + level + '_placements_scaled_bar.pdf'
+# _plot_data(data_file, plot_file, title, colors, True)
 
 
 def _generate_domain_stack_plots(sp1, sp2, level):
-    df = _get_and_clean_data(level)
-    d = _massage_data(df)
+    df = _get_and_clean_data(level, file_name=MBARI_12_14_MERGED_FILE, label_a='12', label_b='14')
+    d = _massage_data(df, label_a='12', label_b='14')
     if level != 'domain':
         d.drop(d.tail(2).index, inplace=True)  # drop last two rows if not domain level (redundant in all others)
 
@@ -336,8 +336,6 @@ def create_figure_2(out_file=MBARI_RESULTS_DIR + 'figure_2.pdf'):
 
 # Figure 3 is six histograms: (post_prob, edpl, taxa_depth) x (euks, bacteria)
 def create_figure_3(out_file=MBARI_RESULTS_DIR + 'figure_3.pdf'):
-    # MBARI_2012_LINEAGE_FILE = MBARI_DATA_DIR + '2012_MBARI_cog_placements_with_lineage_test.tsv'
-    # MBARI_2014_LINEAGE_FILE = MBARI_DATA_DIR + '2014_MBARI_cog_placements_with_lineage_test.tsv'
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
     fig, axes = plt.subplots(nrows=3, ncols=2)
@@ -378,35 +376,44 @@ def create_figure_3(out_file=MBARI_RESULTS_DIR + 'figure_3.pdf'):
 def create_figure_4(out_file=MBARI_RESULTS_DIR + 'figure_4.pdf'):
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
+    df16 = read_df_from_file(MBARI_2016_LINEAGE_FILE, low_memory=False)
     fig, axes = plt.subplots(nrows=2, ncols=1)
 
     subplot = axes[0]
     domain_filter = 'Bacteria'
     create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, domain_filter)
     create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, domain_filter)
+    create_edpl_post_prob_scatter(subplot, df16, '2016', COLOR_2016, domain_filter)
 
-    divider_x = 0.28  # eyeballed estimate
+    divider_x = 0.27  # eyeballed estimate
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
     l12, r12 = _calc_split(df12, divider_x, domain_filter)
     l14, r14 = _calc_split(df14, divider_x, domain_filter)
+    l16, r16 = _calc_split(df16, divider_x, domain_filter)
     subplot.text(0.12, 0.83, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
     subplot.text(0.65, 0.83, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
     subplot.text(0.12, 0.70, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
     subplot.text(0.65, 0.70, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.12, 0.57, '{:2.0f}%'.format(l16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
+    subplot.text(0.65, 0.57, '{:2.0f}%'.format(r16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
 
     subplot = axes[1]
     domain_filter = 'Eukaryota'
     create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, domain_filter)
     create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, domain_filter)
+    create_edpl_post_prob_scatter(subplot, df16, '2016', COLOR_2014, domain_filter)
 
-    divider_x = 0.75  # eyeballed estimate
+    divider_x = 0.80  # eyeballed estimate
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
     l12, r12 = _calc_split(df12, divider_x, domain_filter)
     l14, r14 = _calc_split(df14, divider_x, domain_filter)
+    l16, r16 = _calc_split(df16, divider_x, domain_filter)
     subplot.text(0.45, 0.83, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
     subplot.text(0.85, 0.83, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
     subplot.text(0.45, 0.70, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
     subplot.text(0.85, 0.70, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.45, 0.57, '{:2.0f}%'.format(l16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
+    subplot.text(0.85, 0.57, '{:2.0f}%'.format(r16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
 
     # put legend in upper right subplot and set font size
     legend = axes[0].legend(loc='upper right', scatterpoints=3)
@@ -432,11 +439,11 @@ if __name__ == '__main__':
     }
     sns.set_style('darkgrid', style_overrides)
 
-    create_figure_1()
+    # create_figure_1()
 
     create_figure_2()
 
-    create_figure_3()
+    # create_figure_3()
 
     create_figure_4()
 

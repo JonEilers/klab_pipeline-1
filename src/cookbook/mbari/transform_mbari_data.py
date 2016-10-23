@@ -8,9 +8,9 @@ import pandas as pd
 
 from cookbook.mbari import MBARI_2012_BASE, MBARI_2012_EDPL_FILE, MBARI_2012_LINEAGE_FILE, MBARI_2012_REF_PKG_FILE, \
     MBARI_2012_PACKAGE_DIR, MBARI_2014_BASE, MBARI_2014_EDPL_FILE, MBARI_2014_LINEAGE_FILE, MBARI_2014_REF_PKG_FILE, \
-    MBARI_2014_PACKAGE_DIR, MBARI_12_14_REF_COUNTS_FILE, MBARI_12_14_MERGED_FILE, MBARI_14_16_REF_COUNTS_FILE, \
+    MBARI_2014_PACKAGE_DIR, MBARI_12_14_REF_COUNTS_FILE, MBARI_12_14_MERGED_FILE, MBARI_12_16_REF_COUNTS_FILE, \
     MBARI_2016_REF_PKG_FILE, MBARI_2016_PACKAGE_DIR, MBARI_2016_EDPL_FILE, MBARI_2016_BASE, MBARI_2016_LINEAGE_FILE, \
-    MBARI_14_16_MERGED_FILE
+    MBARI_12_16_MERGED_FILE
 from klab.analysis.edpl import get_edpl
 from klab.analysis.ref_package_placements import get_ref_package_placements
 from klab.process.derived_info import add_placement_type_column, group_and_count
@@ -145,9 +145,9 @@ if __name__ == '__main__':
     if not os.path.isfile(MBARI_12_14_REF_COUNTS_FILE):
         _merge_reference_package_data(MBARI_2012_REF_PKG_FILE, '12', MBARI_2014_REF_PKG_FILE, '14',
                                       MBARI_12_14_REF_COUNTS_FILE)
-    if not os.path.isfile(MBARI_14_16_REF_COUNTS_FILE):
-        _merge_reference_package_data(MBARI_2014_REF_PKG_FILE, '14', MBARI_2016_REF_PKG_FILE, '16',
-                                      MBARI_14_16_REF_COUNTS_FILE)
+    if not os.path.isfile(MBARI_12_16_REF_COUNTS_FILE):
+        _merge_reference_package_data(MBARI_2012_REF_PKG_FILE, '12', MBARI_2016_REF_PKG_FILE, '16',
+                                      MBARI_12_16_REF_COUNTS_FILE)
 
     # edpl calculations
     if not os.path.isfile(MBARI_2012_EDPL_FILE):
@@ -174,6 +174,6 @@ if __name__ == '__main__':
     if not os.path.isfile(MBARI_12_14_MERGED_FILE):
         _merge_mbari_domain_data(file_a=MBARI_2012_LINEAGE_FILE, label_a='12', file_b=MBARI_2014_LINEAGE_FILE,
                                  label_b='14', result=MBARI_12_14_MERGED_FILE)
-    if not os.path.isfile(MBARI_14_16_MERGED_FILE):
-        _merge_mbari_domain_data(file_a=MBARI_2014_LINEAGE_FILE, label_a='14', file_b=MBARI_2016_LINEAGE_FILE,
-                                 label_b='16', result=MBARI_14_16_MERGED_FILE)
+    if not os.path.isfile(MBARI_12_16_MERGED_FILE):
+        _merge_mbari_domain_data(file_a=MBARI_2012_LINEAGE_FILE, label_a='12', file_b=MBARI_2016_LINEAGE_FILE,
+                                 label_b='16', result=MBARI_12_16_MERGED_FILE)

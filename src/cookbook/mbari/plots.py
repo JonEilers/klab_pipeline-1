@@ -188,7 +188,7 @@ def _create_comparison_histogram(subplot, bins, series1, color1, series2, color2
     print('{:2.2f}%'.format((1 - n.sum()) * 100))
 
     subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
-    subplot.set_xlabel(xlabel, fontsize=10)
+    subplot.set_xlabel(xlabel, fontsize=7)
     if xlim:
         subplot.set_xlim(xlim)
     if ylim:
@@ -200,7 +200,7 @@ def _create_comparison_histogram(subplot, bins, series1, color1, series2, color2
 def _create_taxa_depth_histogram(a, df12, df14):
     bins = range(0, 25, 1)
     _create_comparison_histogram(a, bins=bins, series1=df12.taxa_depth, color1=COLOR_2012, series2=df14.taxa_depth,
-                                 color2=COLOR_2014, xlabel=r'Taxa Depth', xlim=[0, 25])
+                                 color2=COLOR_2014, xlabel=r'Taxa Depth', xlim=[0, 25], ylim=[0, 0.35])
 
 
 def _create_edpl_histogram(a, df12, df14):
@@ -399,9 +399,9 @@ def create_figure_2_original(out_file=MBARI_RESULTS_DIR + 'figure_2.pdf'):
 def create_figure_3(out_file=MBARI_RESULTS_DIR + 'figure_3.pdf'):
     df12 = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     df14 = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
-    fig, axes = plt.subplots(nrows=3, ncols=2)
+    fig, axes = plt.subplots(nrows=3, ncols=3)
 
-    domain_filter = 'Bacteria'
+    domain_filter = 'Archaea'
     print(domain_filter)
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
@@ -410,7 +410,7 @@ def create_figure_3(out_file=MBARI_RESULTS_DIR + 'figure_3.pdf'):
     _create_edpl_histogram(axes[1, 0], d12, d14)
     _create_taxa_depth_histogram(axes[2, 0], d12, d14)
 
-    domain_filter = 'Eukaryota'
+    domain_filter = 'Bacteria'
     print(domain_filter)
     d12 = df12[df12.domain_name == domain_filter]
     d14 = df14[df14.domain_name == domain_filter]
@@ -419,12 +419,25 @@ def create_figure_3(out_file=MBARI_RESULTS_DIR + 'figure_3.pdf'):
     _create_edpl_histogram(axes[1, 1], d12, d14)
     _create_taxa_depth_histogram(axes[2, 1], d12, d14)
 
+    domain_filter = 'Eukaryota'
+    print(domain_filter)
+    d12 = df12[df12.domain_name == domain_filter]
+    d14 = df14[df14.domain_name == domain_filter]
+    axes[0, 2].set_title(domain_filter)
+    _create_post_prob_histogram(axes[0, 2], d12, d14)
+    _create_edpl_histogram(axes[1, 2], d12, d14)
+    _create_taxa_depth_histogram(axes[2, 2], d12, d14)
+
     # put legend in lower right subplot and set font size
-    legend = axes[2, 1].legend(loc='upper right')
-    plt.setp(legend.get_texts(), fontsize=10)
-    # hide y-tick labels for a couple subplots
+    legend = axes[2, 2].legend(loc='upper right')
+    plt.setp(legend.get_texts(), fontsize=8)
+    # hide y-tick labels for all but left subplots
     plt.setp(axes[0, 1].get_yticklabels(), visible=False)
+    plt.setp(axes[0, 2].get_yticklabels(), visible=False)
     plt.setp(axes[1, 1].get_yticklabels(), visible=False)
+    plt.setp(axes[1, 2].get_yticklabels(), visible=False)
+    plt.setp(axes[2, 1].get_yticklabels(), visible=False)
+    plt.setp(axes[2, 2].get_yticklabels(), visible=False)
     # remove dead space
     plt.tight_layout()
 
@@ -505,7 +518,7 @@ if __name__ == '__main__':
 
     create_figure_2()
 
-    # create_figure_3()
+    create_figure_3()
 
     create_figure_4()
 

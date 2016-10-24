@@ -119,7 +119,7 @@ def _generate_domain_stack_plot(sp1, level):
     gap = 1 - width
     xlim = [0 - gap - (width / 2), len(categories) - (width / 2)]  # leave gap on left edge, gap on right edge
 
-    d.plot(ax=sp1, kind='bar', stacked=True, color=colors, width=width, linewidth=0, legend=False, alpha=0.9)
+    d.plot(ax=sp1, kind='bar', stacked=True, color=colors, width=width, linewidth=0, legend=False, alpha=0.8)
     sp1.set_xticklabels(categories, rotation='horizontal')
     sp1.set_ylabel('Placements (thousands)', color='0.4')
     sp1.yaxis.set_major_formatter(FuncFormatter(_to_thousands))
@@ -269,9 +269,7 @@ def _calc_split(df, divider, domain_filter):
 # Figure 1 is three bar charts: ref pkg counts, placement counts, normalized counts
 def create_figure_1(out_file=MBARI_RESULTS_DIR + 'figure_1.pdf'):
     fig, axes = plt.subplots(nrows=3, ncols=1, figsize=(6, 8))
-    x = 'domain_name'
-    y = ['2012', '2014']
-    c = [COLOR_2012, COLOR_2014]
+    c = [COLOR_2012, COLOR_2014, COLOR_2016]
 
     d4 = read_df_from_file(MBARI_12_14_REF_COUNTS_FILE)
     d6 = read_df_from_file(MBARI_12_16_REF_COUNTS_FILE)
@@ -280,7 +278,8 @@ def create_figure_1(out_file=MBARI_RESULTS_DIR + 'figure_1.pdf'):
     d3.drop(['2012_y'], axis=1, inplace=True)
     subplot = axes[0]
     subplot.set_title('Increase in Unique References')
-    d3.plot('domain_name', ['2014 Change', '2016 Change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
+    d3.plot('domain_name', ['2014 Change', '2016 Change'], ax=subplot, kind='bar', linewidth=0, legend=False,
+            alpha=0.65, color=c[1:])
     subplot.xaxis.grid(False)
     subplot.set_xlabel('')
     subplot.legend(loc='upper left')
@@ -309,7 +308,8 @@ def create_figure_1(out_file=MBARI_RESULTS_DIR + 'figure_1.pdf'):
 
     subplot = axes[1]
     subplot.set_title('Increase in Unique Placements')
-    df.plot('domain_name', ['2014 Change', '2016 Change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
+    df.plot('domain_name', ['2014 Change', '2016 Change'], ax=subplot, kind='bar', linewidth=0, legend=False,
+            alpha=0.65, color=c[1:])
     subplot.xaxis.grid(False)
     subplot.set_xlabel('')
     subplot.legend(loc='upper center')
@@ -322,8 +322,12 @@ def create_figure_1(out_file=MBARI_RESULTS_DIR + 'figure_1.pdf'):
 
     subplot = axes[2]
     subplot.set_title('Placement Efficiency')
-    d.plot('domain_name', ['2012', '2014', '2016'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
-    # _side_by_side_bar(subplot, d, x=x, y=y, colors=c)
+    d.plot('domain_name', ['2012', '2014', '2016'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.65,
+           color=c)
+    # x = 'domain_name'
+    # y = ['2012', '2014']
+    # _side_by_side_bar(subplot, d, x=x, y=y, colors=c[:2])
+    subplot.xaxis.grid(False)
     subplot.set_xlabel('')
     subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
     legend = subplot.legend(loc='upper right')
@@ -447,36 +451,37 @@ def create_figure_4(out_file=MBARI_RESULTS_DIR + 'figure_4.pdf'):
     l12, r12 = _calc_split(df12, divider_x, domain_filter)
     l14, r14 = _calc_split(df14, divider_x, domain_filter)
     l16, r16 = _calc_split(df16, divider_x, domain_filter)
-    subplot.text(0.12, 0.83, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
-    subplot.text(0.65, 0.83, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
-    subplot.text(0.12, 0.70, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
-    subplot.text(0.65, 0.70, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
-    subplot.text(0.12, 0.57, '{:2.0f}%'.format(l16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
-    subplot.text(0.65, 0.57, '{:2.0f}%'.format(r16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
+    subplot.text(0.17, 0.83, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.32, 0.83, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.17, 0.70, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.32, 0.70, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.17, 0.57, '{:2.0f}%'.format(l16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
+    subplot.text(0.32, 0.57, '{:2.0f}%'.format(r16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
 
     subplot = axes[1]
     domain_filter = 'Eukaryota'
     create_edpl_post_prob_scatter(subplot, df12, '2012', COLOR_2012, domain_filter)
     create_edpl_post_prob_scatter(subplot, df14, '2014', COLOR_2014, domain_filter)
-    create_edpl_post_prob_scatter(subplot, df16, '2016', COLOR_2014, domain_filter)
+    create_edpl_post_prob_scatter(subplot, df16, '2016', COLOR_2016, domain_filter)
 
     divider_x = 0.80  # eyeballed estimate
     subplot.vlines(x=divider_x, ymin=0, ymax=1, colors='k', linestyles='dashed', label='')
     l12, r12 = _calc_split(df12, divider_x, domain_filter)
     l14, r14 = _calc_split(df14, divider_x, domain_filter)
     l16, r16 = _calc_split(df16, divider_x, domain_filter)
-    subplot.text(0.45, 0.83, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
+    subplot.text(0.68, 0.83, '{:2.0f}%'.format(l12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
     subplot.text(0.85, 0.83, '{:2.0f}%'.format(r12 * 100), transform=subplot.transAxes, color=COLOR_2012, fontsize=15)
-    subplot.text(0.45, 0.70, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
+    subplot.text(0.68, 0.70, '{:2.0f}%'.format(l14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
     subplot.text(0.85, 0.70, '{:2.0f}%'.format(r14 * 100), transform=subplot.transAxes, color=COLOR_2014, fontsize=15)
-    subplot.text(0.45, 0.57, '{:2.0f}%'.format(l16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
+    subplot.text(0.68, 0.57, '{:2.0f}%'.format(l16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
     subplot.text(0.85, 0.57, '{:2.0f}%'.format(r16 * 100), transform=subplot.transAxes, color=COLOR_2016, fontsize=15)
 
     # put legend in upper right subplot and set font size
     legend = axes[0].legend(loc='upper right', scatterpoints=3)
     plt.setp(legend.get_texts(), fontsize=12)
     # hide x-tick labels for top subplot
-    # plt.setp(axes[0].get_xticklabels(), visible=False)
+    plt.setp(axes[0].get_xticklabels(), visible=False)
+    axes[0].set_xlabel('')
     # remove dead space
     plt.tight_layout()
 

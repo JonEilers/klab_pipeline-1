@@ -20,7 +20,7 @@ from klab.process.file_manager import read_df_from_file, CLASSIFICATION_COLUMN
 from klab.process.derived_info import group_and_count
 from cookbook.mbari import MBARI_RESULTS_DIR, COLOR_2012, COLOR_2014, COLOR_2016, MBARI_2012_LINEAGE_FILE, \
     MBARI_2014_LINEAGE_FILE, MBARI_2016_LINEAGE_FILE, MBARI_12_16_MERGED_FILE, MBARI_12_14_MERGED_FILE, \
-    MBARI_12_14_REF_COUNTS_FILE
+    MBARI_12_14_REF_COUNTS_FILE, MBARI_12_16_REF_COUNTS_FILE
 
 # ['Same', 'Archaea', 'Bacteria', 'Eukaryota', 'Lost Placements']
 DOMAIN_COLORS = ['0.7', 'y', 'g', 'b', 'k']  # number is grey scale
@@ -273,50 +273,67 @@ def create_figure_1(out_file=MBARI_RESULTS_DIR + 'figure_1.pdf'):
     y = ['2012', '2014']
     c = [COLOR_2012, COLOR_2014]
 
-    d3 = read_df_from_file(MBARI_12_14_REF_COUNTS_FILE)
+    d4 = read_df_from_file(MBARI_12_14_REF_COUNTS_FILE)
+    d6 = read_df_from_file(MBARI_12_16_REF_COUNTS_FILE)
+    d3 = pd.merge(d4, d6, on="domain_name")
+    d3.rename(columns={'2012_x': '2012', 'change_x': '2014 Change', 'change_y': '2016 Change'}, inplace=True)
+    d3.drop(['2012_y'], axis=1, inplace=True)
     subplot = axes[0]
     subplot.set_title('Increase in Unique References')
-    d3.plot('domain_name', ['change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
+    d3.plot('domain_name', ['2014 Change', '2016 Change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
     subplot.xaxis.grid(False)
     subplot.set_xlabel('')
+    subplot.legend(loc='upper left')
 
     # filter by domain and drop dups for 2012 and 2014 data
     d = read_df_from_file(MBARI_2012_LINEAGE_FILE, low_memory=False)
     d.drop_duplicates(CLASSIFICATION_COLUMN, inplace=True)
     df = d[d['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
     df12 = group_and_count(df, ['domain_name'])
+
     d = read_df_from_file(MBARI_2014_LINEAGE_FILE, low_memory=False)
     d.drop_duplicates(CLASSIFICATION_COLUMN, inplace=True)
     df = d[d['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
     df14 = group_and_count(df, ['domain_name'])
-    # merge 2012 and 2014 data
-    df = pd.merge(df12, df14, on='domain_name', how='outer', suffixes=('_12', '_14'))
-    df.rename(columns={'count_12': '2012', 'count_14': '2014'}, inplace=True)
-    df['change'] = df['2014'] / df['2012']
+
+    d = read_df_from_file(MBARI_2016_LINEAGE_FILE, low_memory=False)
+    d.drop_duplicates(CLASSIFICATION_COLUMN, inplace=True)
+    df = d[d['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
+    df16 = group_and_count(df, ['domain_name'])
+
+    # merge 2012, 2014, 2016 data
+    df = df12.merge(df14, on='domain_name', suffixes=('_12', '_14')).merge(df16, on='domain_name')
+    df.rename(columns={'count_12': '2012', 'count_14': '2014', 'count': '2016'}, inplace=True)
+    df['2014 Change'] = df['2014'] / df['2012']
+    df['2016 Change'] = df['2016'] / df['2012']
 
     subplot = axes[1]
     subplot.set_title('Increase in Unique Placements')
-    df.plot('domain_name', ['change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
-    subplot.set_ylim([0, 3.5])  # same as plot above
+    df.plot('domain_name', ['2014 Change', '2016 Change'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
     subplot.xaxis.grid(False)
     subplot.set_xlabel('')
+    subplot.legend(loc='upper center')
 
     # normalize data
     d = pd.merge(d3, df, on='domain_name', how='outer', suffixes=('_ref', '_domain'))
     d['2012'] = d['2012_domain'] / d['2012_ref']
     d['2014'] = d['2014_domain'] / d['2014_ref']
+    d['2016'] = d['2016_domain'] / d['2016_ref']
 
     subplot = axes[2]
     subplot.set_title('Placement Efficiency')
-    _side_by_side_bar(subplot, d, x=x, y=y, colors=c)
+    d.plot('domain_name', ['2012', '2014', '2016'], ax=subplot, kind='bar', linewidth=0, legend=False, alpha=0.8)
+    # _side_by_side_bar(subplot, d, x=x, y=y, colors=c)
+    subplot.set_xlabel('')
     subplot.yaxis.set_major_formatter(FuncFormatter(_to_percent))
-    legend = subplot.legend(loc='upper center')
+    legend = subplot.legend(loc='upper right')
 
     # set legend font size
-    plt.setp(legend.get_texts(), fontsize=10)
+    # plt.setp(legend.get_texts(), fontsize=10)
     # hide x-tick labels for a couple subplots
     plt.setp(axes[0].get_xticklabels(), visible=False)
     plt.setp(axes[1].get_xticklabels(), visible=False)
+    plt.setp(axes[2].get_xticklabels(), rotation='horizontal')
     # remove dead space
     plt.tight_layout()
 
@@ -479,7 +496,7 @@ if __name__ == '__main__':
     }
     sns.set_style('darkgrid', style_overrides)
 
-    # create_figure_1()
+    create_figure_1()
 
     create_figure_2()
 

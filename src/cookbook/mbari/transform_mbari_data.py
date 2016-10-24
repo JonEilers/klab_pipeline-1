@@ -107,7 +107,7 @@ def _merge_reference_package_data(file_a, label_a, file_b, label_b, result):
     df = pd.merge(df_a, df_b, on='domain_name', how='outer', suffixes=('_' + label_a, '_' + label_b))
     df = df[df['domain_name'].isin(['Archaea', 'Bacteria', 'Eukaryota'])]
     df.rename(columns={'count_' + label_a: year_a, 'count_' + label_b: year_b}, inplace=True)
-    df['change'] = df[year_a] / df[year_b]
+    df['change'] = df[year_b] / df[year_a]
     write_df_to_file(df, result)
 
 

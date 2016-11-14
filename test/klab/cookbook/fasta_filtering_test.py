@@ -21,5 +21,5 @@ class TestFastaFiltering(unittest.TestCase):
         try:
             _split_fasta_file('no_file', None, None, None)
             self.fail('should have thrown ValueError')
-        except ValueError, ve:
+        except ValueError as ve:
             self.assertEqual('no_file is not a file.', ve.message)

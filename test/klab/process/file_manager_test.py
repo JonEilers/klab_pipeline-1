@@ -16,7 +16,7 @@ class TestFileManager(unittest.TestCase):
         df = file_manager._build_data_frame_from_jplace_files(TestFileManager.data_dir)
 
         self.assertEquals(134, len(df.index))
-        self.assertEquals(10, len(df.columns))
+        self.assertEquals(11, len(df.columns))
 
         self.assertEqual('.1-.8_coastal_FHGDIPM01D4PA5_4', df.fragment_id[0])
         self.assertEqual('COG0001', df.gene[0])
@@ -28,6 +28,7 @@ class TestFileManager(unittest.TestCase):
         self.assertAlmostEqual(0.051685, df.marginal_like[0], 6)
         self.assertAlmostEqual(1.961135, df.pendant_length[0], 6)
         self.assertAlmostEqual(0.002871, df.post_prob[0], 6)
+        self.assertEqual('.1-.8', df['sample'][0])  # sample is also a function, so have to use [''] notation
 
     def test_classification_data_type_issue(self):
         df = file_manager._build_data_frame_from_jplace_files(TestFileManager.data_dir)

@@ -17,8 +17,10 @@ from Bio.Seq import Seq
 
 log = logging.getLogger(__name__)
 
+
 class InvalidReferencePackage(Exception):
     pass
+
 
 # Prefer taxtastic refpkg
 try:
@@ -31,6 +33,7 @@ except ImportError:
         All of this (and much more) is in taxtastic.refpkg, but this loses a
         dependency.
         """
+
         def __init__(self, path, create=False):
             if not os.path.isdir(path):
                 raise InvalidReferencePackage("{0} is not a directory.".format(path))
@@ -38,7 +41,7 @@ except ImportError:
             self.contents_path = self._join('CONTENTS.json')
             if not os.path.exists(self.contents_path):
                 raise InvalidReferencePackage(
-                        "CONTENTS.json not found. Is this a reference package?")
+                    "CONTENTS.json not found. Is this a reference package?")
 
             with open(self.contents_path) as fp:
                 self.contents = json.load(fp)
@@ -70,12 +73,12 @@ class ReferencePackage(Refpkg):
             elif header.startswith('HMMER3'):
                 return 'HMMER3'
             else:
-                raise ValueError(
-                        "Couldn't determine alignment method from '{0}'".format(header))
+                raise ValueError("Couldn't determine alignment method from '{0}'".format(header))
 
     @property
     def has_mask(self):
         return 'mask' in self.contents['files']
+
 
 @contextlib.contextmanager
 def _temp_file(**kwargs):
@@ -101,8 +104,7 @@ def _parse_stockholm_consensus(sto_handle):
 
     def is_consensus(c):
         if c not in 'x.':
-            raise ValueError("Unexpected character in mask: {0}".format(c) +
-                    " Only 'x' and '.' are permitted")
+            raise ValueError("Unexpected character in mask: {0}".format(c) + " Only 'x' and '.' are permitted")
         return c == 'x'
 
     lines = (line.rstrip() for line in sto_handle)
@@ -182,13 +184,13 @@ class AlignmentMask(object):
         new_mask = [i and j for i, j in zip(self.mask, other.mask)]
         return AlignmentMask(new_mask)
 
+
 def generate_mask(refpkg, stockholm_alignment):
     """
     Generate an AlignmentMask from a reference package and stockholm alignment
     """
     with refpkg.open_resource('mask') as fp:
-        unmasked_positions = set(int(i.strip())
-                                     for i in fp.read().split(','))
+        unmasked_positions = set(int(i.strip()) for i in fp.read().split(','))
 
     # Get length of alignment
     with open(stockholm_alignment) as fp:
@@ -199,8 +201,7 @@ def generate_mask(refpkg, stockholm_alignment):
         consensus_columns = _parse_stockholm_consensus(fp)
 
     if not align_length == len(consensus_columns.mask):
-        raise ValueError("Consensus Columns and Alignment have "
-                "differing lengths")
+        raise ValueError("Consensus Columns and Alignment have differing lengths")
 
     counter = itertools.count().next
     consensus_column_indexes = (counter() if i else None
@@ -209,22 +210,24 @@ def generate_mask(refpkg, stockholm_alignment):
                                     in consensus_column_indexes])
     return consensus_mask
 
+
 def mask_sequences(refpkg, source, target):
     """
     Apply mask from reference package to the source file, writing to target file.
     """
     mask = generate_mask(refpkg, source)
     masked_sequences = mask.mask_records(
-            SeqIO.parse(source, 'stockholm'))
+        SeqIO.parse(source, 'stockholm'))
     SeqIO.write(masked_sequences, target, 'stockholm')
 
+
 def hmmer_align(refpkg, sequence_file, output_path, use_mask=True,
-        use_mpi=False, mpi_args=None, mpi_program=None, program_path='hmmalign',
-        alignment_options=None, stdout=None):
+                use_mpi=False, mpi_args=None, mpi_program=None, program_path='hmmalign',
+                alignment_options=None, stdout=None):
     d = os.path.dirname(output_path)
     with tempfile.NamedTemporaryFile(dir=d, prefix='.hmmer_aln') as tf:
         cmd = [program_path, '-o', tf.name,
-                '--mapali', refpkg.resource_path('aln_sto')]
+               '--mapali', refpkg.resource_path('aln_sto')]
         cmd.extend(alignment_options or [])
         cmd.extend((refpkg.resource_path('profile'), sequence_file))
         log.info(' '.join(cmd))
@@ -237,9 +240,10 @@ def hmmer_align(refpkg, sequence_file, output_path, use_mask=True,
             tf.close()
             os.rename(tf.name, output_path)
 
+
 def infernal_align(refpkg, sequence_file, output_path, use_mask=True,
-        use_mpi=False, mpi_args=None, mpi_program='mpirun',
-        program_path='cmalign', alignment_options=None, stdout=None):
+                   use_mpi=False, mpi_args=None, mpi_program='mpirun',
+                   program_path='cmalign', alignment_options=None, stdout=None):
     d = os.path.dirname(output_path)
     base_command = ['cmalign']
     if use_mpi:
@@ -247,7 +251,7 @@ def infernal_align(refpkg, sequence_file, output_path, use_mask=True,
                        ['--mpi']
 
     with tempfile.NamedTemporaryFile(prefix='.infernal_aln', dir=d) as tf, \
-         tempfile.NamedTemporaryFile(prefix='.infernal_merged', dir=d) as merged:
+            tempfile.NamedTemporaryFile(prefix='.infernal_merged', dir=d) as merged:
         cmd = base_command[:]
         cmd.extend(alignment_options or [])
         cmd.extend(['-o', tf.name, refpkg.resource_path('profile'),
@@ -276,9 +280,10 @@ def infernal_align(refpkg, sequence_file, output_path, use_mask=True,
             merged.close()
             os.rename(merged.name, output_path)
 
+
 def pynast_align(refpkg, sequence_file, output_path, use_mask=True,
-        use_mpi=False, mpi_args=None, mpi_program='mpirun',
-        program_path='pynast', alignment_options=None, stdout=None):
+                 use_mpi=False, mpi_args=None, mpi_program='mpirun',
+                 program_path='pynast', alignment_options=None, stdout=None):
     if use_mask and refpkg.has_mask:
         raise NotImplementedError("Cannot mask with PyNAST")
 
@@ -290,6 +295,7 @@ def pynast_align(refpkg, sequence_file, output_path, use_mask=True,
 
     log.info(' '.join(cmd))
     subprocess.check_call(cmd, stdout=stdout)
+
 
 ALIGNERS = {
     'HMMER3': hmmer_align,
@@ -307,6 +313,7 @@ ALIGNMENT_DEFAULTS = {
 # Default output format
 DEFAULT_FORMAT = {'HMMER3': 'stockholm', 'INFERNAL': 'stockholm', 'PyNAST': 'fasta'}
 
+
 def align(arguments):
     """
     Align sequences to a reference package alignment.
@@ -320,20 +327,21 @@ def align(arguments):
     with _temp_file(prefix='.refpkg_align', dir=dn) as tf:
         tf.close()
         r = alignment_func(refpkg, arguments.seqfile, tf.name,
-            use_mask=arguments.use_mask, use_mpi=arguments.use_mpi,
-            mpi_args=arguments.mpi_arguments, mpi_program=arguments.mpi_run,
-            alignment_options=alignment_options, stdout=arguments.stdout)
+                           use_mask=arguments.use_mask, use_mpi=arguments.use_mpi,
+                           mpi_args=arguments.mpi_arguments, mpi_program=arguments.mpi_run,
+                           alignment_options=alignment_options, stdout=arguments.stdout)
 
         if (not arguments.output_format or
-                arguments.output_format == DEFAULT_FORMAT[prof]):
+                    arguments.output_format == DEFAULT_FORMAT[prof]):
             # No format converseion needed
             os.rename(tf.name, arguments.outfile)
         else:
             # Convert
             SeqIO.convert(tf.name, DEFAULT_FORMAT[prof], arguments.outfile,
-                    arguments.output_format)
+                          arguments.output_format)
 
     return r
+
 
 def extract(arguments):
     """
@@ -345,8 +353,7 @@ def extract(arguments):
     if not arguments.use_mask:
         with refpkg.open_resource('aln_sto') as input_fp:
             with arguments.output_file as output_fp:
-                result = SeqIO.convert(input_fp, 'stockholm', output_fp,
-                        arguments.output_format)
+                result = SeqIO.convert(input_fp, 'stockholm', output_fp, arguments.output_format)
         logging.info("Wrote %d sequences", result)
         return
 
@@ -361,8 +368,7 @@ def extract(arguments):
         try:
             with refpkg.open_resource('mask') as fp:
                 mask = AlignmentMask.from_csv_file(fp, alignment_length)
-            logging.info("Applying mask - keeping %d/%d positions",
-                    mask.unmasked_count, len(mask))
+            logging.info("Applying mask - keeping %d/%d positions", mask.unmasked_count, len(mask))
             sequences = mask.mask_records(sequences)
         except KeyError:
             log.warn("No mask found. Extracting all columns.")
@@ -377,11 +383,10 @@ def main(argv=sys.argv[1:]):
     Parse command-line arguments.
     """
     logging.basicConfig(level=logging.INFO,
-            format="%(levelname)s: %(message)s")
+                        format="%(levelname)s: %(message)s")
 
-    align_defaults = ' '.join('({0}: "{1}")'.format(profile, ' '.join(options)) for
-            profile, options in
-            ALIGNMENT_DEFAULTS.items())
+    align_defaults = ' '.join('({0}: "{1}")'.format(profile, ' '.join(options))
+                              for profile, options in ALIGNMENT_DEFAULTS.items())
 
     parser = argparse.ArgumentParser(description="""Wrapper
             script for Infernal and HMMER alignment binaries.""")
@@ -393,21 +398,19 @@ def main(argv=sys.argv[1:]):
     parser_help.add_argument('action', nargs=1)
 
     # align
-    parser_align = subparsers.add_parser('align',
-            help=align.__doc__)
+    parser_align = subparsers.add_parser('align', help=align.__doc__)
     parser_align.set_defaults(func=align)
     parser_align.add_argument('--align-opts', dest='alignment_options',
-            metavar='OPTS', help="""Alignment options, such as "--mapali
+                              metavar='OPTS', help="""Alignment options, such as "--mapali
             $aln_sto".  '$' characters will need to be escaped if using
             template variables.  Available template variables are $aln_sto,
             $profile.  Defaults are as follows for the different profiles:
             """ + align_defaults, type=shlex.split)
     parser_align.add_argument('--alignment-method', dest='profile_version',
-            choices=ALIGNERS.keys(), help="""Profile version to use.  [default:
+                              choices=ALIGNERS.keys(), help="""Profile version to use.  [default:
             Guess. PyNAST is used if a valid CM or HMM is not found in the
             reference package.]""")
-    parser_align.add_argument('--no-mask', default=True, dest="use_mask",
-            action='store_false', help="""Do not
+    parser_align.add_argument('--no-mask', default=True, dest="use_mask", action='store_false', help="""Do not
             trim the alignment to unmasked columns. [default:
             apply mask if it exists]""")
     parser_align.add_argument('refpkg', type=ReferencePackage, help="""Reference package
@@ -417,35 +420,31 @@ def main(argv=sys.argv[1:]):
     parser_align.add_argument('outfile', help="""Output file""")
     parser_align.add_argument('--stdout', help="""Write alignment program
             stdout to FILE [default: /dev/null]""", default=open(os.devnull),
-            metavar='FILE', type=argparse.FileType('w'))
-    parser_align.add_argument('--debug', action='store_true',
-            help='Enable debug output', default=False)
-    parser_align.add_argument('--verbose', action='store_true',
-            help='Enable verbose output')
+                              metavar='FILE', type=argparse.FileType('w'))
+    parser_align.add_argument('--debug', action='store_true', help='Enable debug output', default=False)
+    parser_align.add_argument('--verbose', action='store_true', help='Enable verbose output')
     parser_align.add_argument('--output-format', help="""Write output in FORMAT
             [default: stockholm for HMMER, INFERNAL; fasta for PyNAST]""",
-            choices=('fasta', 'stockholm'))
+                              choices=('fasta', 'stockholm'))
     mpi_args = parser_align.add_argument_group(description="MPI Options [INFERNAL only]")
     mpi_args.add_argument('--use-mpi', action='store_true', default=False,
-            help="""Use MPI [default: %(default)s]""")
+                          help="""Use MPI [default: %(default)s]""")
     mpi_args.add_argument('--mpi-arguments', type=shlex.split,
-            help="""Arguments to pass to mpirun [default: %(default)s]""")
+                          help="""Arguments to pass to mpirun [default: %(default)s]""")
     mpi_args.add_argument('--mpi-run', default='mpirun',
-            help="""Name of mpirun executable [default: %(default)s]""")
+                          help="""Name of mpirun executable [default: %(default)s]""")
 
     # extract
     parser_extract = subparsers.add_parser('extract',
-            help=extract.__doc__)
+                                           help=extract.__doc__)
     parser_extract.set_defaults(func=extract)
     parser_extract.add_argument("--output-format",
-            default="stockholm", help="output format [default: %(default)s]")
+                                default="stockholm", help="output format [default: %(default)s]")
     parser_extract.add_argument("--no-mask", dest='use_mask', default=True,
-            action="store_false", help="""Do not apply mask to alignment
+                                action="store_false", help="""Do not apply mask to alignment
             [default: apply mask if it exists]""")
-    parser_extract.add_argument('refpkg', type=ReferencePackage,
-            help='Reference package directory')
-    parser_extract.add_argument('output_file', type=argparse.FileType('w'),
-            help="""Destination""")
+    parser_extract.add_argument('refpkg', type=ReferencePackage, help='Reference package directory')
+    parser_extract.add_argument('output_file', type=argparse.FileType('w'), help="""Destination""")
 
     arguments = parser.parse_args()
 
@@ -456,6 +455,7 @@ def main(argv=sys.argv[1:]):
         main([str(arguments.action[0]), '-h'])
 
     arguments.func(arguments)
+
 
 if __name__ == "__main__":
     main()

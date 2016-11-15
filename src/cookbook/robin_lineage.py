@@ -6,9 +6,9 @@
 import argparse
 import os
 
+from cookbook.mbari.transform_mbari_data import create_mbari_lineage_files
 from klab.process.derived_info import group_and_count, FUZZY, CONFIDENT
 from klab.process.file_manager import write_df_to_file, create_placements
-from cookbook.mbari.transform_mbari_data import create_mbari_lineage_files
 from klab.process.lineage import create_lineage
 
 

@@ -2,7 +2,7 @@
 
 To run a shotgun-metagenome through the analysis (not amplicon):  
 
-MAKE NEST  
+### MAKE NEST
 1. Be sure you have run the file through a prep script built for this analysis [see ../prep_seq/README.md]  
 2. Copy make_nest_HTC.sh.temp and make_nest_HTC.sub.temp to your project dir  
 3. Remove the .temp extension from their names  
@@ -14,18 +14,18 @@ MAKE NEST
 8. Check that your script has made it to the cluster by using "condor_q -submitter your_username"  
 9. Wait for it to complete......................  
 
-DO NESTRUN  
+### DO NESTRUN
 1. Copy "pancakes.py" to your project dir  
 2. Check that the pathways to "search.sh" and "search_place.sub" templates are correct  
 3. Run "python pancakes.py"  
 4. This should throw all the ./analysis dirs onto the cluster, check to confirm  
 5. Wait for them to complete....................  
 
-GRAB JPLACE  
+### GRAB JPLACE
 1. Copy "extractalator.py" to your project dir  
 2. Run "python extractalator.py"  
 3. This will create a new dir called "place_files" in your project dir  
 4. It will then populate the new dir with all the jplace files under './analysis'  
 
-DAP  
+### DAP
 buffering....  

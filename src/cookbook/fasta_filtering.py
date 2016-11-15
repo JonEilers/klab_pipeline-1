@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
+import os
 import re
 import string
 import sys
-import os
 
 from Bio import SeqIO
 
@@ -42,7 +42,7 @@ def _filter_fasta_file(node_dict, name_dict, input_file, output_file, include, e
     output_handle = open(output_file, 'w')
     SeqIO.write(matching_sequences, output_handle, "fasta")
     output_handle.close()
-    print "Wrote %i matching sequences to %s" % (len(matching_sequences), output_file)
+    print('Wrote %i matching sequences to %s' % (len(matching_sequences), output_file))
 
 
 def _split_fasta_file(input_file, output_dir, include_set, exclude_set):

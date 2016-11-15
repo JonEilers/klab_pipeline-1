@@ -1,16 +1,16 @@
-from os import walk, path
 import gzip
 import subprocess
 import sys
+from os import walk, path
 
 
 def find_fastq(file_path):
     # walk the path and find the fastq files
     fastq_list = []
     for root, dirs, files in walk(file_path):
-        for file in files:
-            if 'fastq' in file:
-                file_path = path.join(root, file)
+        for f in files:
+            if 'fastq' in f:
+                file_path = path.join(root, f)
                 fastq_list.append(file_path)
     return fastq_list
 
@@ -24,7 +24,7 @@ def ungzip(fastq, save_path):
     out.write(unzip.read())
     unzip.close()
     out.close()
-    print new_file, 'saved...'
+    print(new_file, 'saved...')
     return new_file
 
 
@@ -36,7 +36,7 @@ def run_fastx_trimmer(fastq, save_path):
     front.wait()
     if front.returncode != 0:
         sys.exit()
-    print trim_front, 'front trimmed...'
+    print(trim_front, 'front trimmed...')
     # Trim end
     trim_end = path.join(save_path, '.'.join([fastq.rsplit('/', 1)[1].rsplit('.', 1)[0], 'fastx']))
     end = subprocess.Popen(
@@ -45,7 +45,7 @@ def run_fastx_trimmer(fastq, save_path):
     end.wait()
     if end.returncode != 0:
         sys.exit()
-    print trim_end, 'end trimmed...'
+    print(trim_end, 'end trimmed...')
     return trim_end
 
 
@@ -56,7 +56,7 @@ def run_fastq_trimmer(fastq, save_path):
     trim.wait()
     if trim.returncode != 0:
         sys.exit()
-    print fastq_trim, 'run...'
+    print(fastq_trim, 'run...')
     return fastq_trim
 
 
@@ -67,18 +67,19 @@ def run_fastq_filter(fastq, save_path):
     filter.wait()
     if filter.returncode != 0:
         sys.exit()
-    print fastq_filter, 'run...'
+    print(fastq_filter, 'run...')
     return fastq_filter
 
 
 def run_derep(fastq, save_path):
     fasta_derep = path.join(save_path, '.'.join([fastq.rsplit('/', 1)[1], 'derep', 'fasta']))
     derep = subprocess.Popen(
-        ' '.join(['vsearch', '--derep_fulllength', fastq, '--sizeout', '--minuniquesize 2', '--output', fasta_derep]), shell=True)
+        ' '.join(['vsearch', '--derep_fulllength', fastq, '--sizeout', '--minuniquesize 2', '--output', fasta_derep]),
+        shell=True)
     derep.wait()
     if derep.returncode != 0:
         sys.exit()
-    print fasta_derep, 'run...'
+    print(fasta_derep, 'run...')
     return fasta_derep
 
 
@@ -89,9 +90,9 @@ def run_swarm(fasta, save_path):
     derep.wait()
     if derep.returncode != 0:
         sys.exit()
-    print fasta_swarm, 'run...'
+    print(fasta_swarm, 'run...')
     return fasta_swarm
-    
+
 
 fastq_path = sys.argv[1]
 fastq_list = find_fastq(fastq_path)
@@ -102,13 +103,13 @@ fastx_save_path = path.join(save_path, 'fastx')
 trimmer_save_path = path.join(save_path, 'fastq_trimmer')
 filter_save_path = path.join(save_path, 'fastq_filter')
 derep_save_path = path.join(save_path, 'derep')
-#swarm_save_path = path.join(save_path, 'swarm')
+# swarm_save_path = path.join(save_path, 'swarm')
 
 for fastq in fastq_list:
     # Deal with repeated names in sub-projects
-    #if 'eDNA_not-normalized_recirc' in fastq:
+    # if 'eDNA_not-normalized_recirc' in fastq:
     #    norm = 'not_norm'
-    #else:
+    # else:
     #    norm = 'norm'
     # They are gzipped
     if '.gz' in fastq:
@@ -118,4 +119,4 @@ for fastq in fastq_list:
     fastq_trim = run_fastq_trimmer(fastx_trim, trimmer_save_path)
     fastq_filter = run_fastq_filter(fastq_trim, filter_save_path)
     fastq_derep = run_derep(fastq_filter, derep_save_path)
-    #fasta_swarm = run_swarm(fastq_derep, swarm_save_path)
+    # fasta_swarm = run_swarm(fastq_derep, swarm_save_path)

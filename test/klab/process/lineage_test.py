@@ -1,21 +1,21 @@
 import unittest
+
 import pandas as pd
 
-from klab.process.file_manager import CLASSIFICATION_COLUMN
 import klab.process.lineage as lineage
-
+from klab.process.file_manager import CLASSIFICATION_COLUMN
 
 nodes_dict = {
-    1: 1,  # root
-    131567: 1,  # cellular organisms
-    2: 131567,  # bacteria
-    6: 2,  # rest of these are bogus nodes
-    7: 6,
-    9: 7,
-    17: 16,
-    18: 2,
-    19: 18,
-    56: 9,
+    1: (1, lineage.NO_RANK),  # root
+    131567: (1, lineage.NO_RANK),  # cellular organisms
+    2: (131567, 'superkingdom'),  # bacteria
+    6: (2, 'genus'),  # rest of these are bogus nodes
+    7: (6, 'species'),
+    9: (7, lineage.NO_RANK),
+    17: (16, lineage.NO_RANK),
+    18: (2, lineage.NO_RANK),
+    19: (18, lineage.NO_RANK),
+    56: (9, 'variety'),
 }
 
 name_dict = {
@@ -62,11 +62,13 @@ class TestLineage(unittest.TestCase):
         self.assertEqual(lineage.MISSING_ID_LIST, lineage._get_specific_taxonomy_levels(None))
 
     def test_get_lineage(self):
-        self.assertEqual([666], lineage.get_lineage(nodes_dict, 666))  # not in dictionary
-        self.assertEqual([1], lineage.get_lineage(nodes_dict, 1))  # root
-        self.assertEqual([131567], lineage.get_lineage(nodes_dict, 131567))  # cellular organisms
-        self.assertEqual([2], lineage.get_lineage(nodes_dict, 2))  # if not 131567 or 1, strip them off
-        self.assertEqual([2, 6, 7, 9, 56], lineage.get_lineage(nodes_dict, 56))
+        self.assertEqual(([666], [lineage.NO_RANK]), lineage.get_lineage(nodes_dict, 666))  # not in dictionary
+        self.assertEqual(([1], [lineage.NO_RANK]), lineage.get_lineage(nodes_dict, 1))  # root
+        self.assertEqual(([131567], [lineage.NO_RANK]), lineage.get_lineage(nodes_dict, 131567))  # cellular organisms
+        self.assertEqual(([2], ['superkingdom']),
+                         lineage.get_lineage(nodes_dict, 2))  # if not 131567 or 1, strip them off
+        self.assertEqual(([2, 6, 7, 9, 56], ['superkingdom', 'genus', 'species', 'no rank', 'variety']),
+                         lineage.get_lineage(nodes_dict, 56))
 
     def test_build_lineage_matrix_full(self):
         placements = pd.DataFrame([2, 6, 2, 6, 6, 56], columns=[CLASSIFICATION_COLUMN])

@@ -18,21 +18,43 @@ MISSING_ID_LIST = [MISSING_ID] * 4
 NO_MATCH = 'NO MATCH'
 NO_NAME = 'MISSING NAME'
 DELETED_NAME = 'DELETED NODE'
+NO_RANK = 'no rank'
 
 
-def _build_dict_from_file(node_file):
+def _build_merged_dict(merged_file):
+    d = {}
+    f = open(merged_file, 'r')
+    try:
+        for row in f:
+            columns = row.split('\t')
+            key = int(columns[0])
+            d[key] = int(columns[1].rstrip())
+    finally:
+        f.close()
+    return d
+
+
+def _build_names_dict(names_file):
+    d = {}
+    f = open(names_file, 'r')
+    try:
+        for row in f:
+            columns = row.split('\t')
+            key = int(columns[0])
+            d[key] = columns[1].rstrip()
+    finally:
+        f.close()
+    return d
+
+
+def _build_node_dict(node_file):
     d = {}
     f = open(node_file, 'r')
     try:
         for row in f:
             columns = row.split('\t')
             key = int(columns[0])
-            v = columns[1].rstrip()
-            try:
-                value = int(v)  # might be an int, might be a string
-            except ValueError:
-                value = v
-            d[key] = value
+            d[key] = (int(columns[1].rstrip()), columns[2].rstrip())
     finally:
         f.close()
     return d
@@ -43,8 +65,8 @@ def _build_deleted_list(delnode_file):
     f = open(delnode_file, 'r')
     try:
         for row in f:
-            id = int(row.rstrip())
-            l.append(id)
+            taxa = int(row.rstrip())
+            l.append(taxa)
     finally:
         f.close()
     return l
@@ -61,19 +83,25 @@ def _get_specific_taxonomy_levels(taxonomy_list):
 
 
 def get_lineage(node_dict, leaf):
-    parent_id = node_dict.get(leaf)
     lineage = [leaf]
+    if leaf not in node_dict:
+        return lineage, [NO_RANK]
+
+    parent_id, r = node_dict.get(leaf)
+    rank = [r]
     while parent_id and parent_id != CELLULAR_ORGANISMS_ID and parent_id != ROOT_ID:
         lineage.append(parent_id)
-        parent_id = node_dict.get(parent_id)
-    return lineage[::-1]  # reverse the order so it starts with highest node
+        parent_id, r = node_dict.get(parent_id)
+        rank.append(r)
+    return lineage[::-1], rank[::-1]  # reverse the order so they start with highest node
 
 
+# TODO ech 2016-11-16 - list of ranks as parameter
 def build_lineage_matrix(node_dict, placements, full_taxa=False):
     leaf_list = placements[CLASSIFICATION_COLUMN].unique()  # only build lineage for this set of placements
     lineage_matrix = []
     for leaf in leaf_list:
-        lineage = get_lineage(node_dict, leaf)
+        lineage, rank = get_lineage(node_dict, leaf)
         depth = len(lineage)
         if full_taxa:
             lineage_matrix.append(lineage)
@@ -83,10 +111,9 @@ def build_lineage_matrix(node_dict, placements, full_taxa=False):
     return lineage_matrix
 
 
+# TODO ech 2016-11-16 - list of ranks as parameter
 def _build_lineage_frame(node_dict, placements):
-    lineage_matrix = build_lineage_matrix(node_dict, placements, True)
-    df1 = pd.DataFrame(data=lineage_matrix)
-    write_df_to_file(df1, '/Users/ehervol/Desktop/lineage.tsv')
+    lineage_matrix = build_lineage_matrix(node_dict, placements, False)
     df = pd.DataFrame(data=lineage_matrix,
                       columns=['taxa_depth', 'domain_id', 'division_id', 'class_id', CLASSIFICATION_COLUMN])
     return df
@@ -109,10 +136,10 @@ def create_taxonomy_data_structures():
     return_code = subprocess.call(os.path.join(ncbi_dir, 'get_ncbi_data.sh'), shell=True)
     if return_code != 0:
         raise Exception('Problem getting NCBI data.')
-    node_dict = _build_dict_from_file(os.path.join(ncbi_dir, 'nodes.tsv'))
-    name_dict = _build_dict_from_file(os.path.join(ncbi_dir, 'names.tsv'))
+    node_dict = _build_node_dict(os.path.join(ncbi_dir, 'nodes.tsv'))
+    name_dict = _build_names_dict(os.path.join(ncbi_dir, 'names.tsv'))
     name_dict[MISSING_ID] = NO_MATCH  # better to add here than make a special case in code
-    merged_dict = _build_dict_from_file(os.path.join(ncbi_dir, 'merged.tsv'))
+    merged_dict = _build_merged_dict(os.path.join(ncbi_dir, 'merged.tsv'))
     deleted_list = _build_deleted_list(os.path.join(ncbi_dir, 'delnodes.tsv'))
     return node_dict, name_dict, merged_dict, deleted_list
 
@@ -127,6 +154,7 @@ def create_lineage(placements, out_file=None):
     node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures()
     placements = _update_classification_ids(placements, merged_dict)
     lineage_frame = _build_lineage_frame(node_dict=node_dict, placements=placements)
+    # write_df_to_file(lineage_frame, '~/Desktop/lineage.tsv')
     add_name_column(lineage_frame, 'domain_id', 'domain_name', name_dict, deleted_list)
     add_name_column(lineage_frame, 'division_id', 'division_name', name_dict, deleted_list)
     add_name_column(lineage_frame, 'class_id', 'class_name', name_dict, deleted_list)

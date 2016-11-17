@@ -1,24 +1,24 @@
 import unittest
+
 import pandas as pd
 
 from klab.analysis.diversity import _build_lineage_dict, _calculate_similarity, _build_similarity_matrix, \
     build_similarity_frame, CLASSIFICATION_NAME_COLUMN
+from klab.process import lineage
 from klab.process.file_manager import CLASSIFICATION_COLUMN
 
-
 node_dict = {
-    1: 1,  # root
-    131567: 1,  # cellular organisms
-    2: 131567,  # bacteria
-    2759: 131567,  # eukaryota
-    6: 2,  # rest of these are bogus nodes
-    7: 6,
-    9: 7,
-    16: 131567,
-    17: 16,
-    18: 2,
-    19: 18,
-    56: 9,
+    1: (1, lineage.NO_RANK),  # root
+    131567: (1, lineage.NO_RANK),  # cellular organisms
+    2: (131567, 'superkingdom'),  # bacteria
+    2759: (131567, 'superkingdom'),  # eukaryota
+    6: (2, 'genus'),  # rest of these are bogus nodes
+    7: (6, 'species'),
+    9: (7, lineage.NO_RANK),
+    17: (131567, lineage.NO_RANK),
+    18: (2, lineage.NO_RANK),
+    19: (18, lineage.NO_RANK),
+    56: (9, 'variety'),
 }
 
 
@@ -77,7 +77,7 @@ class TestDiversity(unittest.TestCase):
         self.assertEqual([2], ld.get(2))
         self.assertEqual([2, 6], ld.get(6))
         self.assertEqual([2, 6, 7, 9], ld.get(9))
-        self.assertEqual([16, 17], ld.get(17))
+        self.assertEqual([17], ld.get(17))
 
     def test_build_similarity_frame(self):
         dat = [[2, 'two', 4], [6, 'six', 5], [9, 'nine', 2], [17, 'seventeen', 25]]
@@ -106,4 +106,3 @@ class TestDiversity(unittest.TestCase):
         self.assertEqual(0, sim.six[3])
         self.assertEqual(0, sim.nine[3])
         self.assertEqual(1, sim.seventeen[3])
-

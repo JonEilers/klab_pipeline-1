@@ -35,8 +35,8 @@ grep $GOOD_ROW_MARKER names.dmp > temp.dmp
 cat temp.dmp | cut -f1,3 > names.tsv # second column is '|' from dmp field terminator
 
 # nodes file
-# keep the tax_id and parent columns
-cat nodes.dmp | cut -f1,3 > nodes.tsv
+# keep the tax_id, parent and rank columns
+cat nodes.dmp | cut -f1,3,5 > nodes.tsv
 
 # merged nodes file
 # keep the old and new columns

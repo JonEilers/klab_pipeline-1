@@ -14,7 +14,7 @@ CELLULAR_ORGANISMS_ID = 131567
 VIRUS_ID = 10239
 
 MISSING_ID = -1
-MISSING_ID_LIST = [MISSING_ID] * 4
+MISSING_ID_LIST = [MISSING_ID] * 20
 NO_MATCH = 'NO MATCH'
 NO_NAME = 'MISSING NAME'
 DELETED_NAME = 'DELETED NODE'
@@ -72,9 +72,19 @@ def _build_deleted_list(delnode_file):
     return l
 
 
+def _get_specific_taxonomy_levels2(taxonomy_list, lineage, rank):
+    if not taxonomy_list:
+        return MISSING_ID_LIST[:len(lineage)]
+
+    most_specific_id = taxonomy_list[-1:]  # create a list with last element
+    padded_list = list(taxonomy_list) + MISSING_ID_LIST  # copy taxa list and pad with missing ids
+    domain_division_class_ids = padded_list[:3]  # get first three in list (may include missing ids)
+    return domain_division_class_ids + most_specific_id
+
+
 def _get_specific_taxonomy_levels(taxonomy_list):
     if not taxonomy_list:
-        return MISSING_ID_LIST
+        return MISSING_ID_LIST[:4]
 
     most_specific_id = taxonomy_list[-1:]  # create a list with last element
     padded_list = list(taxonomy_list) + MISSING_ID_LIST  # copy taxa list and pad with missing ids

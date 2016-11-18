@@ -10,7 +10,7 @@ from future.utils import bytes_to_native_str
 
 try:
     import simplejson as json
-except ImportError:
+except ImportError:  # pragma nocover
     import json  # simplejson has better feedback on parsing failures
 
 CLASSIFICATION_COLUMN = 'classification'
@@ -50,9 +50,9 @@ def read_df_from_file(file_name, low_memory=True):
         return pd.read_table(file_name, low_memory=low_memory)
     elif ext == '.csv':
         return pd.read_csv(file_name, low_memory=low_memory)
-    elif ext in ('.h5', '.hdf5'):
-        # need PyTables et al for hdf5 storage
-        return pd.read_hdf(file_name, 'table')
+    # need PyTables et al for hdf5 storage and we haven't needed the access efficiency (yet)
+    # elif ext in ('.h5', '.hdf5'):
+    #     return pd.read_hdf(file_name, 'table')
     else:
         raise Exception('unknown file format')
 
@@ -149,7 +149,7 @@ def create_placements(dir, out_file=None):
     return pruned_data
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma nocover
     parser = argparse.ArgumentParser()
     parser.add_argument('-directory', help='directory with .jplace files', required=True)
     parser.add_argument('-out_file', help='output file', required=True)

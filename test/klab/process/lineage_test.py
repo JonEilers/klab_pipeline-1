@@ -33,39 +33,44 @@ merged_dict = {
 del_list = [43]
 
 
-# def test_get_specific_taxonomy_levels2():
-#     t = ['domain', 'class', 'lowest']
-#     l = ['domain', 'division', 'class', 'lowest']
-#     r = ['domain', 'division', 'class', 'lowest']
+def test_get_specific_taxonomy_levels2():
+    t = ['domain', 'class']
+    l = [2, 6, 7, 45]
+    r = ['domain', 'division', 'class', 'species']
+    assert lineage.MISSING_ID_LIST[:3] == lineage._get_specific_taxonomy_levels(t, [], r)
+    assert [2, 7, 45] == lineage._get_specific_taxonomy_levels(t, l, r)
+    assert [6, 45, 45] == lineage._get_specific_taxonomy_levels(['division', 'species'], l, r)
+    assert [lineage.MISSING_ID, 7, lineage.MISSING_ID, 45] == \
+           lineage._get_specific_taxonomy_levels(['superkingdom', 'class', 'phylum'], l, r)
 
 
 def test_full_taxonomy_levels():
     t = ['domain', 'division', 'class', 'other1', 'other2', 'lowest']
-    assert ['domain', 'division', 'class', 'lowest'] == lineage._get_specific_taxonomy_levels(t)
+    assert ['domain', 'division', 'class', 'lowest'] == lineage._get_top_three_and_lowest_levels(t)
 
 
 def test_domain_div_class():
     t = ['domain', 'division', 'class']
-    assert ['domain', 'division', 'class', 'class'] == lineage._get_specific_taxonomy_levels(t)
+    assert ['domain', 'division', 'class', 'class'] == lineage._get_top_three_and_lowest_levels(t)
 
 
 def test_domain_div():
     t = ['domain', 'division']
-    assert ['domain', 'division', lineage.MISSING_ID, 'division'] == lineage._get_specific_taxonomy_levels(t)
+    assert ['domain', 'division', lineage.MISSING_ID, 'division'] == lineage._get_top_three_and_lowest_levels(t)
 
 
 def test_domain():
     t = ['domain']
-    assert ['domain', lineage.MISSING_ID, lineage.MISSING_ID, 'domain'] == lineage._get_specific_taxonomy_levels(t)
+    assert ['domain', lineage.MISSING_ID, lineage.MISSING_ID, 'domain'] == lineage._get_top_three_and_lowest_levels(t)
 
 
 def test_no_taxa():
     t = []
-    assert lineage.MISSING_ID_LIST[:4] == lineage._get_specific_taxonomy_levels(t)
+    assert lineage.MISSING_ID_LIST[:4] == lineage._get_top_three_and_lowest_levels(t)
 
 
 def test_no_nuthin():
-    assert lineage.MISSING_ID_LIST[:4] == lineage._get_specific_taxonomy_levels(None)
+    assert lineage.MISSING_ID_LIST[:4] == lineage._get_top_three_and_lowest_levels(None)
 
 
 def test_get_lineage():
@@ -79,13 +84,19 @@ def test_get_lineage():
 
 def test_build_lineage_matrix_full():
     placements = pd.DataFrame([2, 6, 2, 6, 6, 56], columns=[CLASSIFICATION_COLUMN])
-    assert [[2], [2, 6], [2, 6, 7, 9, 56]] == lineage.build_lineage_matrix(nodes_dict, placements, True)
+    assert [[2], [2, 6], [2, 6, 7, 9, 56]] == lineage.build_lineage_matrix(nodes_dict, placements, full_taxa=True)
 
 
-def test_build_lineage_matrix_partial():
+def test_build_lineage_matrix_first_three():
     placements = pd.DataFrame([2, 6, 2, 6, 6, 56], columns=[CLASSIFICATION_COLUMN])
     assert [[1, 2, -1, -1, 2], [2, 2, 6, -1, 6], [5, 2, 6, 7, 56]] == \
-           lineage.build_lineage_matrix(nodes_dict, placements, False)
+           lineage.build_lineage_matrix(nodes_dict, placements)
+
+
+def test_build_lineage_matrix_specific_taxa():
+    placements = pd.DataFrame([2, 6, 2, 6, 6, 56], columns=[CLASSIFICATION_COLUMN])
+    assert [[1, 2, -1, 2], [2, 2, -1, 6], [5, 2, 7, 56]] == \
+           lineage.build_lineage_matrix(nodes_dict, placements, taxa_list=['superkingdom', 'species'])
 
 
 def test_build_lineage_frame():

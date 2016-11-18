@@ -72,24 +72,32 @@ def _build_deleted_list(delnode_file):
     return l
 
 
-def _get_specific_taxonomy_levels2(taxonomy_list, lineage, rank):
-    if not taxonomy_list:
-        return MISSING_ID_LIST[:len(lineage)]
+# Get a list of specific matches to taxa names ('superkingdom','phylum','class', etc)
+# WARNING: there are a lot of 'no rank' taxa in ncbi lineages - a given level might have spotty coverage
+def _get_specific_taxonomy_levels(taxonomy_list, lineage, rank):
+    if not lineage:
+        return MISSING_ID_LIST[:len(taxonomy_list) + 1]
 
-    most_specific_id = taxonomy_list[-1:]  # create a list with last element
-    padded_list = list(taxonomy_list) + MISSING_ID_LIST  # copy taxa list and pad with missing ids
-    domain_division_class_ids = padded_list[:3]  # get first three in list (may include missing ids)
-    return domain_division_class_ids + most_specific_id
+    res = []
+    for t in taxonomy_list:
+        try:
+            i = rank.index(t)
+            res.append(lineage[i])
+        except ValueError:
+            res.append(MISSING_ID)
+    res.append(lineage[-1])  # append lowest taxa item in every case
+    return res
 
 
-def _get_specific_taxonomy_levels(taxonomy_list):
-    if not taxonomy_list:
+# This is the way we mostly do it - take the first three taxa levels ('domain','division','errr...") and the lowest
+def _get_top_three_and_lowest_levels(lineage):
+    if not lineage:
         return MISSING_ID_LIST[:4]
 
-    most_specific_id = taxonomy_list[-1:]  # create a list with last element
-    padded_list = list(taxonomy_list) + MISSING_ID_LIST  # copy taxa list and pad with missing ids
-    domain_division_class_ids = padded_list[:3]  # get first three in list (may include missing ids)
-    return domain_division_class_ids + most_specific_id
+    most_specific_id = lineage[-1:]  # create a list with last element
+    padded_list = list(lineage) + MISSING_ID_LIST  # copy taxa list and pad with missing ids
+    top_three = padded_list[:3]  # get first three in list (may include missing ids)
+    return top_three + most_specific_id
 
 
 def get_lineage(node_dict, leaf):
@@ -106,8 +114,7 @@ def get_lineage(node_dict, leaf):
     return lineage[::-1], rank[::-1]  # reverse the order so they start with highest node
 
 
-# TODO ech 2016-11-16 - list of ranks as parameter
-def build_lineage_matrix(node_dict, placements, full_taxa=False):
+def build_lineage_matrix(node_dict, placements, taxa_list=(), full_taxa=False):
     leaf_list = placements[CLASSIFICATION_COLUMN].unique()  # only build lineage for this set of placements
     lineage_matrix = []
     for leaf in leaf_list:
@@ -116,16 +123,24 @@ def build_lineage_matrix(node_dict, placements, full_taxa=False):
         if full_taxa:
             lineage_matrix.append(lineage)
         else:
-            upper_taxa = _get_specific_taxonomy_levels(lineage)
-            lineage_matrix.append([depth] + upper_taxa)
+            if taxa_list:
+                taxa = _get_specific_taxonomy_levels(taxa_list, lineage, rank)
+            else:
+                taxa = _get_top_three_and_lowest_levels(lineage)
+            lineage_matrix.append([depth] + taxa)
     return lineage_matrix
 
 
-# TODO ech 2016-11-16 - list of ranks as parameter
-def _build_lineage_frame(node_dict, placements):
-    lineage_matrix = build_lineage_matrix(node_dict, placements, False)
-    df = pd.DataFrame(data=lineage_matrix,
-                      columns=['taxa_depth', 'domain_id', 'division_id', 'class_id', CLASSIFICATION_COLUMN])
+def _build_lineage_frame(node_dict, placements, taxa_list=()):
+    lineage_matrix = build_lineage_matrix(node_dict, placements, taxa_list=taxa_list, full_taxa=False)
+    if taxa_list:
+        col = ['taxa_depth']
+        col.extend(['%s_id' % t for t in taxa_list])
+        col.append(CLASSIFICATION_COLUMN)
+        df = pd.DataFrame(data=lineage_matrix, columns=col)
+    else:
+        df = pd.DataFrame(data=lineage_matrix,
+                          columns=['taxa_depth', 'domain_id', 'division_id', 'class_id', CLASSIFICATION_COLUMN])
     return df
 
 
@@ -160,14 +175,18 @@ def _update_classification_ids(df, merged_dict):
     return df
 
 
-def create_lineage(placements, out_file=None):
+def create_lineage(placements, taxa_list=(), out_file=None):
     node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures()
     placements = _update_classification_ids(placements, merged_dict)
-    lineage_frame = _build_lineage_frame(node_dict=node_dict, placements=placements)
-    # write_df_to_file(lineage_frame, '~/Desktop/lineage.tsv')
-    add_name_column(lineage_frame, 'domain_id', 'domain_name', name_dict, deleted_list)
-    add_name_column(lineage_frame, 'division_id', 'division_name', name_dict, deleted_list)
-    add_name_column(lineage_frame, 'class_id', 'class_name', name_dict, deleted_list)
+    lineage_frame = _build_lineage_frame(node_dict=node_dict, placements=placements, taxa_list=taxa_list)
+    # write_df_to_file(lineage_frame, '~/Desktop/lineage.tsv')  # TODO ech 2016-11-17 - remove this after testing
+    if taxa_list:
+        for t in taxa_list:
+            add_name_column(lineage_frame, '%s_id' % t, '%s_name' % t, name_dict, deleted_list)
+    else:
+        add_name_column(lineage_frame, 'domain_id', 'domain_name', name_dict, deleted_list)
+        add_name_column(lineage_frame, 'division_id', 'division_name', name_dict, deleted_list)
+        add_name_column(lineage_frame, 'class_id', 'class_name', name_dict, deleted_list)
     add_name_column(lineage_frame, CLASSIFICATION_COLUMN, 'lowest_classification_name', name_dict, deleted_list)
 
     df = pd.merge(left=placements, right=lineage_frame, on=CLASSIFICATION_COLUMN, how='left')
@@ -184,7 +203,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     p = read_df_from_file(args.placement_file)
-    create_lineage(placements=p, out_file=args.out_file)
+    create_lineage(placements=p, out_file=args.out_file, taxa_list=['superkingdom', 'phylum', 'class'])
 
     # -p '/placeholder/test/data/test_placements.tsv' -o '/placeholder/test/data/test_placements_with_lineage.tsv'
     # -p '/shared_data/2014_placements.tsv' -o '/shared_data/2014_placements_with_lineage.tsv'

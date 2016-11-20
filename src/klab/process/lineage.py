@@ -197,14 +197,15 @@ def create_lineage(placements, taxa_list=(), out_file=None):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-placement_file', help='sequence placement file', required=True)
-    parser.add_argument('-out_file', help='output file', required=True)
+    parser = argparse.ArgumentParser(description='Add lineage information to a placement file.')
+    parser.add_argument('-placement_file', help='placement file in tsv or csv format', required=True)
+    parser.add_argument('-rankings', help='quote-enclosed comma-separated list of desired ncbi rankings. '
+                                          'Default is first three and lowest taxa.')
+    parser.add_argument('-out_file', help='output file (tsv or csv)', required=True)
     args = parser.parse_args()
 
+    r = []
+    if args.rankings:
+        r = [x.strip() for x in args.rankings.split(',')]
     p = read_df_from_file(args.placement_file)
-    create_lineage(placements=p, out_file=args.out_file, taxa_list=['superkingdom', 'phylum', 'class'])
-
-    # -p '/placeholder/test/data/test_placements.tsv' -o '/placeholder/test/data/test_placements_with_lineage.tsv'
-    # -p '/shared_data/2014_placements.tsv' -o '/shared_data/2014_placements_with_lineage.tsv'
-    # -p '/shared_data/2012_placements.tsv' -o '/shared_data/2012_placements_with_lineage.tsv'
+    create_lineage(placements=p, out_file=args.out_file, taxa_list=r)

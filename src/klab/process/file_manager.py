@@ -63,9 +63,9 @@ def write_df_to_file(df, file_name, write_index=False):
         df.to_csv(file_name, index=write_index, sep=TAB_CHAR)
     elif ext == '.csv':
         df.to_csv(file_name, index=write_index)
-    elif ext in ('.h5', '.hdf5'):
-        # need PyTables et al for hdf5 storage
-        df.to_hdf(file_name, 'table')
+    # elif ext in ('.h5', '.hdf5'):
+    #     # need PyTables et al for hdf5 storage
+    #     df.to_hdf(file_name, 'table')
     else:
         raise Exception('unknown file format')
 
@@ -150,13 +150,9 @@ def create_placements(dir, out_file=None):
 
 
 if __name__ == '__main__':  # pragma nocover
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Create a placement file from a directory of jplace files.')
     parser.add_argument('-directory', help='directory with .jplace files', required=True)
-    parser.add_argument('-out_file', help='output file', required=True)
+    parser.add_argument('-out_file', help='output file (tsv or csv format)', required=True)
     args = parser.parse_args()
 
     create_placements(dir=args.directory, out_file=args.out_file)
-
-    # -d 'data' -o 'data/test_placements.tsv'
-    # -d '/data/2012_MBARI_COGs' -o '/data/2012_placements.tsv'
-    # -d '/data/2014_MBARI_COGs' -o '/data/2014_placements.tsv'

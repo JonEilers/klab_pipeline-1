@@ -3,7 +3,7 @@
 import argparse
 import os
 
-from klab.analysis.diversity import CLASSIFICATION_NAME_COLUMN, NORMALIZE_COLUMN
+from klab.jplace.diversity import CLASSIFICATION_NAME_COLUMN, NORMALIZE_COLUMN
 from klab.process.file_manager import create_placements, write_df_to_file
 from klab.process.lineage import create_lineage
 

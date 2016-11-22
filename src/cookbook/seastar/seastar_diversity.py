@@ -3,7 +3,7 @@ import os
 
 from klab.process.derived_info import CONFIDENT
 from klab.process.file_manager import read_df_from_file
-from klab.analysis.diversity import CLASSIFICATION_NAME_COLUMN, create_n_way_diversity_files
+from klab.jplace.diversity import CLASSIFICATION_NAME_COLUMN, create_n_way_diversity_files
 
 if __name__ == '__main__':
     # get the file with all the data and rename one of the columns

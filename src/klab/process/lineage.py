@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import unicode_literals
+
 import argparse
 import os
 import subprocess
@@ -179,7 +181,6 @@ def create_lineage(placements, taxa_list=(), out_file=None):
     node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures()
     placements = _update_classification_ids(placements, merged_dict)
     lineage_frame = _build_lineage_frame(node_dict=node_dict, placements=placements, taxa_list=taxa_list)
-    # write_df_to_file(lineage_frame, '~/Desktop/lineage.tsv')  # TODO ech 2016-11-17 - remove this after testing
     if taxa_list:
         for t in taxa_list:
             add_name_column(lineage_frame, '%s_id' % t, '%s_name' % t, name_dict, deleted_list)

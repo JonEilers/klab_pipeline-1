@@ -4,7 +4,7 @@ import argparse
 
 from klab.process.derived_info import add_placement_type_column, CONFIDENT
 from klab.process.file_manager import read_df_from_file, CLASSIFICATION_COLUMN
-from klab.analysis.diversity import create_n_way_diversity_files
+from klab.jplace.diversity import create_n_way_diversity_files
 
 
 def create_bb_diversity_files(placement_file, compare, out_directory):

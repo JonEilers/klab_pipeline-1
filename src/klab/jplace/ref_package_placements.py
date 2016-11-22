@@ -34,6 +34,7 @@ def _get_tax_map_info(root):
     return df
 
 
+# TODO ech 2016-11-22 - add specific rankings as parameter
 def get_ref_package_placements(root_directory, out_file=None):
     d2 = _get_tax_map_info(root_directory)
     return create_lineage(placements=d2, out_file=out_file)

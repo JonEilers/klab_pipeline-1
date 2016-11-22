@@ -11,8 +11,8 @@ from cookbook.mbari import MBARI_2012_BASE, MBARI_2012_EDPL_FILE, MBARI_2012_LIN
     MBARI_2014_PACKAGE_DIR, MBARI_12_14_REF_COUNTS_FILE, MBARI_12_14_MERGED_FILE, MBARI_12_16_REF_COUNTS_FILE, \
     MBARI_2016_REF_PKG_FILE, MBARI_2016_PACKAGE_DIR, MBARI_2016_EDPL_FILE, MBARI_2016_BASE, MBARI_2016_LINEAGE_FILE, \
     MBARI_12_16_MERGED_FILE
-from klab.analysis.edpl import get_edpl
-from klab.analysis.ref_package_placements import get_ref_package_placements
+from klab.jplace.edpl import get_edpl
+from klab.jplace.ref_package_placements import get_ref_package_placements
 from klab.process.derived_info import add_placement_type_column, group_and_count
 from klab.process.file_manager import create_placements, write_df_to_file, read_df_from_file, CLASSIFICATION_COLUMN
 from klab.process.lineage import create_lineage

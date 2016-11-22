@@ -1,6 +1,6 @@
 import pandas as pd
 
-from klab.analysis.diversity import _build_lineage_dict, _calculate_similarity, _build_similarity_matrix, \
+from klab.jplace.diversity import _build_lineage_dict, _calculate_similarity, _build_similarity_matrix, \
     build_similarity_frame, CLASSIFICATION_NAME_COLUMN
 from klab.process import lineage
 from klab.process.file_manager import CLASSIFICATION_COLUMN

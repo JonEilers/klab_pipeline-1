@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-from __future__ import division
+from __future__ import division, unicode_literals
 
 import argparse
 import os
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from klab.process.derived_info import group_and_count
 from klab.process.file_manager import write_df_to_file, create_placements, CLASSIFICATION_COLUMN
@@ -110,7 +110,7 @@ def build_similarity_frame(abundance, node_dict=None):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser('Calculate abundance and similarity for Leinster diversity metric.')
     parser.add_argument('-directory', help='directory with .jplace files', required=True)
     parser.add_argument('-out_directory', help='output directory', required=True)
     args = parser.parse_args()

@@ -53,7 +53,7 @@ def get_edpl(root_directory, out_file=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        'Calculates Expected Distance between Placement Locations using pplacer guppy utility.')
+        description='Calculates Expected Distance between Placement Locations using pplacer guppy utility.')
     parser.add_argument('-directory', help='directory with .jplace files', required=True)
     parser.add_argument('-out_file', help='output file', required=True)
     args = parser.parse_args()

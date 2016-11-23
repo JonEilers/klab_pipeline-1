@@ -23,7 +23,7 @@ DELETED_NAME = 'DELETED NODE'
 NO_RANK = 'no rank'
 
 
-def _build_merged_dict(merged_file):
+def _build_merged_dict(merged_file):  # pragma nocover
     d = {}
     f = open(merged_file, 'r')
     try:
@@ -36,7 +36,7 @@ def _build_merged_dict(merged_file):
     return d
 
 
-def _build_names_dict(names_file):
+def _build_names_dict(names_file):  # pragma nocover
     d = {}
     f = open(names_file, 'r')
     try:
@@ -49,7 +49,7 @@ def _build_names_dict(names_file):
     return d
 
 
-def _build_node_dict(node_file):
+def _build_node_dict(node_file):  # pragma nocover
     d = {}
     f = open(node_file, 'r')
     try:
@@ -62,7 +62,7 @@ def _build_node_dict(node_file):
     return d
 
 
-def _build_deleted_list(delnode_file):
+def _build_deleted_list(delnode_file):  # pragma nocover
     l = []
     f = open(delnode_file, 'r')
     try:
@@ -72,6 +72,19 @@ def _build_deleted_list(delnode_file):
     finally:
         f.close()
     return l
+
+
+def create_taxonomy_data_structures():  # pragma nocover
+    ncbi_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../data'))
+    return_code = subprocess.call(os.path.join(ncbi_dir, 'get_ncbi_data.sh'), shell=True)
+    if return_code != 0:
+        raise Exception('Problem getting NCBI data.')
+    node_dict = _build_node_dict(os.path.join(ncbi_dir, 'nodes.tsv'))
+    name_dict = _build_names_dict(os.path.join(ncbi_dir, 'names.tsv'))
+    name_dict[MISSING_ID] = NO_MATCH  # better to add here than make a special case in code
+    merged_dict = _build_merged_dict(os.path.join(ncbi_dir, 'merged.tsv'))
+    deleted_list = _build_deleted_list(os.path.join(ncbi_dir, 'delnodes.tsv'))
+    return node_dict, name_dict, merged_dict, deleted_list
 
 
 # Get a list of specific matches to taxa names ('superkingdom','phylum','class', etc)
@@ -158,27 +171,16 @@ def add_name_column(df, id_column, name_column, name_dict, deleted_list):
     return df
 
 
-def create_taxonomy_data_structures():
-    ncbi_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../data'))
-    return_code = subprocess.call(os.path.join(ncbi_dir, 'get_ncbi_data.sh'), shell=True)
-    if return_code != 0:
-        raise Exception('Problem getting NCBI data.')
-    node_dict = _build_node_dict(os.path.join(ncbi_dir, 'nodes.tsv'))
-    name_dict = _build_names_dict(os.path.join(ncbi_dir, 'names.tsv'))
-    name_dict[MISSING_ID] = NO_MATCH  # better to add here than make a special case in code
-    merged_dict = _build_merged_dict(os.path.join(ncbi_dir, 'merged.tsv'))
-    deleted_list = _build_deleted_list(os.path.join(ncbi_dir, 'delnodes.tsv'))
-    return node_dict, name_dict, merged_dict, deleted_list
-
-
 # update old ids with new ones (if they exist) otherwise keep existing
 def _update_classification_ids(df, merged_dict):
     df[CLASSIFICATION_COLUMN] = df[CLASSIFICATION_COLUMN].apply(lambda x: merged_dict.get(x, x))
     return df
 
 
-def create_lineage(placements, taxa_list=(), out_file=None):
-    node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures()
+def create_lineage(placements, taxa_list=(), out_file=None, node_dict=None, name_dict=None, merged_dict=None,
+                   deleted_list=None):
+    if not node_dict:  # way for tests to inject the information
+        node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures()  # pragma nocover
     placements = _update_classification_ids(placements, merged_dict)
     lineage_frame = _build_lineage_frame(node_dict=node_dict, placements=placements, taxa_list=taxa_list)
     if taxa_list:
@@ -192,12 +194,12 @@ def create_lineage(placements, taxa_list=(), out_file=None):
 
     df = pd.merge(left=placements, right=lineage_frame, on=CLASSIFICATION_COLUMN, how='left')
     add_placement_type_column(df)
-    if out_file:
+    if out_file:  # pragma nocover
         write_df_to_file(df, out_file)
     return df
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma nocover
     parser = argparse.ArgumentParser(description='Add lineage information to a placement file.')
     parser.add_argument('-placement_file', help='placement file in tsv or csv format', required=True)
     parser.add_argument('-rankings', help='quote-enclosed comma-separated list of desired ncbi rankings. '

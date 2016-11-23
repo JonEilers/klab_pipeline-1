@@ -34,7 +34,7 @@ def _get_json_contents(file_name):
     json_data = None
     try:
         json_data = json.load(f)
-    except Exception as e:
+    except Exception as e:  # pragma nocover
         print('json error with file %s - skipping\n%s' % (f.name, e.message))
     finally:
         f.close()
@@ -43,7 +43,7 @@ def _get_json_contents(file_name):
 
 def read_df_from_file(file_name, low_memory=True):
     if not os.path.exists(file_name):
-        raise Exception('File %s not found.' % file_name)
+        raise IOError('File %s not found.' % file_name)
 
     ext = os.path.splitext(file_name)[1].lower()
     if ext == '.tsv':
@@ -54,7 +54,7 @@ def read_df_from_file(file_name, low_memory=True):
     # elif ext in ('.h5', '.hdf5'):
     #     return pd.read_hdf(file_name, 'table')
     else:
-        raise Exception('unknown file format')
+        raise ValueError('unknown file format')
 
 
 def write_df_to_file(df, file_name, write_index=False):
@@ -67,14 +67,14 @@ def write_df_to_file(df, file_name, write_index=False):
     #     # need PyTables et al for hdf5 storage
     #     df.to_hdf(file_name, 'table')
     else:
-        raise Exception('unknown file format')
+        raise ValueError('unknown file format')
 
 
 def _build_data_frame_from_jplace_files(root):
     column_names = ['fragment_id', 'gene', 'sample']
     files = get_files(root)
     if not files:
-        raise Exception('No jplace files were found.')
+        raise IOError('No jplace files were found.')
 
     # TODO ech 2015-01-24 - create gene/tree table (maybe)
     data = []
@@ -144,7 +144,7 @@ def create_placements(dir, out_file=None):
     # deduped_data = _fix_dup_problem_with_hack(pruned_data)
     # coerce CLASSIFICATION_COLUMN to int - will be needed later when matching
     pruned_data[CLASSIFICATION_COLUMN] = pruned_data[CLASSIFICATION_COLUMN].astype(int)
-    if out_file:
+    if out_file:  # pragma nocover
         write_df_to_file(pruned_data, out_file)
     return pruned_data
 

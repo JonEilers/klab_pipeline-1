@@ -1,4 +1,10 @@
+#!/usr/bin/env python
+
+from __future__ import unicode_literals
+
 import os
+
+import pytest
 
 import klab.process.file_manager as file_manager
 
@@ -6,12 +12,34 @@ DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file_
 
 
 def test_read_df_from_file():
+    with pytest.raises(IOError) as ioe:
+        file_manager.read_df_from_file('non-existent-file.tsv')
+    assert 'non-existent-file.tsv not found' in str(ioe.value)
+
+    with pytest.raises(ValueError) as ve:
+        file_manager.read_df_from_file(os.path.join(DATA_DIR, 'sequence.fasta'))
+    assert 'unknown file format' in str(ve.value)
+
     df = file_manager.read_df_from_file(os.path.join(DATA_DIR, 'test_data.tsv'))
     assert 7 == len(df.index)
     assert 9 == len(df.columns)
 
+    df = file_manager.read_df_from_file(os.path.join(DATA_DIR, 'test_data.csv'))
+    assert 7 == len(df.index)
+    assert 9 == len(df.columns)
+
+
+def test_write_df_from_file():
+    with pytest.raises(ValueError) as ve:
+        file_manager.write_df_to_file(None, 'sequence.fasta')
+    assert 'unknown file format' in str(ve.value)
+
 
 def test_build_data_frame_from_jplace_files():
+    with pytest.raises(IOError) as ioe:
+        file_manager._build_data_frame_from_jplace_files('non-existent-dir')
+    assert 'No jplace files were found' in str(ioe.value)
+
     df = file_manager._build_data_frame_from_jplace_files(DATA_DIR)
     delta = 0.000001
 

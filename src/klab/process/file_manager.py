@@ -29,7 +29,7 @@ def get_files(root_directory, extension='.jplace'):
     return filtered_files
 
 
-def _get_json_contents(file_name):
+def get_json_contents(file_name):
     f = open(file_name)
     json_data = None
     try:
@@ -79,7 +79,7 @@ def _build_data_frame_from_jplace_files(root):
     # TODO ech 2015-01-24 - create gene/tree table (maybe)
     data = []
     for path in files:
-        contents = _get_json_contents(path)
+        contents = get_json_contents(path)
         if contents and contents['placements'] != []:  # Ryan add and ... to deal with empty jplace files 03/04/2016
             file_name = os.path.basename(path)
             gene = file_name.split('.')[0]  # name of gene is first part of file name

@@ -8,6 +8,6 @@ source activate bds
 
 # TODO ech 2016-11-22 - write switch code for p3.5
 
-pip install simplejson pytest jupyter seqmagick
+pip install simplejson jupyter seqmagick pytest coverage mock
 
 # hmmer, infernal, mothur, pplacer, phylosift?

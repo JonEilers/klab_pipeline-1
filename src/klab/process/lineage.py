@@ -115,18 +115,31 @@ def _get_top_three_and_lowest_levels(lineage):
     return top_three + most_specific_id
 
 
-def get_lineage(node_dict, leaf):
-    lineage = [leaf]
-    if leaf not in node_dict:
-        return lineage, [NO_RANK]
+memoized_lineage = {}
+memoized_rank = {}
 
+
+def get_lineage(node_dict, leaf):
+    if leaf in memoized_lineage:
+        return memoized_lineage[leaf], memoized_rank[leaf]
+
+    if leaf not in node_dict:
+        memoized_lineage[leaf] = [leaf]
+        memoized_rank[leaf] = [NO_RANK]
+        return memoized_lineage[leaf], memoized_rank[leaf]
+
+    lineage = [leaf]
     parent_id, r = node_dict.get(leaf)
     rank = [r]
     while parent_id and parent_id != CELLULAR_ORGANISMS_ID and parent_id != ROOT_ID:
         lineage.append(parent_id)
         parent_id, r = node_dict.get(parent_id)
         rank.append(r)
-    return lineage[::-1], rank[::-1]  # reverse the order so they start with highest node
+
+    # reverse the order so they start with highest node
+    memoized_lineage[leaf] = lineage[::-1]
+    memoized_rank[leaf] = rank[::-1]
+    return memoized_lineage[leaf], memoized_rank[leaf]
 
 
 def build_lineage_matrix(node_dict, placements, taxa_list=(), full_taxa=False):
@@ -134,7 +147,6 @@ def build_lineage_matrix(node_dict, placements, taxa_list=(), full_taxa=False):
     lineage_matrix = []
     for leaf in leaf_list:
         lineage, rank = get_lineage(node_dict, leaf)
-        depth = len(lineage)
         if full_taxa:
             lineage_matrix.append(lineage)
         else:
@@ -142,6 +154,7 @@ def build_lineage_matrix(node_dict, placements, taxa_list=(), full_taxa=False):
                 taxa = _get_specific_taxonomy_levels(taxa_list, lineage, rank)
             else:
                 taxa = _get_top_three_and_lowest_levels(lineage)
+            depth = len(lineage)
             lineage_matrix.append([depth] + taxa)
     return lineage_matrix
 

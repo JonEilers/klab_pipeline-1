@@ -23,17 +23,24 @@ def transpose_name_dict(name_dict):
     return tnd
 
 
-def filter_jplace_files(files, output_dir, filter_names, node_dict=None, name_dict=None):
+def filter_jplace_files(files, output_dir, filter_items, node_dict=None, name_dict=None):
     if not node_dict:  # way for tests to inject the information
         node_dict, name_dict, merged_dict, deleted_list = create_taxonomy_data_structures()  # pragma nocover
     t_name_dict = transpose_name_dict(name_dict)
 
     filter_taxa = []
-    for i in filter_names:
-        if i.lower() in t_name_dict:
-            filter_taxa.append(t_name_dict[i.lower()])
-        else:
-            raise ValueError('"%s" is not a NCBI taxa name' % i)
+    for i in filter_items:
+        try:
+            item = int(i)
+            if item in name_dict:
+                filter_taxa.append(item)
+            else:
+                raise RuntimeError('%d is not a NCBI taxa id' % item)
+        except ValueError:
+            if i.lower() in t_name_dict:
+                filter_taxa.append(t_name_dict[i.lower()])
+            else:
+                raise RuntimeError('"%s" is not a NCBI taxa name' % i)
 
     for path in files:
         contents = get_json_contents(path)
@@ -64,7 +71,9 @@ def filter_jplace_files(files, output_dir, filter_names, node_dict=None, name_di
 if __name__ == '__main__':  # pragma nocover
     parser = argparse.ArgumentParser(description='Remove certain placements from jplace files.')
     parser.add_argument('-directory', help='directory with original jplace files', required=True)
-    parser.add_argument('-taxa', help='quote-enclosed comma-separated list of undesired NCBI taxa names', required=True)
+    parser.add_argument('-taxa', help='quote-enclosed comma-separated list of undesired NCBI taxa names or ids'
+                                      ' ex: "Bacteria,10239" (id for Viruses superkingdom)',
+                        required=True)
     parser.add_argument('-out_dir', help='output directory for filtered jplace files', required=True)
     args = parser.parse_args()
 
@@ -82,4 +91,4 @@ if __name__ == '__main__':  # pragma nocover
 
     t = [x.strip() for x in args.taxa.split(',')]
 
-    filter_jplace_files(files=jplace_files, output_dir=args.out_dir, filter_names=t)
+    filter_jplace_files(files=jplace_files, output_dir=args.out_dir, filter_items=t)

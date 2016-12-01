@@ -39,21 +39,26 @@ def filter_jplace_files(files, output_dir, filter_names, node_dict=None, name_di
         contents = get_json_contents(path)
         if contents and contents['placements'] != []:
             file_name = os.path.basename(path)
+            classification_index = contents['fields'].index('classification')  # find the taxa_id column
             filtered_items = []
             items = contents['placements']
             for item in items:
-                taxa_id = item['p'][0][2]  # pull the best placement[0] taxa_id[2]
+                taxa_id = int(item['p'][0][classification_index])  # pull the best placement[0] taxa_id
                 lineage, rank = get_lineage(node_dict, taxa_id)
                 # if nothing in the lineage matches anything in the filter list then keep it
                 if len(numpy.intersect1d(lineage, filter_taxa, assume_unique=True)) == 0:
                     filtered_items.append(item)
-            if len(items) == len(filtered_items):
-                print('%s is unchanged' % file_name)  # pragma nocover
+            if len(filtered_items) == 0:
+                print('Removed all placements from %s. Not creating empty copy.' % file_name)  # pragma nocover
             else:
-                print('Removed %d placements from %s' % (len(items) - len(filtered_items), file_name))  # pragma nocover
-            contents['placements'] = filtered_items
-            with open(os.path.join(output_dir, file_name), 'w') as outfile:
-                json.dump(contents, outfile, indent=1, separators=(',', ':'))
+                if len(items) == len(filtered_items):
+                    print('%s is unchanged' % file_name)  # pragma nocover
+                else:
+                    print('Removed %d of %d placements from %s' %
+                          (len(items) - len(filtered_items), len(items), file_name))  # pragma nocover
+                    contents['placements'] = filtered_items
+                with open(os.path.join(output_dir, file_name), 'w') as outfile:
+                    json.dump(contents, outfile, indent=1, separators=(',', ':'))
 
 
 if __name__ == '__main__':  # pragma nocover
